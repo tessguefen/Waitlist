@@ -10,12 +10,12 @@ function Waitlist_Load_Query( filter, sort, offset, count, callback, delegator )
 								delegator );
 }
 
-function Waitlist_Batchlist_Delete( time_added, email, callback, delegator ) {
+function Waitlist_Batchlist_Delete( id, callback, delegator ) {
 	return AJAX_Call_Module(	callback,
 								'admin',
 								'TGWaitlist',
 								'Waitlist_Delete',
-								'time_added=' + encodeURIComponent( time_added ) + '&email=' + encodeURIComponent( email ),
+								'Waitlist_ID=' + encodeURIComponent( id ),
 								delegator );
 }
 
