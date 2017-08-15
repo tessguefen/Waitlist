@@ -1,8 +1,8 @@
 function Waitlist_Batchlist() {
 	var self = this;
-	MMBatchList.call( this, 'Waitlist_Batchlist' );
+	MMBatchList.call( this, 'jsWaitlist_Batchlist' );
 	this.Feature_SearchBar_SetPlaceholderText( 'Search Waitlists...' );
-	this.SetDefaultSort( 'id', '-' );
+	this.SetDefaultSort( 'time_added', '-' );
 	this.Feature_Delete_Enable('Delete Waitlist(s)');
 	this.Feature_RowDoubleClick_Enable();
 	this.processingdialog = new ProcessingDialog();
@@ -16,18 +16,19 @@ Waitlist_Batchlist.prototype.onLoad = Waitlist_Load_Query;
 Waitlist_Batchlist.prototype.onCreateRootColumnList = function() {
 	var columnlist =
 	[
+		new MMBatchList_Column_Name( 'Waitlist ID', 'id', 'id')
+		.SetAdvancedSearchEnabled(false)
+		.SetDisplayInMenu(false)
+		.SetDisplayInList(false)
+		.SetAdvancedSearchEnabled(false),
 		new MMBatchList_Column_DateTime( 'Date Added', 'time_added', 'time_added'),
 		new MMBatchList_Column_Name( 'Email', 'email', 'email'),
 		new MMBatchList_Column_Name( 'Product Code', 'product_code', 'product_code'),
 		new MMBatchList_Column_Name( 'Variant Code', 'variant_code', 'variant_code'),
 		new MMBatchList_Column_Name( 'Product ID', 'product_id', 'product_id')
-		new MMBatchList_Column_Name( 'Waitlist ID', 'id', 'id')
-		.SetAdvancedSearchEnabled(false)
 		.SetDisplayInMenu(false)
-		.SetDisplayInList(false),
-		.SetAdvancedSearchEnabled(false)
-		.SetDisplayInMenu(false)
-		.SetDisplayInList(false),
+		.SetDisplayInList(false)
+		.SetAdvancedSearchEnabled(false),
 		new MMBatchList_Column_Name( 'Variant ID', 'variant_id ', 'variant_id ')
 		.SetAdvancedSearchEnabled(false)
 		.SetDisplayInMenu(false)
@@ -37,7 +38,7 @@ Waitlist_Batchlist.prototype.onCreateRootColumnList = function() {
 }
 
 Waitlist_Batchlist.prototype.onDelete = function( item, callback, delegator ) {
-	Waitlist_Batchlist_Delete( item.record.id callback, delegator );
+	Waitlist_Batchlist_Delete( item.record.id, callback, delegator );
 }
 
 Waitlist_Batchlist.prototype.triggerEmails = function() {

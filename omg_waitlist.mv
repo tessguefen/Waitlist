@@ -110,8 +110,7 @@
 <MvFUNCTION NAME = "Module_System_Content" PARAMETERS = "module var, tab, load_fields" STANDARDOUTPUTLEVEL = "text, html, compresswhitespace">
 	<MvIF EXPR = "{ l.tab EQ 'TGWaitlist'}">
 		<MvEVAL EXPR = "{ [ g.Module_Admin ].Element_MMBatchList_HTML() }">
-		<div id="Waitlist_Batchlist"></div>
-		<MvFUNCTIONRETURN VALUE = 1>
+		<div id="jsWaitlist_Batchlist"></div>
 	</MvIF>
 	<MvFUNCTIONRETURN VALUE = 1>
 </MvFUNCTION>
@@ -125,7 +124,6 @@
 		<script language="JavaScript">
 			MMScreen_LoadFinished( function() { new Waitlist_Batchlist(); } );
 		</script>
-		<MvFUNCTIONRETURN VALUE = 1>
 	</MvIF>
 	<MvFUNCTIONRETURN VALUE = 1>
 </MvFUNCTION>
@@ -162,7 +160,7 @@
 | Client Side Feature (clienside)
 | ============================
 </MvCOMMENT>
-<MvFUNCTION NAME = "Module_Clientside" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = "html, text" ERROROUTPUTLEVEL = "">
+<MvFUNCTION NAME = "Module_Clientside" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = "text,compresswhitespace" ERROROUTPUTLEVEL = "">
 	<MvIF EXPR = "{ g.Filename EQ 'Waitlist_Batchlist.js' }">
 		<MvINCLUDE FILE = "js/Waitlist_Batchlist.js">
 	</MvIF>
