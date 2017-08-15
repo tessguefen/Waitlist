@@ -2,7 +2,7 @@ function Waitlist_Batchlist() {
 	var self = this;
 	MMBatchList.call( this, 'jsWaitlist_Batchlist' );
 	this.Feature_SearchBar_SetPlaceholderText( 'Search Waitlists...' );
-	this.SetDefaultSort( 'time_added', '-' );
+	this.SetDefaultSort( 'id', '-' );
 	this.Feature_Delete_Enable('Delete Waitlist(s)');
 	this.Feature_RowDoubleClick_Enable();
 	this.processingdialog = new ProcessingDialog();
@@ -52,7 +52,7 @@ Waitlist_Batchlist.prototype.triggerEmails = function() {
 			continue;
 		}
 
-		list.push( item.record.time_added );
+		list.push( item.record.id );
 	}
 
 	this.processingdialog.Show( 'Triggering Emails...' );
