@@ -1,2 +1,2 @@
 # Waitlist
-## In Progress
+In Progress
