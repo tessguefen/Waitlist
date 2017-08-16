@@ -34,7 +34,6 @@
 	<MvASSIGN NAME = "l.waitlist_email_page:ui_id"		VALUE = "0">
 	<MvASSIGN NAME = "l.waitlist_email_page:settings"	VALUE = "">
 	<MvCAPTURE VARIABLE = "l.waitlist_email_page:data">
-		<MIVA STANDARDOUTPUTLEVEL = "">
 		<MvINCLUDE FILE = "templates/WatilistEmailTemplate.txt" INTERPRET = "OFF">
 	</MvCAPTURE>
 
@@ -95,6 +94,7 @@
 </MvCOMMENT>
 
 <MvFUNCTION NAME = "Module_Notify_Product_Delete" PARAMETERS = "module var, product var" STANDARDOUTPUTLEVEL = "compresswhitespace" ERROROUTPUTLEVEL = "">
+	<MvASSIGN NAME = "l.success" VALUE = "{ Waitlist_Delete_Product( l.product:id ) }">
 	<MvFUNCTIONRETURN VALUE = 1>
 </MvFUNCTION>
 
@@ -116,6 +116,9 @@
 </MvCOMMENT>
 
 <MvFUNCTION NAME = "SystemModule_Action" PARAMETERS = "module var, action" STANDARDOUTPUTLEVEL = "compresswhitespace">
+	<MvIF EXPR = "{ 'WaitlistAdd' CIN l.action }">
+		<MvASSIGN NAME = "l.success" VALUE = "{ Waitlist_Form_Add( g.Waitlist_Product_Code, g.Waitlist_Variant_ID, g.Waitlist_Email ) }">
+	</MvIF>
 	<MvFUNCTIONRETURN VALUE = 1>
 </MvFUNCTION>
 
@@ -212,6 +215,8 @@
 |		Waitlist_Trigger_Email_Lowlevel( waitlist var )
 |		Waitlist_Product_Check( product_id, variant_id, waitlist var )
 |		Read_Variant_Options( options var )
+|		Waitlist_Delete_Product( product_id )
+|		Waitlist_Form_Add( product_code, variant_id, email )
 |
 |	JSON/ Batchlist Functions
 |		JSON_Waitlist_All_Load_Query( module var )
@@ -539,6 +544,28 @@
 		</MvIF>
 	</MvFOREACH>
 	<MvFUNCTIONRETURN VALUE = "{ l.options }" />
+</MvFUNCTION>
+
+<MvFUNCTION NAME = "Waitlist_Delete_Product" PARAMETERS = "product_id" STANDARDOUTPUTLEVEL = "">
+	<MvQUERY NAME 	= "Merchant"
+			 QUERY 	= "{ 'DELETE FROM ' $ g.Store_Table_Prefix $ 'TGWaitlist WHERE product_id = ?' }"
+			 FIELDS = "l.product_id">
+	<MvIF EXPR = "{ g.MvQUERY_Error }">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-DELETE-2000:', g.MvQUERY_Error ) }">
+	</MvIF>
+	<MvFUNCTIONRETURN VALUE = 1>
+</MvFUNCTION>
+
+<MvFUNCTION NAME = "Waitlist_Form_Add" PARAMETERS = "product_code, variant_id, email" STANDARDOUTPUTLEVEL = "">
+	<MvIF EXPR = "{ NOT [ g.Module_Library_DB ].Product_Load_Code( l.product_code, l.product ) }">
+		<MvASSIGN NAME = "g.Waitlist_Error" VALUE = "{ l.product_code $ ' does not exist.' }">
+		<MvFUNCTIONRETURN VALUE = 0 />
+	</MvIF>
+	<MvIF EXPR = "{ NOT Waitlist_Add( l.product:id, l.variant_id, l.email ) }">
+		<MvFUNCTIONRETURN VALUE = 0 />
+	</MvIF>
+	<MvASSIGN NAME = "g.Waitlist_Message" VALUE = "Success!" />
+	<MvFUNCTIONRETURN VALUE = 1 />
 </MvFUNCTION>
 
 <MvFUNCTION NAME = "JSON_Waitlist_All_Load_Query" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = "text, html, compresswhitespace">
