@@ -172,11 +172,13 @@
 <MvCOMMENT>
 |
 |	Custom Functions
+|		Waitlist_Load_ID( waitlist_id, waitlist var )
 |		Waitlist_Add_Lowlevel( timestamp, product_id, variant_id, email, cust_id )
 |		WaitlistXCheck( product_id, variant_id, email, cust_id )
 |		Waitlist_Add( product_id, variant_id, email )
 |		Waitlist_Delete( time_added, email )
 |		Waitlist_Trigger_Email( waitlist )
+|		Read_Variant_Options( options var )
 |
 |	JSON/ Batchlist Functions
 |		JSON_Waitlist_All_Load_Query( module var )
@@ -184,6 +186,40 @@
 |		JSON_Waitlist_Trigger_Emails( waitlists )
 |
 </MvCOMMENT>
+
+<MvFUNCTION NAME = "Waitlist_Load_ID" PARAMETERS = "waitlist_id, waitlist var" STANDARDOUTPUTLEVEL = "">
+	<MvASSIGN NAME = "l.waitlist_id" VALUE = "{ trim( l.waitlist_id ) }">
+
+	<MvIF EXPR = "{ ( l.waitlist_id EQ 0 ) OR ( ISNULL l.waitlist_id ) }">
+		<MvASSIGN NAME = "g.Waitlist_Error" VALUE = "Missing Waitlist ID.">
+		<MvFUNCTIONRETURN VALUE = 0 />
+	</MvIF>
+
+
+	<MvOPENVIEW NAME	= "Merchant"
+				VIEW 	= "WaitlistLoad"
+				QUERY 	= "{ 'SELECT * FROM ' $ g.Store_Table_Prefix $ 'TGWaitlist WHERE id = ? ' }"
+				FIELDS	= "l.waitlist_id">
+
+	<MvIF EXPR = "{ g.MvOPENVIEW_Error }">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-CHECK-1001:', 'An error occured while checking a record. Error:' $ g.MvQUERY_Error ) }">
+	</MvIF>
+
+	<MvASSIGN NAME = "l.waitlist" MEMBER = "id"				VALUE = "{ WaitlistLoad.d.id }">
+	<MvASSIGN NAME = "l.waitlist" MEMBER = "time_added"		VALUE = "{ WaitlistLoad.d.time_added }">
+	<MvASSIGN NAME = "l.waitlist" MEMBER = "product_id"		VALUE = "{ WaitlistLoad.d.product_id }">
+	<MvASSIGN NAME = "l.waitlist" MEMBER = "variant_id"		VALUE = "{ WaitlistLoad.d.variant_id }">
+	<MvASSIGN NAME = "l.waitlist" MEMBER = "email"			VALUE = "{ WaitlistLoad.d.email }">
+	<MvASSIGN NAME = "l.waitlist" MEMBER = "cust_id" 		VALUE = "{ WaitlistLoad.d.cust_id }">
+
+	<MvCLOSEVIEW NAME = "Merchant" VIEW = "WaitlistLoad">
+
+	<MvIF EXPR = "{ l.waitlist:id GT 0 }">
+		<MvFUNCTIONRETURN VALUE = 1>
+	</MvIF>
+
+	<MvFUNCTIONRETURN VALUE = 0 />
+</MvFUNCTION>
 
 <MvFUNCTION NAME = "Waitlist_Add_Lowlevel" PARAMETERS = "timestamp, product_id, variant_id, email, cust_id" STANDARDOUTPUTLEVEL = "">
 	<MvASSIGN NAME = "l.timestamp"		VALUE = "{ trim( l.timestamp ) }">
@@ -302,11 +338,80 @@
 </MvFUNCTION>
 
 <MvFUNCTION NAME = "Waitlist_Trigger_Email" PARAMETERS = "waitlist_id" STANDARDOUTPUTLEVEL = "">
-	<MvCOMMENT> <!-- Add Code for email here. --> </MvCOMMENT>
-	<MvIF EXPR = "{ NOT Waitlist_Delete( l.waitlist_id ) }">
+	<MvIF EXPR = "{ NOT Waitlist_Load_ID( l.waitlist_id, l.waitlist ) }">
 		<MvFUNCTIONRETURN VALUE = 0 />
 	</MvIF>
+
+	<MvIF EXPR = "{ NOT [ g.Module_Library_DB ].Product_Load_ID( l.waitlist:product_id, l.waitlist:product ) }">
+		<MvFUNCTIONRETURN VALUE = 0 />
+	</MvIF>
+
+	<MvASSIGN NAME = "l.continue" VALUE = "0" />
+
+	<MvIF EXPR = "{ l.waitlist:variant_id GT 0 }">
+		<MvDO FILE = "{ g.Module_Feature_INV_RT }" NAME = "l.continue" VALUE = "{ Inventory_Is_Available_Variant( l.waitlist:product, l.waitlist:variant_id, 1) }">
+		<MvIF EXPR = "{ [ g.Module_Library_DB ].ProductVariantPartList_Load_Variant( l.waitlist:product:id,  l.waitlist:variant_id, l.waitlist:variants  ) }">
+			<MvFOREACH ITERATOR = "l.variant" ARRAY = "l.waitlist:variants">
+				<MvDO FILE = "{ g.Module_Library_DB }" NAME = "l.success" VALUE = "{ Product_Load_ID( l.variant:part_id, l.variant:product ) }">
+			</MvFOREACH>
+		</MvIF>
+		<MvIF EXPR = "{ [ g.Module_Library_DB ].ProductVariantList_Load_Variant( l.waitlist:product:id, l.waitlist:variant_id, l.waitlist:options ) }">
+			<MvASSIGN NAME = "l.success" VALUE = "{ Read_Variant_Options( l.waitlist:options ) }">
+		</MvIF>
+	<MvELSE>
+		<MvDO FILE = "{ g.Module_Feature_INV_RT }" NAME = "l.continue" VALUE = "{ Inventory_Check_Available( l.waitlist:product, 1) }">
+	</MvIF>
+
+	<MvIF EXPR = "{ l.continue LE 0 }">
+		<MvFUNCTIONRETURN VALUE = 0 />
+	</MvIF>
+
+	<MvDO FILE = "{ g.Module_Feature_TUI_DB }" NAME = "l.loaded" VALUE = "{ Page_Load_Code( 'WatilistEmailTemplate', l.page) }">
+
+	<MvIF EXPR = "{ [ g.Module_Feature_TUI_DB ].ManagedTemplate_Load_ID( l.page:templ_id, l.waitlist_email_template ) }">
+
+		<MvASSIGN NAME = "l.all_settings:waitlist" VALUE = "{ l.waitlist }">
+
+		<MvCAPTURE VARIABLE = "l.message">
+			<MvDO FILE = "{ g.Store_Template_Path $ l.waitlist_email_template:filename }" NAME = "l.success" VALUE = "{ Template_Render( l.settings, l.all_settings ) }">
+		</MvCAPTURE>
+
+		<MvASSIGN NAME ="l.email_headers" VALUE = "{ 'Content-Type: text/html; charset=ISO-8859-1' $ asciichar( 13 ) $ asciichar( 10 ) $ asciichar( 13 ) $ asciichar( 10 ) }">
+
+		<MvASSIGN NAME = "l.subject" VALUE = "Default Waitlist Subject">
+		<MvIF EXPR = "{ g.Email_Subject }">
+			<MvASSIGN NAME = "l.subject" VALUE = "{ g.Email_Subject }">
+		</MvIF>
+
+		<MvASSIGN NAME = "l.from" VALUE = "{ g.Store:Email }">
+		<MvIF EXPR = "{ g.Email_From }">
+			<MvASSIGN NAME = "l.from" VALUE = "{ g.Email_From }">
+		</MvIF>
+
+		<MvDO FILE = "{ g.Module_Library_Utilities }" NAME = "l.email_sent"  VALUE = "{ SendEmail( l.waitlist:email, l.from, '', l.subject, l.email_headers, l.message) }">
+	</MvIF>
+	<MvIF EXPR = "{ l.email_sent }">
+		<MvIF EXPR = "{ NOT Waitlist_Delete( l.waitlist_id ) }">
+			<MvFUNCTIONRETURN VALUE = 0 />
+		</MvIF>
+	</MvIF>
+
 	<MvFUNCTIONRETURN VALUE = 1 />
+</MvFUNCTION>
+
+<MvFUNCTION NAME = "Read_Variant_Options" PARAMETERS = "options var" STANDARDOUTPUTLEVEL = "">
+	<MvFOREACH ITERATOR = "l.option" ARRAY = "l.options" INDEX = "l.options_index">
+		<MvIF EXPR = "{ l.option:attmpat_id GT 0 }">
+			<MvDO FILE = "{ g.Module_Library_DB }"		NAME = "l.success" VALUE = "{ Attribute_Load_ID( l.option:attr_id, l.option:attribute ) }">
+			<MvDO FILE = "{ g.Module_Feature_ATT_DB }"	NAME = "l.success" VALUE = "{ AttributeTemplateAttr_Load_ID( l.option:attmpat_id, l.option:product_attribute ) }">
+			<MvDO FILE = "{ g.Module_Feature_ATT_DB }"	NAME = "l.success" VALUE = "{ AttributeTemplate_Load_ID( l.option:attribute:attemp_id, l.option:attributetemplate ) }">
+			<MvDO FILE = "{ g.Module_Feature_ATT_DB }"	NAME = "l.success" VALUE = "{ AttributeTemplateOption_Load_ID( l.option:option_id, l.option:option ) }">
+		<MvELSE>
+			<MvDO FILE = "{ g.Module_Library_DB }" NAME = "l.success" VALUE = "{ Attribute_Load_ID( l.option:attr_id, l.option:attribute ) }">
+			<MvDO FILE = "{ g.Module_Library_DB }" NAME = "l.success" VALUE = "{ Option_Load_ID( l.option:option_id, l.option:option ) }">
+		</MvIF>
+	</MvFOREACH>
+	<MvFUNCTIONRETURN VALUE = "{ l.options }" />
 </MvFUNCTION>
 
 <MvFUNCTION NAME = "JSON_Waitlist_All_Load_Query" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = "text, html, compresswhitespace">
@@ -375,9 +480,7 @@
 
 <MvFUNCTION NAME = "JSON_Waitlist_Trigger_Emails" PARAMETERS = "waitlists" STANDARDOUTPUTLEVEL = "">
 	<MvFOREACH ITERATOR = "l.waitlist_id" ARRAY = "l.waitlist_array" COUNT = "{ [ g.Module_JSON ].JSON_Array_Integer( l.waitlists, l.waitlist_array ) }">
-		<MvIF EXPR = "{ NOT Waitlist_Trigger_Email( l.waitlist_id ) }">
-			<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error( g.Error_Code, g.Error_Message ) }">
-		</MvIF>
+		<MvASSIGN NAME = "l.success" VALUE = "{ Waitlist_Trigger_Email( l.waitlist_id ) }">
 	</MvFOREACH>
 	<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Success() }">
 </MvFUNCTION>
