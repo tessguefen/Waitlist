@@ -342,7 +342,129 @@
 		<MvFUNCTIONRETURN VALUE = 0 />
 	</MvIF>
 
-	<MvIF EXPR = "{ NOT [ g.Module_Library_DB ].Product_Load_ID( l.waitlist:product_id, l.waitlist:product ) }">
+	<MvIF EXPR = "{ NOT Waitlist_Product_Check( l.waitlist:product_id, l.waitlist:variant_id, l.waitlist) }">
+		<MvFUNCTIONRETURN VALUE = 0 />
+	</MvIF>
+
+	<MvDO FILE = "{ g.Module_Library_Utilities }" NAME = "l.waitlist:formatted_date" VALUE = "{ Format_Date( l.waitlist:time_added, s.miva_language ) }">
+
+	<MvFUNCTIONRETURN VALUE = "{ Waitlist_Trigger_Email_Lowlevel( l.waitlist ) }" />
+</MvFUNCTION>
+
+<MvFUNCTION NAME = "Waitlist_Trigger_Emails" PARAMETERS = "product_id, variant_id" STANDARDOUTPUTLEVEL = "">
+	<MvIF EXPR = "{ NOT Waitlist_Product_Check( l.product_id, l.variant_id, l.waitlist) }">
+		<MvFUNCTIONRETURN VALUE = 0 />
+	</MvIF>
+
+	<MvOPENVIEW NAME	= "Merchant"
+				VIEW 	= "WaitlistXLoadIDs"
+				QUERY 	= "{ 'SELECT * FROM ' $ g.Store_Table_Prefix $ 'TGWaitlist WHERE product_id = ? AND variant_id = ?' }"
+				FIELDS	= "l.waitlist:product_id, l.waitlist:variant_id">
+
+	<MvIF EXPR = "{ g.MvOPENVIEW_Error }">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-CHECK-1003:', 'An error occured while checking a record. Error:' $ g.MvQUERY_Error ) }">
+	</MvIF>
+
+	<MvASSIGN NAME = "g.WatilistCount" VALUE = "0">
+
+	<MvWHILE EXPR = "{ ( NOT WaitlistXLoadIDs.d.EOF ) AND ( ( g.WatilistCount EQ 0 ) OR (l.waitlist_num LT ( g.WatilistCount + 1) ) ) }">
+
+		<MvASSIGN NAME = "l.waitlist" MEMBER = "id"				VALUE = "{ WaitlistXLoadIDs.d.id }">
+		<MvASSIGN NAME = "l.waitlist" MEMBER = "time_added"		VALUE = "{ WaitlistXLoadIDs.d.time_added }">
+		<MvASSIGN NAME = "l.waitlist" MEMBER = "email"			VALUE = "{ WaitlistXLoadIDs.d.email }">
+		<MvASSIGN NAME = "l.waitlist" MEMBER = "cust_id" 		VALUE = "{ WaitlistXLoadIDs.d.cust_id }">
+
+		<MvDO FILE = "{ g.Module_Library_Utilities }" NAME = "l.waitlist:formatted_date" VALUE = "{ Format_Date( l.waitlist:time_added, s.miva_language ) }">
+	
+		<MvASSIGN NAME = "l.success" VALUE = "{ Waitlist_Trigger_Email_Lowlevel( l.waitlist ) }">
+
+		<MvASSIGN NAME = "l.waitlist_num"	VALUE = "{ l.waitlist_num + 1 }">
+
+		<MvSKIP NAME = "Merchant" VIEW = "WaitlistXLoadIDs" ROWS = 1>
+
+	</MvWHILE>
+
+	<MvCLOSEVIEW NAME = "Merchant" VIEW = "WaitlistXLoadIDs">
+
+	<MvFUNCTIONRETURN VALUE = 1>
+</MvFUNCTION>
+
+<MvFUNCTION NAME = "Waitlist_Trigger_Email_Lowlevel" PARAMETERS = "waitlist var" STANDARDOUTPUTLEVEL = "">
+	<MvIF EXPR = "{ NOT Waitlist_Load_ID( l.waitlist:id, l.temp ) }">
+		<MvFUNCTIONRETURN VALUE = 0 />
+	</MvIF>
+
+	<MvDO FILE = "{ g.Module_Feature_TUI_DB }" NAME = "l.loaded" VALUE = "{ Page_Load_Code( 'WatilistEmailTemplate', l.page) }">
+
+	<MvIF EXPR = "{ [ g.Module_Feature_TUI_DB ].ManagedTemplate_Load_ID( l.page:templ_id, l.waitlist_email_template ) }">
+
+		<MvCOMMENT>
+		|
+		| Load and initialize items
+		|
+		</MvCOMMENT>
+
+		<MvASSIGN NAME = "l.item_pos"			VALUE = 1>
+		<MvASSIGN NAME = "l.item_count"			VALUE = "{ [ g.Module_Feature_TUI_DB ].ItemModuleList_Load_Page_Render( l.page:id,			l.page:settings:_mgr ) }">
+		<MvASSIGN NAME = "l.extension_count"	VALUE = "{ [ g.Module_Feature_TUI_DB ].ItemExtensionModuleList_Load_Page_Render( l.page:id,	l.page:settings:_mgr ) }">
+
+		<MvWHILE EXPR = "{ l.item_pos LE l.item_count }">
+			<MvIF EXPR = "{ NOT [ g.Module_Feature_TUI_MGR ].TemplateManager_Initialize_Item_LowLevel( l.page:settings, l.page:settings:_mgr:items[ l.item_pos ] ) }">
+				<MvFUNCTIONRETURN VALUE = 0>
+			</MvIF>
+
+			<MvIF EXPR = "{ g.TemplateManager_Exception }">
+				<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-ERROR-1000', 'Item \'' $ l.page:settings:_mgr:items[ l.item_pos ]:item_code $ '\' threw exception \'' $ g.TemplateManager_Exception_Code $ '\' during initialization' ) }">
+			</MvIF>
+
+			<MvASSIGN NAME = "l.item_pos"	VALUE = "{ l.item_pos + 1 }">
+		</MvWHILE>
+		<MvASSIGN NAME = "l.all_settings" VALUE = "{ l.page:settings }">
+		<MvASSIGN NAME = "l.all_settings:waitlist" VALUE = "{ l.waitlist }">
+
+		<MvCAPTURE VARIABLE = "l.message">
+			<MvDO FILE = "{ g.Store_Template_Path $ l.waitlist_email_template:filename }" NAME = "l.success" VALUE = "{ Template_Render( l.settings, l.all_settings ) }">
+		</MvCAPTURE>
+
+		<MvASSIGN NAME ="l.email_headers" VALUE = "{ 'Content-Type: text/html; charset=ISO-8859-1' $ asciichar( 13 ) $ asciichar( 10 ) $ asciichar( 13 ) $ asciichar( 10 ) }">
+
+		<MvASSIGN NAME = "l.subject" VALUE = "Default Waitlist Subject">
+		<MvIF EXPR = "{ g.Email_Subject }">
+			<MvASSIGN NAME = "l.subject" VALUE = "{ g.Email_Subject }">
+		</MvIF>
+
+		<MvASSIGN NAME = "l.from" VALUE = "{ g.Store:Email }">
+		<MvIF EXPR = "{ g.Email_From }">
+			<MvASSIGN NAME = "l.from" VALUE = "{ g.Email_From }">
+		</MvIF>
+
+		<MvDO FILE = "{ g.Module_Library_Utilities }" NAME = "l.email_sent"  VALUE = "{ SendEmail( l.waitlist:email, l.from, '', l.subject, l.email_headers, l.message) }">
+	</MvIF>
+
+	<MvIF EXPR = "{ l.email_sent }">
+		<MvASSIGN NAME = "l.success" VALUE = "{ [ g.Module_Admin ].Admin_Log_Action( 'TGWaitlist-SUCCESS-1000', 'Waitlist Email triggered to' $ l.waitlist:email ) }">
+		<MvIF EXPR = "{ NOT Waitlist_Delete( l.waitlist:id ) }">
+			<MvFUNCTIONRETURN VALUE = 0 />
+		</MvIF>
+	</MvIF>
+
+	<MvFUNCTIONRETURN VALUE = 1 />
+</MvFUNCTION>
+
+<MvFUNCTION NAME = "Waitlist_Product_Check" PARAMETERS = "product_id, variant_id, waitlist var" STANDARDOUTPUTLEVEL = "">
+	<MvIF EXPR = "{ ISNULL l.product_id OR l.product_id EQ 0 }">
+			<MvFUNCTIONRETURN VALUE = 0>
+	</MvIF>
+
+	<MvIF EXPR = "{ ISNULL l.variant_id }">
+		<MvASSIGN NAME = "l.variant_id" VALUE = "0">
+	</MvIF>
+
+	<MvASSIGN NAME = "l.waitlist:product_id" VALUE = "{ l.product_id }">
+	<MvASSIGN NAME = "l.waitlist:variant_id" VALUE = "{ l.variant_id }">
+
+
+	<MvIF EXPR = "{ NOT [ g.Module_Library_DB ].Product_Load_ID( l.product_id, l.waitlist:product ) }">
 		<MvFUNCTIONRETURN VALUE = 0 />
 	</MvIF>
 
@@ -365,40 +487,8 @@
 	<MvIF EXPR = "{ l.continue LE 0 }">
 		<MvFUNCTIONRETURN VALUE = 0 />
 	</MvIF>
-
-	<MvDO FILE = "{ g.Module_Feature_TUI_DB }" NAME = "l.loaded" VALUE = "{ Page_Load_Code( 'WatilistEmailTemplate', l.page) }">
-
-	<MvIF EXPR = "{ [ g.Module_Feature_TUI_DB ].ManagedTemplate_Load_ID( l.page:templ_id, l.waitlist_email_template ) }">
-
-		<MvASSIGN NAME = "l.all_settings:waitlist" VALUE = "{ l.waitlist }">
-
-		<MvCAPTURE VARIABLE = "l.message">
-			<MvDO FILE = "{ g.Store_Template_Path $ l.waitlist_email_template:filename }" NAME = "l.success" VALUE = "{ Template_Render( l.settings, l.all_settings ) }">
-		</MvCAPTURE>
-
-		<MvASSIGN NAME ="l.email_headers" VALUE = "{ 'Content-Type: text/html; charset=ISO-8859-1' $ asciichar( 13 ) $ asciichar( 10 ) $ asciichar( 13 ) $ asciichar( 10 ) }">
-
-		<MvASSIGN NAME = "l.subject" VALUE = "Default Waitlist Subject">
-		<MvIF EXPR = "{ g.Email_Subject }">
-			<MvASSIGN NAME = "l.subject" VALUE = "{ g.Email_Subject }">
-		</MvIF>
-
-		<MvASSIGN NAME = "l.from" VALUE = "{ g.Store:Email }">
-		<MvIF EXPR = "{ g.Email_From }">
-			<MvASSIGN NAME = "l.from" VALUE = "{ g.Email_From }">
-		</MvIF>
-
-		<MvDO FILE = "{ g.Module_Library_Utilities }" NAME = "l.email_sent"  VALUE = "{ SendEmail( l.waitlist:email, l.from, '', l.subject, l.email_headers, l.message) }">
-	</MvIF>
-	<MvIF EXPR = "{ l.email_sent }">
-		<MvIF EXPR = "{ NOT Waitlist_Delete( l.waitlist_id ) }">
-			<MvFUNCTIONRETURN VALUE = 0 />
-		</MvIF>
-	</MvIF>
-
 	<MvFUNCTIONRETURN VALUE = 1 />
 </MvFUNCTION>
-
 <MvFUNCTION NAME = "Read_Variant_Options" PARAMETERS = "options var" STANDARDOUTPUTLEVEL = "">
 	<MvFOREACH ITERATOR = "l.option" ARRAY = "l.options" INDEX = "l.options_index">
 		<MvIF EXPR = "{ l.option:attmpat_id GT 0 }">
