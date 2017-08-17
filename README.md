@@ -10,8 +10,8 @@
 	- [x] Customization over Subject & "Email From"
 		- [x] `g.Email_Subject` & `g.Email_From` in template code will be used.
 - [x] On deletion of a product, all references of that product are removed from the Waitlist table
-- [ ] Create Function to check all waitlists for email triggers
-	- [ ] Tie this functionality to a scheduled task
+- [x] Create Function to check all waitlists for email triggers
+	- [x] Tie this functionality to a scheduled task
 - [ ] Create if statement for form (hide/ shown on PROD page)
 - [ ] Create a JSON version of form submission
 	- [ ] JSON would return success [1|0], messages
