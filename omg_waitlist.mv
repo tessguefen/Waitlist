@@ -194,7 +194,7 @@
 </MvCOMMENT>
 <MvFUNCTION NAME = "Module_Clientside" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = "text,compresswhitespace" ERROROUTPUTLEVEL = "">
 	<MvIF EXPR = "{ g.Waitlist_API EQ 1 }">
-		<MvEVAL EXPR = "{ Waitlist_API() }">
+		<MvFUNCTIONRETURN VALUE = "{ Waitlist_API() }">
 	</MvIF>
 	<MvIF EXPR = "{ g.Filename EQ 'Waitlist_Batchlist.js' }">
 		<MvINCLUDE FILE = "js/Waitlist_Batchlist.js">
@@ -839,6 +839,28 @@
 </MvFUNCTION>
 
 <MvFUNCTION NAME = "Waitlist_API" PARAMETERS = "" STANDARDOUTPUTLEVEL = "">
+	<MvIF EXPR = "{ ISNULL g.Function }">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error( 'Function', 'Missing Function' ) }">
+	</MvIF>
+	<MvCOMMENT>
+	|
+	|	Available Functions
+	|		Waitlist_Add
+	|			g.Product_Code, g.Variant_ID, g.Email		
+	|
+	</MvCOMMENT>
+	<MvIF EXPR = "{ g.Function EQ 'Waitlist_Add' }">
+		<MvIF EXPR = "{ ISNULL g.Product_Code }">
+			<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error( 'Waitlist_Add', 'Missing Product_Code' ) }">
+		</MvIF>
+		<MvIF EXPR = "{ ISNULL g.Email }">
+			<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error( 'Waitlist_Add', 'Missing Email' ) }">
+		</MvIF>
+		<MvIF EXPR = "{ NOT Waitlist_Form_Add( g.Product_Code, g.Variant_ID, g.Email ) }">
+			<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error( 'Waitlist_Add', g.Waitlist_Error ) }">
+		</MvIF>
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Success() }">
+	</MvIF>
 </MvFUNCTION>
 
 <MvFUNCTION NAME = "Waitlist_API_URL" PARAMETERS = "module var, return var" STANDARDOUTPUTLEVEL = "">

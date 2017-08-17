@@ -105,8 +105,7 @@
 															<th class="column" style="font-size:0pt; line-height:0pt; padding:0; margin:0; font-weight:normal; Margin:0" width="20">
 																<table width="100%" border="0" cellspacing="0" cellpadding="0">
 																	<tr>
-																		<td><div style="font-size:0pt; line-height:0pt;" class="mobile-br-15"></div>
-</td>
+																		<td><div style="font-size:0pt; line-height:0pt;" class="mobile-br-15"></div></td>
 																	</tr>
 																</table>
 															</th>
@@ -179,7 +178,7 @@
 																	<mvt:if expr="l.settings:waitlist:variant_id GT 0">
 																		<mvt:assign name="l.settings:waitlist:product:link" value="l.settings:waitlist:product:link $ 'variant_id=' $ l.settings:waitlist:variant_id" />
 																	</mvt:if>
-																	You requested to by added to the wailist for <strong><a href="&mvt:waitlist:product:link;">&mvt:waitlist:product:name;</a></strong> on <strong>&mvt:waitlist:formatted_date;</strong>, and it's back in stock!
+																	You requested to be added to the wailist for <strong><a href="&mvt:waitlist:product:link;">&mvt:waitlist:product:name;</a></strong> on <strong>&mvt:waitlist:formatted_date;</strong>, and it's back in stock!
 																	<mvt:assign name="l.settings:total_options" value="miva_array_elements( l.settings:waitlist:options )" />
 																	<mvt:if expr="l.settings:total_options GT 0">
 																		<mvt:assign name="l.counter" value="0" />
@@ -250,8 +249,7 @@
 																		<th class="column-top" style="font-size:0pt; line-height:0pt; padding:0; margin:0; font-weight:normal; vertical-align:top; Margin:0" valign="top" width="30">
 																			<table width="100%" border="0" cellspacing="0" cellpadding="0">
 																				<tr>
-																					<td><div style="font-size:0pt; line-height:0pt;" class="mobile-br-5"></div>
-</td>
+																					<td><div style="font-size:0pt; line-height:0pt;" class="mobile-br-5"></div></td>
 																				</tr>
 																			</table>
 																		</th>
@@ -269,8 +267,7 @@
 																		<th class="column-top" style="font-size:0pt; line-height:0pt; padding:0; margin:0; font-weight:normal; vertical-align:top; Margin:0" valign="top" width="20">
 																			<table width="100%" border="0" cellspacing="0" cellpadding="0">
 																				<tr>
-																					<td><div style="font-size:0pt; line-height:0pt;" class="mobile-br-5"></div>
-</td>
+																					<td><div style="font-size:0pt; line-height:0pt;" class="mobile-br-5"></div></td>
 																				</tr>
 																			</table>
 																		</th>
