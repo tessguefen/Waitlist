@@ -21,15 +21,89 @@
 - [ ] Look for other functionality that would be useful in this module
 
 ## Item Functionality
-- [ ] Create an item
+- [x] Create an item
 	- [ ] `Waitlist_API_URL( return var )`
 		- This will return a url for the Waitlist API
-	- [ ] `CurrentWaitlistCount( product_id, variant_id, return var )`
+	- [x] `CurrentWaitlistCount( product_id, variant_id, return var )`
 		- This will return the number of people on the waitlist
-	- [ ] `WaitlistXCustomer_Load( cust_id, return var )`
+	- [x] `WaitlistXCustomer_Load( cust_id, return var )`
 		- This will load in all waitlists a customer is currently waiting on (via cust_id)
-	- [ ] `WaitlistXEmail_Load( email, return var )`
+	- [x] `WaitlistXEmail_Load( email, return var )`
 		- This will load in all waitlists a customer is currently waiting on (via email)
+**WaitlistXCustomer_Load & WaitlistXEmail_Load will return an array of waitlists. Example members available:**
+```xml
+:cust_id
+:email
+:id
+:options:attmpat_id
+:options:attr_id
+:options:attribute:attemp_id
+:options:attribute:code
+:options:attribute:cost
+:options:attribute:default_id
+:options:attribute:disp_order
+:options:attribute:id
+:options:attribute:inventory
+:options:attribute:price
+:options:attribute:product_id
+:options:attribute:prompt
+:options:attribute:required
+:options:attribute:type
+:options:attribute:weight
+:options:dimensions
+:options:option:attr_id
+:options:option:code
+:options:option:cost
+:options:option:disp_order
+:options:option:id
+:options:option:price
+:options:option:product_id
+:options:option:prompt
+:options:option:weight
+:options:option_id
+:options:part_count
+:options:product_id
+:options:variant_id
+:product:active
+:product:agrpcount
+:product:cancat_id
+:product:catcount
+:product:code
+:product:cost
+:product:disp_order
+:product:dt_created
+:product:dt_updated
+:product:id
+:product:name
+:product:page_id
+:product:pgrpcount
+:product:price
+:product:taxable
+:product:weight
+:product_id
+:time_added
+:variant_id
+:variantspart_id
+:variants:product:active
+:variants:product:agrpcount
+:variants:product:cancat_id
+:variants:product:catcount
+:variants:product:code
+:variants:product:cost
+:variants:product:disp_order
+:variants:product:dt_created
+:variants:product:dt_updated
+:variants:product:id
+:variants:product:name
+:variants:product:page_id
+:variants:product:pgrpcount
+:variants:product:price
+:variants:product:taxable
+:variants:product:weight
+:variants:product_id
+:variants:quantity
+:variants:variant_id
+```
 
 ## Form Submission
 
