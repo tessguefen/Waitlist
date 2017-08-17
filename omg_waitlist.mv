@@ -5,7 +5,7 @@
 	<MvASSIGN NAME = "l.module:version"		VALUE = "1.000">
 	<MvASSIGN NAME = "l.module:api_ver"		VALUE = "9.03">
 	<MvASSIGN NAME = "l.module:description"	VALUE = "Do all the things! Waitlist in progress.">
-	<MvASSIGN NAME = "l.module:features"	VALUE = "system,vis_system,data_store,not_prod,json,clientside,scheduledtask">
+	<MvASSIGN NAME = "l.module:features"	VALUE = "data_store,not_prod,system,vis_system,json,clientside,scheduledtask,component">
 </MvFUNCTION>
 
 <MvCOMMENT>
@@ -193,6 +193,9 @@
 | ============================
 </MvCOMMENT>
 <MvFUNCTION NAME = "Module_Clientside" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = "text,compresswhitespace" ERROROUTPUTLEVEL = "">
+	<MvIF EXPR = "{ g.Waitlist_API EQ 1 }">
+		<MvEVAL EXPR = "{ Waitlist_API() }">
+	</MvIF>
 	<MvIF EXPR = "{ g.Filename EQ 'Waitlist_Batchlist.js' }">
 		<MvINCLUDE FILE = "js/Waitlist_Batchlist.js">
 	</MvIF>
@@ -258,6 +261,106 @@
 </MvFUNCTION>
 
 <MvCOMMENT>
+| ============================
+|	COMPONENT
+| ============================
+</MvCOMMENT>
+
+<MvFUNCTION NAME = "ComponentModule_Initialize" PARAMETERS = "module var, item, all_settings var, settings var" STANDARDOUTPUTLEVEL = "compresswhitespace">
+	<MvFUNCTIONRETURN VALUE = 1>
+</MvFUNCTION>
+
+<MvFUNCTION NAME = "ComponentModule_Render_End" PARAMETERS = "module var, item, all_settings var, settings var, param" STANDARDOUTPUTLEVEL = "compresswhitespace">
+</MvFUNCTION>
+
+<MvFUNCTION NAME = "ComponentModule_Tabs" PARAMETERS = "module var, item, settings var" STANDARDOUTPUTLEVEL = "compresswhitespace">
+</MvFUNCTION>
+
+<MvFUNCTION NAME = "ComponentModule_Validate" PARAMETERS = "module var, item, field_prefix, fields var" STANDARDOUTPUTLEVEL = "compresswhitespace">
+	<MvFUNCTIONRETURN VALUE = 1>
+</MvFUNCTION>
+
+<MvFUNCTION NAME = "ComponentModule_Update" PARAMETERS = "module var, item, field_prefix, fields var, settings var" STANDARDOUTPUTLEVEL = "compresswhitespace">
+	<MvFUNCTIONRETURN VALUE = 1>
+</MvFUNCTION>
+
+<MvFUNCTION NAME = "ComponentModule_Content" PARAMETERS = "module var, item, tab, load_fields, field_prefix, fields var, settings var" STANDARDOUTPUTLEVEL = "compresswhitespace">
+</MvFUNCTION>
+
+<MvFUNCTION NAME = "ComponentModule_Defaults" PARAMETERS = "module var, settings var" STANDARDOUTPUTLEVEL = "compresswhitespace">
+</MvFUNCTION>
+
+<MvFUNCTION NAME = "ComponentModule_Page_Assign" PARAMETERS = "module var, page var, item, settings var" STANDARDOUTPUTLEVEL = "compresswhitespace">
+	<MvFUNCTIONRETURN VALUE = 1>
+</MvFUNCTION>
+
+<MvFUNCTION NAME = "ComponentModule_Page_Unassign" PARAMETERS = "module var, page var, item, settings var" STANDARDOUTPUTLEVEL = "compresswhitespace">
+	<MvFUNCTIONRETURN VALUE = 1>
+</MvFUNCTION>
+
+<MvFUNCTION NAME = "ComponentModule_Prerender" PARAMETERS = "module var, item, all_settings var, settings var, param" STANDARDOUTPUTLEVEL = "compresswhitespace">
+</MVFUNCTION>
+
+<MvFUNCTION NAME = "ComponentModule_Render_Start" PARAMETERS = "module var, item, all_settings var, settings var, param" STANDARDOUTPUTLEVEL = "compresswhitespace">
+	<MvIF EXPR = "{ NOT Parse_Function_Parameters( l.param, l.function_name, l.parameters, l.parameter_count ) }">
+		<MvFUNCTIONRETURN VALUE = 0>
+	</MvIF>
+
+	<MvIF EXPR = "{ l.function_name EQ 'waitlist_api_url' }">
+		<MvIF EXPR = "{ l.parameter_count EQ 1 }">
+			<MvIF EXPR = "{ NOT Is_Variable( l.parameters[1] ) }">
+				<MvFUNCTIONRETURN VALUE = "{ Parameter_Error( l.param, 'The first parameter must be a variable' ) }">
+			</MvIF>
+			<MvIF EXPR = "{ NOT Waitlist_API_URL( l.module, l.return) }">
+				<MvFUNCTIONRETURN VALUE = 0>
+			</MvIF>
+			<MvASSIGN NAME = "{ l.parameters[1] }" VALUE = "{ l.return }">
+		</MvIF>
+		<MvFUNCTIONRETURN VALUE = 1>
+	</MvIF>
+
+	<MvIF EXPR = "{ l.function_name EQ 'currentwaitlistcount' }">
+		<MvIF EXPR = "{ l.parameter_count EQ 3 }">
+			<MvIF EXPR = "{ NOT Is_Variable( l.parameters[3] ) }">
+				<MvFUNCTIONRETURN VALUE = "{ Parameter_Error( l.param, 'The third parameter must be a variable' ) }">
+			</MvIF>
+			<MvIF EXPR = "{ NOT CurrentWaitlistCount( l.parameters[1], l.parameters[2], l.return) }">
+				<MvFUNCTIONRETURN VALUE = 0>
+			</MvIF>
+			<MvASSIGN NAME = "{ l.parameters[3] }" VALUE = "{ l.return }">
+		</MvIF>
+		<MvFUNCTIONRETURN VALUE = 1>
+	</MvIF>
+
+	<MvIF EXPR = "{ l.function_name EQ 'waitlistxcustomer_load' }">
+		<MvIF EXPR = "{ l.parameter_count EQ 2 }">
+			<MvIF EXPR = "{ NOT Is_Variable( l.parameters[2] ) }">
+				<MvFUNCTIONRETURN VALUE = "{ Parameter_Error( l.param, 'The Second parameter must be a variable' ) }">
+			</MvIF>
+			<MvIF EXPR = "{ NOT WaitlistXCustomer_Load( l.parameters[1], l.return ) }">
+				<MvFUNCTIONRETURN VALUE = 0>
+			</MvIF>
+			<MvASSIGN NAME = "{ l.parameters[2] }" VALUE = "{ l.return }">
+		</MvIF>
+		<MvFUNCTIONRETURN VALUE = 1>
+	</MvIF>
+
+	<MvIF EXPR = "{ l.function_name EQ 'waitlistxemail_load' }">
+		<MvIF EXPR = "{ l.parameter_count EQ 2 }">
+			<MvIF EXPR = "{ NOT Is_Variable( l.parameters[2] ) }">
+				<MvFUNCTIONRETURN VALUE = "{ Parameter_Error( l.param, 'The Second parameter must be a variable' ) }">
+			</MvIF>
+			<MvIF EXPR = "{ NOT WaitlistXEmail_Load( l.parameters[1], l.return ) }">
+				<MvFUNCTIONRETURN VALUE = 0>
+			</MvIF>
+			<MvASSIGN NAME = "{ l.parameters[2] }" VALUE = "{ l.return }">
+		</MvIF>
+		<MvFUNCTIONRETURN VALUE = 1>
+	</MvIF>
+
+</MvFUNCTION>
+
+<MvCOMMENT>
 |
 |	Custom Functions
 |		Waitlist_Read( waitlist var ) // Uses TGWaitlist.d.
@@ -275,10 +378,24 @@
 |		Waitlist_Form_Add( product_code, variant_id, email )
 |		Waitlists_Trigger_All()
 |
+|	Waitlist API
+|		Waitlist_API()
+|
+|	Specific Functions called via item
+|		Waitlist_API_URL( module var, return var )
+|		CurrentWaitlistCount( product_id, variant_id, return var )
+|		WaitlistXCustomer_Load( cust_id, return var )
+|		WaitlistXEmail_Load( email, return var )
+|
 |	JSON/ Batchlist Functions
 |		JSON_Waitlist_All_Load_Query( module var )
 |		JSON_Waitlist_Delete( time_added, email )
 |		JSON_Waitlist_Trigger_Emails( waitlists )
+|
+|	Component Helpers
+|		Parse_Function_Parameters( string, function_name var, parameters var, parameter_count var )
+|		Parameter_Error( param, message )
+|		Is_Variable( variable var )
 |
 </MvCOMMENT>
 
@@ -464,9 +581,9 @@
 		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-CHECK-1003:', 'An error occured while checking a record. Error:' $ g.MvQUERY_Error ) }">
 	</MvIF>
 
-	<MvASSIGN NAME = "g.WatilistCount" VALUE = "0">
+	<MvASSIGN NAME = "g.WaitlistCount" VALUE = "0">
 
-	<MvWHILE EXPR = "{ ( NOT TGWaitlist.d.EOF ) AND ( ( g.WatilistCount EQ 0 ) OR (l.waitlist_num LT ( g.WatilistCount + 1) ) ) }">
+	<MvWHILE EXPR = "{ ( NOT TGWaitlist.d.EOF ) AND ( ( g.WaitlistCount EQ 0 ) OR (l.waitlist_num LT ( g.WaitlistCount + 1) ) ) }">
 
 		<MvEVAL EXPR = "{ Waitlist_Read( l.waitlist ) }">
 
@@ -703,9 +820,9 @@
 		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-CHECK-1004:', 'An error occured while loading in records. Error:' $ g.MvQUERY_Error ) }">
 	</MvIF>
 
-	<MvASSIGN NAME = "g.WatilistCount" VALUE = "0">
+	<MvASSIGN NAME = "g.WaitlistCount" VALUE = "0">
 
-	<MvWHILE EXPR = "{ ( NOT TGWaitlist.d.EOF ) AND ( ( g.WatilistCount EQ 0 ) OR (l.waitlist_num LT ( g.WatilistCount + 1) ) ) }">
+	<MvWHILE EXPR = "{ ( NOT TGWaitlist.d.EOF ) AND ( ( g.WaitlistCount EQ 0 ) OR (l.waitlist_num LT ( g.WaitlistCount + 1) ) ) }">
 		<MvEVAL EXPR = "{ Waitlist_Read( l.waitlist ) }">
 		<MvASSIGN NAME = "l.success" VALUE = "{ miva_array_insert_var( l.all_waitlists, l.waitlist, -1) }">
 		<MvASSIGN NAME = "l.waitlist_num"	VALUE = "{ l.waitlist_num + 1 }">
@@ -718,5 +835,233 @@
 		<MvASSIGN NAME = "l.success" VALUE = "{ Waitlist_Trigger_EmailsXProduct( l.waitlist:product_id, l.waitlist:variant_id ) }">
 	</MvFOREACH>
 
+	<MvFUNCTIONRETURN VALUE = 1>
+</MvFUNCTION>
+
+<MvFUNCTION NAME = "Waitlist_API" PARAMETERS = "" STANDARDOUTPUTLEVEL = "">
+</MvFUNCTION>
+
+<MvFUNCTION NAME = "Waitlist_API_URL" PARAMETERS = "module var, return var" STANDARDOUTPUTLEVEL = "">
+	<MvASSIGN NAME = "l.return" VALUE = "{ g.clientside_url $ 'Module_Code=' $ encodeattribute( l.module:code ) $ '&Waitlist_API=1' }">
+	<MvFUNCTIONRETURN VALUE = 1>
+</MvFUNCTION>
+
+<MvFUNCTION NAME = "CurrentWaitlistCount" PARAMETERS = "product_id, variant_id, return var" STANDARDOUTPUTLEVEL = "">
+	<MvIF EXPR = "{ ISNULL l.variant_id }">
+		<MvASSIGN NAME = "l.variant_id" VALUE = "0">
+	</MvIF>
+
+	<MvOPENVIEW NAME	= "Merchant"
+				VIEW 	= "TGWaitlistCount"
+				QUERY 	= "{ 'SELECT COUNT(id) as total_count FROM ' $ g.Store_Table_Prefix $ 'TGWaitlist WHERE product_id = ? AND variant_id = ? ' }"
+				FIELDS	= "l.product_id, l.variant_id">
+
+	<MvIF EXPR = "{ g.MvOPENVIEW_Error }">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-CHECK-1001:', 'An error occured while checking a record. Error:' $ g.MvQUERY_Error ) }">
+	</MvIF>
+
+	<MvASSIGN NAME = "l.return" VALUE = "{ TGWaitlistCount.d.total_count }">
+
+	<MvCLOSEVIEW NAME = "Merchant" VIEW = "TGWaitlistCount">
+	
+	<MvFUNCTIONRETURN VALUE = 1>
+</MvFUNCTION>
+
+<MvFUNCTION NAME = "WaitlistXCustomer_Load" PARAMETERS = "cust_id, return var" STANDARDOUTPUTLEVEL = "">
+	<MvIF EXPR = "{ ISNULL l.cust_id }">
+		<MvASSIGN NAME = "l.return" VALUE = "0">
+		<MvFUNCTIONRETURN VALUE = 0>
+	</MvIF>
+	<MvIF EXPR = "{ l.cust_id LE 0 }">
+		<MvASSIGN NAME = "l.return" VALUE = "0">
+		<MvFUNCTIONRETURN VALUE = 0>
+	</MvIF>
+
+	<MvOPENVIEW NAME	= "Merchant"
+				VIEW 	= "TGWaitlist"
+				QUERY 	= "{ 'SELECT * FROM ' $ g.Store_Table_Prefix $ 'TGWaitlist WHERE cust_id = ?' }"
+				FIELDS	= "l.cust_id">
+
+	<MvIF EXPR = "{ g.MvOPENVIEW_Error }">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-CHECK-1005:', 'An error occured while loading in records. Error:' $ g.MvQUERY_Error ) }">
+	</MvIF>
+
+	<MvASSIGN NAME = "g.WaitlistCount" VALUE = "0">
+
+	<MvWHILE EXPR = "{ ( NOT TGWaitlist.d.EOF ) AND ( ( g.WaitlistCount EQ 0 ) OR (l.waitlist_num LT ( g.WaitlistCount + 1) ) ) }">
+		<MvEVAL EXPR = "{ Waitlist_Read( l.waitlist ) }">
+		<MvASSIGN NAME = "l.success" VALUE = "{ Waitlist_Product_Check( l.waitlist:product_id, l.waitlist:variant_id, l.waitlist) }">
+		<MvASSIGN NAME = "l.success" VALUE = "{ miva_array_insert_var( l.all_waitlists, l.waitlist, -1) }">
+		<MvASSIGN NAME = "l.waitlist_num"	VALUE = "{ l.waitlist_num + 1 }">
+		<MvSKIP NAME = "Merchant" VIEW = "TGWaitlist" ROWS = 1>
+	</MvWHILE>
+	<MvCLOSEVIEW NAME = "Merchant" VIEW = "TGWaitlist">
+
+	<MvASSIGN NAME = "l.return" VALUE = "{ l.all_waitlists }">
+
+	<MvFUNCTIONRETURN VALUE = 1>
+</MvFUNCTION>
+
+<MvFUNCTION NAME = "WaitlistXEmail_Load" PARAMETERS = "email, return var" STANDARDOUTPUTLEVEL = "">
+	<MvIF EXPR = "{ ISNULL l.email }">
+		<MvASSIGN NAME = "l.return" VALUE = "0">
+		<MvFUNCTIONRETURN VALUE = 0>
+	</MvIF>
+
+
+	<MvOPENVIEW NAME	= "Merchant"
+				VIEW 	= "TGWaitlist"
+				QUERY 	= "{ 'SELECT * FROM ' $ g.Store_Table_Prefix $ 'TGWaitlist WHERE email = ?' }"
+				FIELDS	= "l.email">
+
+	<MvIF EXPR = "{ g.MvOPENVIEW_Error }">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-CHECK-1005:', 'An error occured while loading in records. Error:' $ g.MvQUERY_Error ) }">
+	</MvIF>
+
+	<MvASSIGN NAME = "g.WaitlistCount" VALUE = "0">
+
+	<MvWHILE EXPR = "{ ( NOT TGWaitlist.d.EOF ) AND ( ( g.WaitlistCount EQ 0 ) OR (l.waitlist_num LT ( g.WaitlistCount + 1) ) ) }">
+		<MvEVAL EXPR = "{ Waitlist_Read( l.waitlist ) }">
+		<MvASSIGN NAME = "l.success" VALUE = "{ Waitlist_Product_Check( l.waitlist:product_id, l.waitlist:variant_id, l.waitlist) }">
+		<MvASSIGN NAME = "l.success" VALUE = "{ miva_array_insert_var( l.all_waitlists, l.waitlist, -1) }">
+		<MvASSIGN NAME = "l.waitlist_num"	VALUE = "{ l.waitlist_num + 1 }">
+		<MvSKIP NAME = "Merchant" VIEW = "TGWaitlist" ROWS = 1>
+	</MvWHILE>
+	<MvCLOSEVIEW NAME = "Merchant" VIEW = "TGWaitlist">
+
+	<MvASSIGN NAME = "l.return" VALUE = "{ l.all_waitlists }">
+
+	<MvFUNCTIONRETURN VALUE = 1>
+</MvFUNCTION>
+
+<MvFUNCTION NAME = "Parse_Function_Parameters" PARAMETERS = "string, function_name var, parameters var, parameter_count var" STANDARDOUTPUTLEVEL = "">	
+	<MvASSIGN NAME = "l.parameter_count" 	VALUE = 0>
+	<MvASSIGN NAME = "l.loop_counter" 		VALUE = 0>
+	<MvASSIGN NAME = "l.string" 			VALUE = "{ trim( l.string ) }">
+	<MvASSIGN NAME = "l.starting_pos" 		VALUE = "{ indexof( '(', l.string, 1 ) + 1 }">
+	<MvASSIGN NAME = "l.function_name" 		VALUE = "{ tolower( substring_var( l.string, 1, l.starting_pos - 2 ) ) }">
+	
+	<MvIF EXPR = "{ l.starting_pos EQ 1 }">
+		<MvFUNCTIONRETURN VALUE = "{ Parameter_Error( l.string, 'Expected \'(\' to start the function call' ) }">
+	</MvIF>
+	
+	<MvIF EXPR = "{ ISNULL l.function_name }">
+		<MvFUNCTIONRETURN VALUE = "{ Parameter_Error( l.string, 'Missing function name' ) }">
+	</MvIF>
+	
+	<MvIF EXPR = "{ substring_var( l.string, len_var( l.string ), 1 ) NE ')' }">
+		<MvFUNCTIONRETURN VALUE = "{ Parameter_Error( l.string, 'Expected \')\' to end the function call' ) }">
+	</MvIF>
+
+	<MvWHILE EXPR = "{ 1 }">
+		<MvASSIGN NAME = "l.quote_pos" 		VALUE = "{ indexof( '\'', l.string, l.starting_pos ) }">
+		<MvASSIGN NAME = "l.end_quote_pos" 	VALUE = "{ indexof( '\'', l.string, l.quote_pos + 1 ) }">
+		<MvASSIGN NAME = "l.comma_pos" 		VALUE = "{ indexof( ',', l.string, l.starting_pos ) }">
+
+		<MvIF EXPR = "{ l.quote_pos AND NOT l.end_quote_pos }">
+			<MvFUNCTIONRETURN VALUE = "{ Parameter_Error( l.string, 'Missing single quote' ) }">
+		</MvIF>
+		
+		<MvWHILE EXPR = "{ ( l.comma_pos LT l.end_quote_pos ) AND ( l.comma_pos GT l.quote_pos ) }"> <MvCOMMENT> comma in a quoted string </MvCOMMENT>
+			<MvASSIGN NAME = "l.comma_pos" VALUE = "{ indexof( ',', l.string, l.comma_pos + 1 ) }">
+		</MvWHILE>
+		
+		<MvIF EXPR = "{ l.comma_pos EQ 0 }"> <MvCOMMENT> on the last parameter or we only have 1 parameter </MvCOMMENT>
+			<MvASSIGN NAME = "l.start" 			VALUE = "{ l.starting_pos }">
+			<MvASSIGN NAME = "l.end" 			VALUE = "{ len_var( l.string ) - l.starting_pos }">
+			<MvASSIGN NAME = "l.starting_pos" 	VALUE = "{ len_var( l.string ) }">
+			<MvASSIGN NAME = "l.quote_pos" 		VALUE = 0>
+		<MvELSE> <MvCOMMENT> if there are more commas to come, grab from the start to the comma</MvCOMMENT>
+			<MvASSIGN NAME = "l.start" 			VALUE = "{ l.starting_pos }">
+			<MvASSIGN NAME = "l.end" 			VALUE = "{ l.comma_pos - l.starting_pos }">
+			<MvASSIGN NAME = "l.starting_pos" 	VALUE = "{ l.comma_pos + 1 }">
+		</MvIF>
+
+		<MvASSIGN NAME = "l.param" VALUE = "{ trim( substring_var( l.string, l.start, l.end ) ) }">
+		
+		<MvIF EXPR = "{ ISNULL l.param }">
+			<MvIF EXPR = "{ l.comma_pos EQ 0 AND l.parameter_count EQ 0 }">
+				<MvFUNCTIONRETURN VALUE = 1>
+			</MvIF>
+			
+			<MvFUNCTIONRETURN VALUE = "{ Parameter_Error( l.string, 'Parameter number ' $ ( ++l.parameter_count ) $ ' cannot be empty' ) }">
+		</MvIF>
+		
+		<MvASSIGN NAME = "l.parameters" INDEX = "{ ++l.parameter_count }" VALUE = "{ l.param }">
+		
+		<MvIF EXPR = "{ l.quote_pos EQ 0 AND l.comma_pos EQ 0 }">
+			<MvWHILESTOP>
+		</MvIF>
+
+		<MvIF EXPR = "{ l.loop_counter GT 1000 }">
+			<MvFUNCTIONRETURN VALUE = "{ Parameter_Error( l.string, 'Error parsing parameters' ) }">
+		</MvIF>
+		
+		<MvASSIGN NAME = "l.loop_counter" VALUE = "{ l.loop_counter + 1 }">
+	</MvWHILE>
+	
+	<MvFUNCTIONRETURN VALUE = 1>
+</MvFUNCTION>
+
+<MvFUNCTION NAME = "Parameter_Error" PARAMETERS = "param, message" STANDARDOUTPUTLEVEL = "">
+	<MvASSIGN NAME = "l.error_count"														VALUE = "{ miva_array_elements( g.Session:wailist ) }">
+	<MvASSIGN NAME = "g.Session:wailist" INDEX = "{ l.error_count + 1 }" MEMBER = "param"	VALUE = "{ l.param }">
+	<MvASSIGN NAME = "g.Session:wailist" INDEX = "{ l.error_count + 1 }" MEMBER = "message"	VALUE = "{ l.message }">
+	
+	<MvFUNCTIONRETURN VALUE = 0>
+</MvFUNCTION>
+
+<MvFUNCTION NAME = "Is_Variable" PARAMETERS = "variable var" STANDARDOUTPUTLEVEL = "">
+	<MvASSIGN NAME = "l.valid_chars" 		VALUE = "_.: ">
+	<MvASSIGN NAME = "l.square_bracket_pos" VALUE = 0>
+	<MvASSIGN NAME = "l.bracket_count" 		VALUE = 0>
+
+	<MvFOR INDEX = "l.pos" COUNT = "{ len_var( l.variable ) }">
+		<MvASSIGN NAME = "l.char" VALUE = "{ substring_var( l.variable, l.pos, 1 ) }">
+
+		<MvIF EXPR = "{ l.pos EQ 1 }">
+			<MvIF EXPR = "{ ( NOT isalpha( l.char ) ) AND
+							( l.char NE '_' ) }">
+				<MvFUNCTIONRETURN VALUE = 0>
+			</MvIF>
+			
+			<MvFORCONTINUE>
+		</MvIF>
+		
+		<MvIF EXPR = "{ l.char EQ '[' }">
+			<MvASSIGN NAME = "l.bracket_count" 				VALUE = "{ l.bracket_count + 1 }">
+			<MvASSIGN NAME = "l.opening_square_bracket_pos" VALUE = "{ indexof( '[', l.variable, l.pos + 1 ) }">
+			<MvASSIGN NAME = "l.closing_square_bracket_pos" VALUE = "{ indexof( ']', l.variable, l.pos ) }">
+			
+			<MvIF EXPR = "{ ( l.opening_square_bracket_pos GT 0 ) AND
+							( l.opening_square_bracket_pos LT l.closing_square_bracket_pos ) }">
+				<MvASSIGN NAME = "l.pos" VALUE = "{ l.opening_square_bracket_pos - 1 }">
+			<MvELSEIF EXPR = "{ l.closing_square_bracket_pos GT 0 }">
+				<MvASSIGN NAME = "l.pos" VALUE = "{ l.closing_square_bracket_pos - 1 }">
+			</MvIF>
+		<MvELSEIF EXPR = "{ l.char EQ ']' }">
+			<MvASSIGN NAME = "l.bracket_count" 				VALUE = "{ l.bracket_count - 1 }">
+			<MvASSIGN NAME = "l.opening_square_bracket_pos" VALUE = "{ indexof( '[', l.variable, l.pos ) }">
+			<MvASSIGN NAME = "l.closing_square_bracket_pos" VALUE = "{ indexof( ']', l.variable, l.pos + 1 ) }">
+			
+			<MvIF EXPR = "{ ( l.opening_square_bracket_pos GT 0 ) AND
+							( l.opening_square_bracket_pos LT l.closing_square_bracket_pos ) }">
+				<MvASSIGN NAME = "l.pos" VALUE = "{ l.opening_square_bracket_pos - 1 }">
+			<MvELSEIF EXPR = "{ l.closing_square_bracket_pos GT 0 }">
+				<MvASSIGN NAME = "l.pos" VALUE = "{ l.closing_square_bracket_pos - 1 }">
+			</MvIF>
+		<MvELSE>
+			<MvIF EXPR = "{ ( NOT isdigit( l.char ) ) AND
+							( NOT isalpha( l.char ) ) AND
+							( NOT ( l.char IN l.valid_chars ) ) }">
+				<MvFUNCTIONRETURN VALUE = 0>
+			</MvIF>
+		</MvIF>
+	</MvFOR>
+	
+	<MvIF EXPR = "{ l.bracket_count NE 0 }">
+		<MvFUNCTIONRETURN VALUE = 0>
+	</MvIF>
+	
 	<MvFUNCTIONRETURN VALUE = 1>
 </MvFUNCTION>
