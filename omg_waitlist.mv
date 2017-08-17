@@ -158,7 +158,7 @@
 </MvFUNCTION>
 
 <MvFUNCTION NAME = "Module_System_Tabs" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = "compresswhitespace">
-	<MvFUNCTIONRETURN VALUE = "TGWaitlist:Waitlist.">
+	<MvFUNCTIONRETURN VALUE = "TGWaitlist:Waitlist">
 </MvFUNCTION>
 
 <MvFUNCTION NAME = "Module_System_Update" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = "compresswhitespace">
