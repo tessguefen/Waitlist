@@ -22,7 +22,7 @@
 
 ## Item Functionality
 - [x] Create an item
-	- [ ] `Waitlist_API_URL( return var )`
+	- [x] `Waitlist_API_URL( return var )`
 		- This will return a url for the Waitlist API
 	- [x] `CurrentWaitlistCount( product_id, variant_id, return var )`
 		- This will return the number of people on the waitlist
