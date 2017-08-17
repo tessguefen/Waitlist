@@ -30,6 +30,7 @@
 		- This will load in all waitlists a customer is currently waiting on (via cust_id)
 	- [x] `WaitlistXEmail_Load( email, return var )`
 		- This will load in all waitlists a customer is currently waiting on (via email)
+
 **WaitlistXCustomer_Load & WaitlistXEmail_Load will return an array of waitlists. Example members available:**
 ```xml
 :cust_id
