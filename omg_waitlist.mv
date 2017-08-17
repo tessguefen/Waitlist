@@ -1,6 +1,6 @@
 <MvFUNCTION NAME = "Module_Description" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = "compresswhitespace">
 	<MvASSIGN NAME = "l.module:code"		VALUE = "TGWaitlist">
-	<MvASSIGN NAME = "l.module:name"		VALUE = "OMG! Waitlist">
+	<MvASSIGN NAME = "l.module:name"		VALUE = "Waitlist">
 	<MvASSIGN NAME = "l.module:provider"	VALUE = "Tess Guefen">
 	<MvASSIGN NAME = "l.module:version"		VALUE = "1.000">
 	<MvASSIGN NAME = "l.module:api_ver"		VALUE = "9.03">
@@ -158,7 +158,7 @@
 </MvFUNCTION>
 
 <MvFUNCTION NAME = "Module_System_Tabs" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = "compresswhitespace">
-	<MvFUNCTIONRETURN VALUE = "TGWaitlist:Omg! Waitlist.">
+	<MvFUNCTIONRETURN VALUE = "TGWaitlist:Waitlist.">
 </MvFUNCTION>
 
 <MvFUNCTION NAME = "Module_System_Update" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = "compresswhitespace">
