@@ -13,8 +13,7 @@
 - [x] Create Function to check all waitlists for email triggers
 	- [x] Tie this functionality to a scheduled task
 - [ ] Create if statement for form (hide/ shown on PROD page)
-- [ ] Create an API version of form submission
-	- [ ] API would return success, messages, etc.
+- [x] Create an API version of form submission
 - [ ] Run check for Waitlist add Product, with no variant, but should be with a variant (only adding the master product should not be allowed)
 - [ ] Admin > Product View, show batchlist for JUST that product? (Can technically be done with an advanced search on Batchlist)
 - [ ] Return `g.Waitlist_Message_ID`, for use elsewhere (for customizations on Messages)
@@ -23,7 +22,7 @@
 ## Item Functionality
 - [x] Create an item
 	- [x] `Waitlist_API_URL( return var )`
-		- This will return a url for the Waitlist API
+		- This will return a url for the Waitlist API (json url)
 	- [x] `CurrentWaitlistCount( product_id, variant_id, return var )`
 		- This will return the number of people on the waitlist
 	- [x] `WaitlistXCustomer_Load( cust_id, return var )`
