@@ -172,6 +172,9 @@
 </MvCOMMENT>
 
 <MvFUNCTION NAME = "Module_JSON" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = "" ERROROUTPUTLEVEL = "">
+	<MvIF EXPR = "{ g.Module_Function EQ 'Waitlist_API' }">
+		<MvFUNCTIONRETURN VALUE = "{ Waitlist_API() }">
+	</MvIF>
 	<MvIF EXPR = "{ NOT [ g.Module_JSON ].JSON_Store_Open() }">
 		<MvFUNCTIONRETURN>
 	</MvIF>
@@ -193,9 +196,6 @@
 | ============================
 </MvCOMMENT>
 <MvFUNCTION NAME = "Module_Clientside" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = "text,compresswhitespace" ERROROUTPUTLEVEL = "">
-	<MvIF EXPR = "{ g.Waitlist_API EQ 1 }">
-		<MvFUNCTIONRETURN VALUE = "{ Waitlist_API() }">
-	</MvIF>
 	<MvIF EXPR = "{ g.Filename EQ 'Waitlist_Batchlist.js' }">
 		<MvINCLUDE FILE = "js/Waitlist_Batchlist.js">
 	</MvIF>
@@ -839,17 +839,17 @@
 </MvFUNCTION>
 
 <MvFUNCTION NAME = "Waitlist_API" PARAMETERS = "" STANDARDOUTPUTLEVEL = "">
-	<MvIF EXPR = "{ ISNULL g.Function }">
-		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error( 'Function', 'Missing Function' ) }">
-	</MvIF>
 	<MvCOMMENT>
 	|
-	|	Available Functions
+	|	Available Functions ( g.WaitlistFunction )
 	|		Waitlist_Add
 	|			g.Product_Code, g.Variant_ID, g.Email		
 	|
 	</MvCOMMENT>
-	<MvIF EXPR = "{ g.Function EQ 'Waitlist_Add' }">
+	<MvIF EXPR = "{ ISNULL g.WaitlistFunction }">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error( 'WaitlistFunction', 'Missing Function' ) }">
+	</MvIF>
+	<MvIF EXPR = "{ g.WaitlistFunction EQ 'Waitlist_Add' }">
 		<MvIF EXPR = "{ ISNULL g.Product_Code }">
 			<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error( 'Waitlist_Add', 'Missing Product_Code' ) }">
 		</MvIF>
@@ -864,7 +864,7 @@
 </MvFUNCTION>
 
 <MvFUNCTION NAME = "Waitlist_API_URL" PARAMETERS = "module var, return var" STANDARDOUTPUTLEVEL = "">
-	<MvASSIGN NAME = "l.return" VALUE = "{ g.clientside_url $ 'Module_Code=' $ encodeattribute( l.module:code ) $ '&Waitlist_API=1' }">
+	<MvASSIGN NAME = "l.return" VALUE = "{ g.json_url $ 'Module_Code=' $ encodeattribute( l.module:code ) $ '&Store_Code=' $ encodeattribute( g.Store:code ) $ '&Function=Module&Module_Function=Waitlist_API' }">
 	<MvFUNCTIONRETURN VALUE = 1>
 </MvFUNCTION>
 
