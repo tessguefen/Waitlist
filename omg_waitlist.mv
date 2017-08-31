@@ -15,18 +15,6 @@
 </MvCOMMENT>
 
 <MvFUNCTION NAME = "Module_Install_Store" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = "text, html, compresswhitespace" ERROROUTPUTLEVEL = "">
-	<MvCOMMENT>
-	|
-	|	Table Structure
-	|	sXX_TGWaitlist
-	|		id
-	|		time_added
-	|		product_id
-	|		variant_id
-	|		email
-	|		cust_id
-	|
-	</MvCOMMENT>
 
 	<MvASSIGN NAME = "l.waitlist_email_page:admin"		VALUE = "0">
 	<MvASSIGN NAME = "l.waitlist_email_page:code"		VALUE = "WatilistEmailTemplate">
@@ -50,6 +38,19 @@
 		</MvIF>
 		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-INSTALL-2000:', 'An error occured while creating the storekey, TGWaitlist. Please make sure this does not already exsist.' ) }">
 	</MvIF>
+
+	<MvCOMMENT>
+	|
+	|	Table Structure
+	|	sXX_TGWaitlist
+	|		id
+	|		time_added
+	|		product_id
+	|		variant_id
+	|		email
+	|		cust_id
+	|
+	</MvCOMMENT>
 
 	<MvQUERY	NAME	= "Merchant"
 				QUERY	= "{ 'CREATE TABLE ' $ g.Store_Table_Prefix $ 'TGWaitlist
@@ -103,6 +104,11 @@
 </MvFUNCTION>
 
 <MvFUNCTION NAME = "Module_Notify_Product_Update" PARAMETERS = "module var, product var" STANDARDOUTPUTLEVEL = "compresswhitespace" ERROROUTPUTLEVEL = "">
+	<MvCOMMENT>
+	|
+	|	9.7 Feature -- Trigger waitlist sched. task later.
+	|
+	</MvCOMMENT>
 	<MvFUNCTIONRETURN VALUE = 1>
 </MvFUNCTION>
 
@@ -736,7 +742,7 @@
 	<MvIF EXPR = "{ NOT Waitlist_Add( l.product:id, l.variant_id, l.email ) }">
 		<MvFUNCTIONRETURN VALUE = 0 />
 	</MvIF>
-	<MvASSIGN NAME = "g.Waitlist_Message" VALUE = "Success!" />
+	<MvASSIGN NAME = "g.Waitlist_Message" VALUE = "{ 'Success! The email, <strong>' $ encodeentities( l.email ) $ '</strong>, has been added to the waitlist.' }" />
 	<MvFUNCTIONRETURN VALUE = 1 />
 </MvFUNCTION>
 
@@ -860,6 +866,11 @@
 			<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error( 'Waitlist_Add', g.Waitlist_Error ) }">
 		</MvIF>
 		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Success() }">
+	</MvIF>
+
+	<MvIF EXPR = "{ g.WaitlistFunction EQ 'Product_Variant_Available' }">
+		<MvIF EXPR = "{ ISNULL g.Product_ID }">
+		</MvIF>
 	</MvIF>
 </MvFUNCTION>
 
