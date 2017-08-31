@@ -683,7 +683,7 @@
 	<MvASSIGN NAME = "l.waitlist:variant_id" VALUE = "{ l.variant_id }">
 
 
-	<MvIF EXPR = "{ NOT [ g.Module_Library_DB ].Product_Load_ID( l.product_id, l.waitlist:product ) }">
+	<MvIF EXPR = "{ NOT [ g.Module_Library_DB ].Runtime_Product_Load_ID( l.product_id, l.waitlist:product ) }">
 		<MvFUNCTIONRETURN VALUE = 0 />
 	</MvIF>
 
@@ -700,10 +700,10 @@
 			<MvASSIGN NAME = "l.success" VALUE = "{ Read_Variant_Options( l.waitlist:options ) }">
 		</MvIF>
 	<MvELSE>
-		<MvDO FILE = "{ g.Module_Feature_INV_RT }" NAME = "l.continue" VALUE = "{ Inventory_Check_Available( l.waitlist:product, 1) }">
+		<MvDO FILE = "{ g.Module_Feature_INV_RT }" NAME = "l.continue" VALUE = "{ Inventory_Is_Available_LowLevel( l.waitlist:product, 1) }">
 	</MvIF>
 
-	<MvIF EXPR = "{ l.continue LE 0 }">
+	<MvIF EXPR = "{ l.continue LT 0 }">
 		<MvFUNCTIONRETURN VALUE = 0 />
 	</MvIF>
 	<MvFUNCTIONRETURN VALUE = 1 />
