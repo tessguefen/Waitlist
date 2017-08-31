@@ -127,8 +127,12 @@ Optional Inputs:
 	Email: <input type="email" name="Waitlist_Email" value="&mvte:global:Waitlist_Email;" /><br />
 	<input type="submit" value="Sign up to the waitlist!" class="button">
 </form>
-<script>
+  ```
+  
+**Javascript to show/ hide form**
+```javascript
 // ---- Update Display When Attribute Machine Fires ---- //
+var waitlist_form = document.getElementsByName( 'waitlist_add' )[0];
 MivaEvents.SubscribeToEvent('variant_changed', function (product_data) {
 	var WaitlistVariantID = document.getElementById( 'jsWaitlist_Variant_ID' );
 	if ( WaitlistVariantID ) {
@@ -137,9 +141,34 @@ MivaEvents.SubscribeToEvent('variant_changed', function (product_data) {
 			WaitlistVariantID.value = product_data.variant_id;
 		}
 	}
+	if ( am&mvte:product:id;.buttons && waitlist_form ) {
+		var show_waitlist = 0;
+		am&mvte:product:id;.buttons.forEach( function( button ) {
+			if ( button.disabled ) show_waitlist = 1;
+		});
+		if ( show_waitlist === 0 ) {
+			waitlist_form.style.display = 'none';
+		} else {
+			waitlist_form.style.display = 'block';
+		}
+	}
 });
-</script>
-  ```
+
+var stock_level = '&mvtj:attributemachine:product:inv_level;';
+if ( stock_level == 'out' && waitlist_form ) {
+	waitlist_form.style.display = 'block';
+} else {
+	waitlist_form.style.display = 'none';
+}
+
+// ---- Show / Hide Form for Attributes ---- //
+if ( typeof am&mvte:product:id; != 'undefined' ) {
+	var inv_msg_element = document.getElementById( am&mvte:product:id;.settings.inventory_element_id );
+	if ( inv_msg_element && ( inv_msg_element.innerHTML ).includes( am&mvte:product:id;.settings.invalid_msg ) && ( waitlist_form ) ) {
+		waitlist_form.style.display = 'none';
+	}
+}
+```
   
 ## Email Template Example
 ![Email Example](http://puu.sh/xbg14/bbb1594b13.png)
