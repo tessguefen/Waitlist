@@ -118,21 +118,32 @@ Optional Inputs:
 
 **Form Example**
 ```xml
-<mvt:if expr="g.Waitlist_Error">Error: &mvte:global:Waitlist_Error;<br /></mvt:if>
-<mvt:if expr="g.Waitlist_Message">&mvte:global:Waitlist_Message;<br /></mvt:if>
-<form name="waitlist_add" method="post" action="&mvte:product:link;">
+<mvt:if expr="g.Waitlist_Error"><div style="background: #e74c3c; color: #fff; font-size: 11px; padding: 5px 10px;">Error: &mvt:global:Waitlist_Error;</div></mvt:if>
+<mvt:if expr="g.Waitlist_Message"><div style="background: #16a085; color: #fff; font-size: 11px; padding: 5px 10px;">&mvt:global:Waitlist_Message;</div></mvt:if>
+
+<form name="waitlist_add" method="post" action="&mvte:product:link;" style="display:none;">
+	<div style="font-size: 11px; background: #ecf0f1; text-align: center; padding: 10px 5px; margin-bottom: 0.75rem;">Sign up with your email to be notified when this product is back in stock!</div>
+	<div id="jsWaitlist_Message"></div>
 	<input type="hidden" name="Action" value="WaitlistAdd" />
 	<input type="hidden" name="Waitlist_Product_Code" value="&mvt:product:code;" />
 	<input type="hidden" name="Waitlist_Variant_ID" id="jsWaitlist_Variant_ID" value="&mvt:attributemachine:variant_id;" />
-	Email: <input type="email" name="Waitlist_Email" value="&mvte:global:Waitlist_Email;" /><br />
-	<input type="submit" value="Sign up to the waitlist!" class="button">
+	<div style="display: flex;flex-direction: row;">
+		<input type="email" name="Waitlist_Email" value="&mvte:global:Waitlist_Email;" placeholder="Email" style="flex: 1 1 auto; padding: 5px; border: 1px solid #bdc3c7; border-right: 0;" />
+		<input type="submit" value="Sign up" class="button" style="flex: 1 1 auto; padding: 5px; border: 0; background-color: #3498db;" />
+	</div>
 </form>
-  ```
-  
-**Javascript to show/ hide form**
+```
+**Item to call Waitlist API (for AJAX call)**
+```xml
+<mvt:item name="waitlist" param="Waitlist_API_URL( l.all_settings:waitlist_url )" />
+```
+
+**Javascript for basic show/ hide & Ajax call**
 ```javascript
+var waitlist_api = '&mvtj:waitlist_url;';
 // ---- Update Display When Attribute Machine Fires ---- //
 var waitlist_form = document.getElementsByName( 'waitlist_add' )[0];
+var watilist_ajax_msg = document.getElementById( 'jsWaitlist_Message');
 MivaEvents.SubscribeToEvent('variant_changed', function (product_data) {
 	var WaitlistVariantID = document.getElementById( 'jsWaitlist_Variant_ID' );
 	if ( WaitlistVariantID ) {
@@ -155,6 +166,38 @@ var stock_level = '&mvtj:attributemachine:product:inv_level;';
 if ( typeof am&mvte:product:id; != 'undefined' ) {
 	var inv_msg_element = document.getElementById( am&mvte:product:id;.settings.inventory_element_id );
 	if ( inv_msg_element && ( inv_msg_element.innerHTML ).includes( am&mvte:product:id;.settings.invalid_msg ) && waitlist_form ) waitlist_form.style.display = 'none';
+}
+
+// Ajax Call
+if ( waitlist_form && waitlist_api ) {
+	waitlist_form.onsubmit = function onSubmit( form ) {
+		form.preventDefault();
+		var Waitlist_Product_Code = document.getElementsByName( 'Waitlist_Product_Code' )[0].value;
+		var Waitlist_Variant_ID = document.getElementsByName( 'Waitlist_Variant_ID' )[0].value;
+		var Waitlist_Email = document.getElementsByName( 'Waitlist_Email' )[0].value;
+
+		var waitlist_data = 'WaitlistFunction=Waitlist_Add&Product_Code=' + Waitlist_Product_Code + '&Variant_ID=' + Waitlist_Variant_ID + '&Email=' + Waitlist_Email;
+
+		var wishlist_call = new XMLHttpRequest();
+		wishlist_call.open('POST', waitlist_api, true);
+		wishlist_call.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+		wishlist_call.onload = function() {
+			if (this.status === 200) {
+				var wishlist_return = JSON.parse( this.responseText );
+				if ( wishlist_return.success === 0 ) {
+					watilist_ajax_msg.innerHTML = wishlist_return.error_message;
+				} else {
+					watilist_ajax_msg.innerHTML = 'Thank you for signing up!';
+				}
+				console.log(wishlist_return);
+			} else {
+				watilist_ajax_msg.innerHTML = 'An error has occurred.';
+			}
+		};
+		wishlist_call.send( waitlist_data );
+
+	}
 }
 ```
   
