@@ -3,8 +3,8 @@
 	<MvASSIGN NAME = "l.module:name"		VALUE = "Waitlist">
 	<MvASSIGN NAME = "l.module:provider"	VALUE = "Tess Guefen">
 	<MvASSIGN NAME = "l.module:version"		VALUE = "1.000">
-	<MvASSIGN NAME = "l.module:api_ver"		VALUE = "9.03">
-	<MvASSIGN NAME = "l.module:description"	VALUE = "Do all the things! Waitlist in progress.">
+	<MvASSIGN NAME = "l.module:api_ver"		VALUE = "9.0006">
+	<MvASSIGN NAME = "l.module:description"	VALUE = "Make it easy for customers to quickly sign up for email alerts on out of stock products. When products are back in stock, emails will be automatically sent out by a Scheduled Task. This works on Products & Variants.">
 	<MvASSIGN NAME = "l.module:features"	VALUE = "data_store,not_prod,system,vis_system,json,clientside,scheduledtask,component">
 </MvFUNCTION>
 
@@ -22,7 +22,7 @@
 	<MvASSIGN NAME = "l.waitlist_email_page:ui_id"		VALUE = "0">
 	<MvASSIGN NAME = "l.waitlist_email_page:settings"	VALUE = "">
 	<MvCAPTURE VARIABLE = "l.waitlist_email_page:data">
-		<MvINCLUDE FILE = "templates/WatilistEmailTemplate.txt" INTERPRET = "OFF">
+		<MvINCLUDE FILE = "templates/WatilistEmailTemplate.mvt" INTERPRET = "OFF">
 	</MvCAPTURE>
 
 	<MvIF EXPR = "{ NOT [ g.Module_Feature_TUI_MGR ].TemplateManager_Create_Page_LowLevel( l.waitlist_email_page, l.waitlist_email_page:data ) }">
@@ -369,7 +369,7 @@
 <MvCOMMENT>
 |
 |	Custom Functions
-|		Waitlist_Read( waitlist var ) // Uses TGWaitlist.d.
+|		Waitlist_Read( waitlist var )
 |		Waitlist_Load_ID( waitlist_id, waitlist var )
 |		Waitlist_Add_Lowlevel( timestamp, product_id, variant_id, email, cust_id )
 |		WaitlistXCheck( product_id, variant_id, email )
@@ -866,11 +866,6 @@
 			<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error( 'Waitlist_Add', g.Waitlist_Error ) }">
 		</MvIF>
 		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Success() }">
-	</MvIF>
-
-	<MvIF EXPR = "{ g.WaitlistFunction EQ 'Product_Variant_Available' }">
-		<MvIF EXPR = "{ ISNULL g.Product_ID }">
-		</MvIF>
 	</MvIF>
 </MvFUNCTION>
 
