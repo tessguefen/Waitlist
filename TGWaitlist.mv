@@ -690,20 +690,20 @@
 	<MvASSIGN NAME = "l.continue" VALUE = "0" />
 
 	<MvIF EXPR = "{ l.waitlist:variant_id GT 0 }">
-		<MvDO FILE = "{ g.Module_Feature_INV_RT }" NAME = "l.continue" VALUE = "{ Inventory_Is_Available_Variant( l.waitlist:product, l.waitlist:variant_id, 1) }">
+		<MvDO FILE = "{ g.Module_Feature_INV_RT }" NAME = "l.continue" VALUE = "{ Inventory_Is_Available_Variant( l.waitlist:product, l.waitlist:variant_id, 1 ) }">
 		<MvIF EXPR = "{ [ g.Module_Library_DB ].ProductVariantPartList_Load_Variant( l.waitlist:product:id,  l.waitlist:variant_id, l.waitlist:variants  ) }">
 			<MvFOREACH ITERATOR = "l.variant" ARRAY = "l.waitlist:variants">
-				<MvDO FILE = "{ g.Module_Library_DB }" NAME = "l.success" VALUE = "{ Product_Load_ID( l.variant:part_id, l.variant:product ) }">
+				<MvDO FILE = "{ g.Module_Library_DB }" NAME = "l.success" VALUE = "{ Runtime_Product_Load_ID( l.variant:part_id, l.variant:product ) }">
 			</MvFOREACH>
 		</MvIF>
 		<MvIF EXPR = "{ [ g.Module_Library_DB ].ProductVariantList_Load_Variant( l.waitlist:product:id, l.waitlist:variant_id, l.waitlist:options ) }">
 			<MvASSIGN NAME = "l.success" VALUE = "{ Read_Variant_Options( l.waitlist:options ) }">
 		</MvIF>
 	<MvELSE>
-		<MvDO FILE = "{ g.Module_Feature_INV_RT }" NAME = "l.continue" VALUE = "{ Inventory_Is_Available_LowLevel( l.waitlist:product, 1) }">
+		<MvDO FILE = "{ g.Module_Feature_INV_RT }" NAME = "l.continue" VALUE = "{ Inventory_Is_Available_LowLevel( l.waitlist:product, 1 ) }">
 	</MvIF>
 
-	<MvIF EXPR = "{ l.continue LT 0 }">
+	<MvIF EXPR = "{ l.continue LE 0 }">
 		<MvFUNCTIONRETURN VALUE = 0 />
 	</MvIF>
 	<MvFUNCTIONRETURN VALUE = 1 />
