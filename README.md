@@ -1,5 +1,7 @@
 # Waitlist
 
+***** ADD PAGE FOR CUSTOMIZATIONS, RETURN 1 OR 0 *****
+
 ## Functionality
 - [x] Waitlist Batchlist
 	- [x] Trigger Emails via Batchlist
