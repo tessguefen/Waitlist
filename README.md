@@ -1,4 +1,5 @@
 # Waitlist
+Current Module Version: 1.001
 
 ## Functionality
 - [x] Waitlist Batchlist
