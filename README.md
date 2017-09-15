@@ -254,7 +254,7 @@ If `g.Waitlist_Email_Continue` is not set, it will use the original determinatio
 :waitlist:options[X]:part_count
 :waitlist:options[X]:product_id
 :waitlist:options[X]:variant_id
-:waitlist:original_determination ( This is either 1 or 0 )
+:waitlist:original_determination (Original Determination from the Module)
 :waitlist:product:active
 :waitlist:product:agrpcount
 :waitlist:product:cancat_id
@@ -285,7 +285,7 @@ If `g.Waitlist_Email_Continue` is not set, it will use the original determinatio
 :waitlist:cust_id
 :waitlist:email
 :waitlist:id=
-:waitlist:original_determination
+:waitlist:original_determination (Original Determination from the Module)
 :waitlist:product:active
 :waitlist:product:agrpcount
 :waitlist:product:cancat_id
