@@ -279,7 +279,7 @@ If `g.Waitlist_Email_Continue` is not set, it will use the original determinatio
 :waitlist:variants[X]:quantity
 :waitlist:variants[X]:variant_id
 ```
-`[x]` Determins it is part of an array.
+`[x]` Determines it is part of an array.
 
 #### When There is no variant:
 ```xml
