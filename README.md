@@ -18,7 +18,7 @@
 - [ ] Admin > Product View, show batchlist for JUST that product? (Can technically be done with an advanced search on Batchlist)
 - [ ] Return `g.Waitlist_Message_ID`, for use elsewhere (for customizations on Messages)
 - [ ] Look for other functionality that would be useful in this module
-- [x] Custom Page to determine if an email should be triggered. [View Details here](#customized-email-trigger-logic)
+- [x] Custom Page to determine if an email should be triggered. [View Details here](#customized-email-trigger-logic-v-1001)
 
 ## Item Functionality
 - [x] Create an item
