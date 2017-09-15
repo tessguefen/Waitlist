@@ -2,7 +2,7 @@
 	<MvASSIGN NAME = "l.module:code"		VALUE = "TGWaitlist">
 	<MvASSIGN NAME = "l.module:name"		VALUE = "Waitlist">
 	<MvASSIGN NAME = "l.module:provider"	VALUE = "Tess Guefen">
-	<MvASSIGN NAME = "l.module:version"		VALUE = "1.000">
+	<MvASSIGN NAME = "l.module:version"		VALUE = "1.001">
 	<MvASSIGN NAME = "l.module:api_ver"		VALUE = "9.0006">
 	<MvASSIGN NAME = "l.module:description"	VALUE = "Make it easy for customers to quickly sign up for email alerts on out of stock products. When products are back in stock, emails will be automatically sent out by a Scheduled Task. This works on Products & Variants.">
 	<MvASSIGN NAME = "l.module:features"	VALUE = "data_store,not_prod,system,vis_system,json,clientside,scheduledtask,component">
@@ -701,6 +701,56 @@
 		</MvIF>
 	<MvELSE>
 		<MvDO FILE = "{ g.Module_Feature_INV_RT }" NAME = "l.continue" VALUE = "{ Inventory_Is_Available_LowLevel( l.waitlist:product, 1 ) }">
+	</MvIF>
+
+	<MvIF EXPR = "{ [ g.Module_Feature_TUI_DB ].Page_Load_Code( 'WatilistEmailLogic', l.logic_page) }">
+		<MvIF EXPR = "{ [ g.Module_Feature_TUI_DB ].ManagedTemplate_Load_ID( l.logic_page:templ_id, l.waitlist_logic_template ) }">
+
+			<MvCOMMENT>
+			|
+			| Load and initialize items
+			|
+			</MvCOMMENT>
+
+			<MvASSIGN NAME = "l.item_pos"			VALUE = 1>
+			<MvASSIGN NAME = "l.item_count"			VALUE = "{ [ g.Module_Feature_TUI_DB ].ItemModuleList_Load_Page_Render( l.logic_page:id,			l.logic_page:settings:_mgr ) }">
+			<MvASSIGN NAME = "l.extension_count"	VALUE = "{ [ g.Module_Feature_TUI_DB ].ItemExtensionModuleList_Load_Page_Render( l.logic_page:id,	l.logic_page:settings:_mgr ) }">
+
+			<MvWHILE EXPR = "{ l.item_pos LE l.item_count }">
+				<MvIF EXPR = "{ NOT [ g.Module_Feature_TUI_MGR ].TemplateManager_Initialize_Item_LowLevel( l.logic_page:settings, l.logic_page:settings:_mgr:items[ l.item_pos ] ) }">
+					<MvFUNCTIONRETURN VALUE = 0>
+				</MvIF>
+
+				<MvIF EXPR = "{ g.TemplateManager_Exception }">
+					<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-ERROR-1000', 'Item \'' $ l.logic_page:settings:_mgr:items[ l.item_pos ]:item_code $ '\' threw exception \'' $ g.TemplateManager_Exception_Code $ '\' during initialization' ) }">
+				</MvIF>
+
+				<MvASSIGN NAME = "l.item_pos"	VALUE = "{ l.item_pos + 1 }">
+			</MvWHILE>
+
+			<MvASSIGN NAME = "l.all_settings" VALUE = "{ l.logic_page:settings }">
+			<MvASSIGN NAME = "l.all_settings:waitlist" VALUE = "{ l.waitlist }">
+			<MvASSIGN NAME = "l.all_settings:waitlist:original_determination" VALUE = "{ l.continue }">
+
+			<MvCOMMENT>
+			|
+			|	Looking for g.Waitlist_Email_Continue (0/1)
+			|
+			</MvCOMMENT>
+
+			<MvASSIGN NAME = "g.Waitlist_Email_Continue" VALUE = "">
+
+			<MvCAPTURE VARIABLE = "l.success">
+				<MvDO FILE = "{ g.Store_Template_Path $ l.waitlist_logic_template:filename }" NAME = "l.success" VALUE = "{ Template_Render( l.settings, l.all_settings ) }">
+			</MvCAPTURE>
+
+			<MvIF EXPR = "{ g.Waitlist_Email_Continue EQ 1 }">
+				<MvASSIGN NAME = "l.continue" VALUE = "1" />
+			<MvELSEIF EXPR = "{ g.Waitlist_Email_Continue EQ 0 }">
+				<MvASSIGN NAME = "l.continue" VALUE = "0" />
+			</MvIF>
+
+		</MvIF>
 	</MvIF>
 
 	<MvIF EXPR = "{ l.continue LE 0 }">
