@@ -1,7 +1,5 @@
 # Waitlist
 
-***** ADD PAGE FOR CUSTOMIZATIONS, RETURN 1 OR 0 *****
-
 ## Functionality
 - [x] Waitlist Batchlist
 	- [x] Trigger Emails via Batchlist
@@ -20,6 +18,7 @@
 - [ ] Admin > Product View, show batchlist for JUST that product? (Can technically be done with an advanced search on Batchlist)
 - [ ] Return `g.Waitlist_Message_ID`, for use elsewhere (for customizations on Messages)
 - [ ] Look for other functionality that would be useful in this module
+- [x] Custom Page to determine if an email should be triggered. [View Details here](#customized-email-trigger-logic)
 
 ## Item Functionality
 - [x] Create an item
@@ -205,3 +204,110 @@ if ( waitlist_form && waitlist_api ) {
   
 ## Email Template Example
 ![Email Example](http://puu.sh/xbg14/bbb1594b13.png)
+
+---
+
+## Customized Email Trigger Logic (v 1.001)
+You can create an Page called `WatilistEmailLogic`, and return a `1` or `0` in the variable `g.Waitlist_Email_Continue`.
+If `g.Waitlist_Email_Continue` is set to 1, it will send the email.
+If `g.Waitlist_Email_Continue` is set to 0, it will not send the email.
+If `g.Waitlist_Email_Continue` is not set, it will use the original determination from the module.
+
+**When an email is triggered, and it uses the page WatilistEmailLogic, you will have access to l.settings:waitlist**
+`l.settings:waitlist:original_determination` is the original determination from the module before hitting the page. It can return 1, 0 & negative values. Anything below or equal to 0 will not trigger the email.
+
+#### When l.settings:waitlist:variant_id is greater than 0:
+```xml
+:waitlist:cust_id
+:waitlist:email
+:waitlist:id
+:waitlist:options[X]:attmpat_id
+:waitlist:options[X]:attr_id
+:waitlist:options[X]:attribute:attemp_id
+:waitlist:options[X]:attribute:code
+:waitlist:options[X]:attribute:cost
+:waitlist:options[X]:attribute:default_id
+:waitlist:options[X]:attribute:disp_order
+:waitlist:options[X]:attribute:id
+:waitlist:options[X]:attribute:inventory
+:waitlist:options[X]:attribute:price
+:waitlist:options[X]:attribute:product_id
+:waitlist:options[X]:attribute:prompt
+:waitlist:options[X]:attribute:required
+:waitlist:options[X]:attribute:type
+:waitlist:options[X]:attribute:weight
+:waitlist:options[X]:dimensions
+:waitlist:options[X]:option:attr_id
+:waitlist:options[X]:option:code
+:waitlist:options[X]:option:cost
+:waitlist:options[X]:option:disp_order
+:waitlist:options[X]:option:id
+:waitlist:options[X]:option:price
+:waitlist:options[X]:option:product_id
+:waitlist:options[X]:option:prompt
+:waitlist:options[X]:option:weight
+:waitlist:options[X]:option_id
+:waitlist:options[X]:part_count
+:waitlist:options[X]:product_id
+:waitlist:options[X]:variant_id
+:waitlist:original_determination ( This is either 1 or 0 )
+:waitlist:product:active
+:waitlist:product:agrpcount
+:waitlist:product:cancat_id
+:waitlist:product:catcount
+:waitlist:product:code
+:waitlist:product:cost
+:waitlist:product:disp_order
+:waitlist:product:id
+:waitlist:product:inv_active
+:waitlist:product:name
+:waitlist:product:page_id
+:waitlist:product:pgrpcount
+:waitlist:product:price
+:waitlist:product:taxable
+:waitlist:product:weight
+:waitlist:product_id
+:waitlist:time_added
+:waitlist:variant_id
+:waitlist:variants[X]:part_id
+:waitlist:variants[X]:product_id
+:waitlist:variants[X]:quantity
+:waitlist:variants[X]:variant_id
+```
+`[x]` Determins it is part of an array.
+
+#### When There is no variant:
+```xml
+:waitlist:cust_id
+:waitlist:email
+:waitlist:id=
+:waitlist:original_determination
+:waitlist:product:active
+:waitlist:product:agrpcount
+:waitlist:product:cancat_id
+:waitlist:product:catcount
+:waitlist:product:code
+:waitlist:product:cost
+:waitlist:product:descrip
+:waitlist:product:disp_order
+:waitlist:product:id
+:waitlist:product:inv_active
+:waitlist:product:inv_available
+:waitlist:product:inv_instock
+:waitlist:product:inv_level
+:waitlist:product:inv_long
+:waitlist:product:inv_low_level
+:waitlist:product:inv_low_track
+:waitlist:product:inv_out_level
+:waitlist:product:inv_out_track
+:waitlist:product:inv_short
+:waitlist:product:name
+:waitlist:product:page_id
+:waitlist:product:pgrpcount
+:waitlist:product:price
+:waitlist:product:taxable
+:waitlist:product:weight
+:waitlist:product_id
+:waitlist:time_added
+:waitlist:variant_id
+```
