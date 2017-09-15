@@ -744,10 +744,12 @@
 				<MvDO FILE = "{ g.Store_Template_Path $ l.waitlist_logic_template:filename }" NAME = "l.success" VALUE = "{ Template_Render( l.settings, l.all_settings ) }">
 			</MvCAPTURE>
 
-			<MvIF EXPR = "{ g.Waitlist_Email_Continue EQ 1 }">
-				<MvASSIGN NAME = "l.continue" VALUE = "1" />
-			<MvELSEIF EXPR = "{ g.Waitlist_Email_Continue EQ 0 }">
-				<MvASSIGN NAME = "l.continue" VALUE = "0" />
+			<MvIF EXPR = "{ NOT ISNULL( g.Waitlist_Email_Continue ) }">
+				<MvIF EXPR = "{ g.Waitlist_Email_Continue EQ 1 }">
+					<MvASSIGN NAME = "l.continue" VALUE = "1" />
+				<MvELSEIF EXPR = "{ g.Waitlist_Email_Continue EQ 0 }">
+					<MvASSIGN NAME = "l.continue" VALUE = "0" />
+				</MvIF>
 			</MvIF>
 
 		</MvIF>
