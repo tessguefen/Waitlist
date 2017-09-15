@@ -209,11 +209,15 @@ if ( waitlist_form && waitlist_api ) {
 
 ## Customized Email Trigger Logic (v 1.001)
 You can create an Page called `WatilistEmailLogic`, and return a `1` or `0` in the variable `g.Waitlist_Email_Continue`.
+
 If `g.Waitlist_Email_Continue` is set to 1, it will send the email.
+
 If `g.Waitlist_Email_Continue` is set to 0, it will not send the email.
+
 If `g.Waitlist_Email_Continue` is not set, it will use the original determination from the module.
 
 **When an email is triggered, and it uses the page WatilistEmailLogic, you will have access to l.settings:waitlist**
+
 `l.settings:waitlist:original_determination` is the original determination from the module before hitting the page. It can return 1, 0 & negative values. Anything below or equal to 0 will not trigger the email.
 
 #### When l.settings:waitlist:variant_id is greater than 0:
