@@ -5,6 +5,7 @@ Current Module Version: 1.002
 - [ ] Add Product Name (variant too?)
 - [ ] Inventory count?
 - [ ] Export of how many Users (#) are waiting per product
+_https://www.miva.com/forums/forum/general/miva-merchant-dream-features/693629-waitlist-module-more-product-data_
 
 ## Functionality
 - [x] Waitlist Batchlist
