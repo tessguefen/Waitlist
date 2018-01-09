@@ -1,6 +1,11 @@
 # Waitlist
 Current Module Version: 1.002
 
+## Coming Soon!
+- [ ] Add Product Name (variant too?)
+- [ ] Inventory count?
+- [ ] Export of how many Users (#) are waiting per product
+
 ## Functionality
 - [x] Waitlist Batchlist
 	- [x] Trigger Emails via Batchlist
