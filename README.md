@@ -2,15 +2,14 @@
 Current Module Version: 1.002
 
 ## Coming Soon!
-- [ ] Add Product Name (variant too?)
 - [ ] Inventory count?
 - [ ] Export of how many Users (#) are waiting per product
-_https://www.miva.com/forums/forum/general/miva-merchant-dream-features/693629-waitlist-module-more-product-data_
 
 ## Functionality
 - [x] Waitlist Batchlist
 	- [x] Trigger Emails via Batchlist
 	- [x] Delete Waitlist entries via Batchlist
+	- [x] Product Name & Variant Name displayed
 - [x] Front-end form submission
 - [x] Page, `WatilistEmailTemplate` created on install with default code for email triggering
 	- [x] Template code includes `l.settings:waitlist` variable. Includes: Product, Variant, Options for selected variant
@@ -24,7 +23,6 @@ _https://www.miva.com/forums/forum/general/miva-merchant-dream-features/693629-w
 - [ ] Run check for Waitlist add Product, with no variant, but should be with a variant (only adding the master product should not be allowed)
 - [ ] Admin > Product View, show batchlist for JUST that product? (Can technically be done with an advanced search on Batchlist)
 - [ ] Return `g.Waitlist_Message_ID`, for use elsewhere (for customizations on Messages)
-- [ ] Look for other functionality that would be useful in this module
 - [x] Custom Page to determine if an email should be triggered. [View Details here](#customized-email-trigger-logic-v-1001)
 
 ## Item Functionality
