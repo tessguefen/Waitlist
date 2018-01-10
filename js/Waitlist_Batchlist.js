@@ -24,7 +24,9 @@ Waitlist_Batchlist.prototype.onCreateRootColumnList = function() {
 		new MMBatchList_Column_DateTime( 'Date Added', 'time_added', 'time_added'),
 		new MMBatchList_Column_Name( 'Email', 'email', 'email'),
 		new MMBatchList_Column_Name( 'Product Code', 'product_code', 'product_code'),
+		new MMBatchList_Column_Name( 'Product Name', 'product_name', 'product_name'),
 		new MMBatchList_Column_Name( 'Variant Code', 'variant_code', 'variant_code'),
+		new MMBatchList_Column_Name( 'Variant Product Name', 'variant_name', 'variant_name'),
 		new MMBatchList_Column_Name( 'Product ID', 'product_id', 'product_id')
 		.SetDisplayInMenu(false)
 		.SetDisplayInList(false)

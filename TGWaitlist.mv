@@ -2,7 +2,7 @@
 	<MvASSIGN NAME = "l.module:code"		VALUE = "TGWaitlist">
 	<MvASSIGN NAME = "l.module:name"		VALUE = "Waitlist">
 	<MvASSIGN NAME = "l.module:provider"	VALUE = "Tess Guefen">
-	<MvASSIGN NAME = "l.module:version"		VALUE = "1.002">
+	<MvASSIGN NAME = "l.module:version"		VALUE = "1.003">
 	<MvASSIGN NAME = "l.module:api_ver"		VALUE = "9.0006">
 	<MvASSIGN NAME = "l.module:description"	VALUE = "Make it easy for customers to quickly sign up for email alerts on out of stock products. When products are back in stock, emails will be automatically sent out by a Scheduled Task. This works on Products & Variants.">
 	<MvASSIGN NAME = "l.module:features"	VALUE = "data_store,not_prod,system,vis_system,json,clientside,scheduledtask,component">
@@ -809,7 +809,7 @@
 	<MvASSIGN NAME = "g.Count"			VALUE = "{ trim( g.Count ) }">
 	<MvASSIGN NAME = "l.search_query"	VALUE = "">
 
-	<MvEVAL EXPR = "{ [ g.Module_Library_DB ].SQL_Query_SELECT( l.search_query,'w.*, p.code as product_code, pv.code as variant_code' ) }">
+	<MvEVAL EXPR = "{ [ g.Module_Library_DB ].SQL_Query_SELECT( l.search_query,'w.*, p.code as product_code, pv.code as variant_code, p.name as product_name, pv.name as variant_name' ) }">
 
 	<MvEVAL EXPR = "{ [ g.Module_Library_DB ].SQL_Query_FROM( l.search_query, g.Store_Table_Prefix $ 'TGWaitlist', 'w' ) }">
 
@@ -819,9 +819,9 @@
 
 	<MvEVAL EXPR = "{ [ g.Module_Library_DB ].SQL_Query_LEFT_OUTER_JOIN( l.search_query, 'w', g.Store_Table_Prefix $ 'Products', 'pv', 'pvp.part_id = pv.id', '' ) }">
 
-	<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Filter( l.search_query, g.Filter,'id:w.id,time_added:w.time_added,product_id:w.product_id,variant_id:w.variant_id,email:w.email,cust_id:w.cust_id,product_code:p.code,variant_code:pv.code' ) }">
+	<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Filter( l.search_query, g.Filter,'id:w.id,time_added:w.time_added,product_id:w.product_id,variant_id:w.variant_id,email:w.email,cust_id:w.cust_id,product_code:p.code,variant_code:pv.code,product_name:p.name,variant_name:pv.name' ) }">
 
-	<MvEVAL EXPR = "{ [ g.Module_Library_DB ].SQL_Query_OrderBy_Fields(l.search_query, g.Sort, 'id:w.id,time_added:w.time_added,product_id:w.product_id,variant_id:w.variant_id,email:w.email,cust_id:w.cust_id,product_code:p.code,variant_code:pv.code', 'w.time_added' ) }">
+	<MvEVAL EXPR = "{ [ g.Module_Library_DB ].SQL_Query_OrderBy_Fields(l.search_query, g.Sort, 'id:w.id,time_added:w.time_added,product_id:w.product_id,variant_id:w.variant_id,email:w.email,cust_id:w.cust_id,product_code:p.code,variant_code:pv.code,product_name:p.name,variant_name:pv.name', 'w.time_added' ) }">
 
 	<MvASSIGN NAME = "l.search_sql" VALUE = "{ [ g.Module_Library_DB].SQL_Query_Build( l.search_query, l.search_fields ) }">
 
@@ -846,7 +846,9 @@
 					"email" : "<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode( TGWaitlist.d.email ) }">",
 					"cust_id" : <MvEVAL EXPR = "{ int( TGWaitlist.d.cust_id ) }">,
 					"product_code" : "<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode( TGWaitlist.d.product_code ) }">",
-					"variant_code" : "<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode( TGWaitlist.d.variant_code ) }">"
+					"product_name" : "<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode( TGWaitlist.d.product_name ) }">",
+					"variant_code" : "<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode( TGWaitlist.d.variant_code ) }">",
+					"variant_name" : "<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode( TGWaitlist.d.variant_name ) }">"
 					<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_ArrayElement_End() }">
 					<MvSKIP NAME = "Merchant" VIEW = "TGWaitlist" ROWS = 1>
 					</MvWHILE>
