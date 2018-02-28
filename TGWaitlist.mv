@@ -2,7 +2,7 @@
 	<MvASSIGN NAME = "l.module:code"		VALUE = "TGWaitlist">
 	<MvASSIGN NAME = "l.module:name"		VALUE = "Waitlist">
 	<MvASSIGN NAME = "l.module:provider"	VALUE = "Tess Guefen">
-	<MvASSIGN NAME = "l.module:version"		VALUE = "1.003">
+	<MvASSIGN NAME = "l.module:version"		VALUE = "1.004">
 	<MvASSIGN NAME = "l.module:api_ver"		VALUE = "9.06">
 	<MvASSIGN NAME = "l.module:description"	VALUE = "Make it easy for customers to quickly sign up for email alerts on out of stock products. When products are back in stock, emails will be automatically sent out by a Scheduled Task. This works on Products & Variants.">
 	<MvASSIGN NAME = "l.module:features"	VALUE = "data_store,not_prod,system,vis_system,json,clientside,scheduledtask,component">
@@ -17,23 +17,23 @@
 <MvFUNCTION NAME = "Module_Install_Store" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = "text, html, compresswhitespace" ERROROUTPUTLEVEL = "">
 
 	<MvASSIGN NAME = "l.waitlist_email_page:admin"		VALUE = "0">
-	<MvASSIGN NAME = "l.waitlist_email_page:code"		VALUE = "WatilistEmailTemplate">
+	<MvASSIGN NAME = "l.waitlist_email_page:code"		VALUE = "WaitlistEmailTemplate">
 	<MvASSIGN NAME = "l.waitlist_email_page:name"		VALUE = "Waitlist Email Template">
 	<MvASSIGN NAME = "l.waitlist_email_page:ui_id"		VALUE = "0">
 	<MvASSIGN NAME = "l.waitlist_email_page:settings"	VALUE = "">
 	<MvCAPTURE VARIABLE = "l.waitlist_email_page:data">
-		<MvINCLUDE FILE = "templates/WatilistEmailTemplate.mvt" INTERPRET = "OFF">
+		<MvINCLUDE FILE = "templates/WaitlistEmailTemplate.mvt" INTERPRET = "OFF">
 	</MvCAPTURE>
 
 	<MvIF EXPR = "{ NOT [ g.Module_Feature_TUI_MGR ].TemplateManager_Create_Page_LowLevel( l.waitlist_email_page, l.waitlist_email_page:data ) }">
-		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-INSTALL-1000:', 'An error occured while creating the page WatilistEmailTemplate' ) }">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-INSTALL-1000:', 'An error occured while creating the page WaitlistEmailTemplate' ) }">
 	</MvIF>
 
 	<MvASSIGN NAME = "l.success" VALUE = "{ [ g.Module_Feature_TUI_MGR ].TemplateManager_Page_Assign_Item( l.waitlist_email_page, 'store' ) }">
 	<MvASSIGN NAME = "l.success" VALUE = "{ [ g.Module_Feature_TUI_MGR ].TemplateManager_Page_Assign_Item( l.waitlist_email_page, 'urls' ) }">
 
 	<MvIF EXPR = "{ NOT [ g.Module_Library_DB ].StoreKey_Insert( 'TGWaitlist', 1 ) }">
-		<MvIF EXPR = "{ [ g.Module_Feature_TUI_DB ].Page_Load_Code( 'WatilistEmailTemplate', l.waitlist_email_page ) }">
+		<MvIF EXPR = "{ [ g.Module_Feature_TUI_DB ].Page_Load_Code( 'WaitlistEmailTemplate', l.waitlist_email_page ) }">
 			<MvASSIGN NAME = "l.success" VALUE = "{ [ g.Module_Feature_TUI_MGR ].TemplateManager_Delete_Page( l.waitlist_email_page ) }">
 		</MvIF>
 		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-INSTALL-2000:', 'An error occured while creating the storekey, TGWaitlist. Please make sure this does not already exsist.' ) }">
@@ -63,7 +63,7 @@
 				 					cust_id			' $ [ g.Module_Library_Native_DBAPI ].DB_Type_NUMBER( 0, 0 )	$ '
 								)' }">
 	<MvIF EXPR = "{ g.MvQUERY_Error }">
-		<MvIF EXPR = "{ [ g.Module_Feature_TUI_DB ].Page_Load_Code( 'WatilistEmailTemplate', l.waitlist_email_page ) }">
+		<MvIF EXPR = "{ [ g.Module_Feature_TUI_DB ].Page_Load_Code( 'WaitlistEmailTemplate', l.waitlist_email_page ) }">
 			<MvASSIGN NAME = "l.success" VALUE = "{ [ g.Module_Feature_TUI_MGR ].TemplateManager_Delete_Page( l.waitlist_email_page ) }">
 		</MvIF>
 		<MvASSIGN NAME = "l.success" VALUE = "{ [ g.Module_Library_DB ].StoreKey_Delete( 'TGWaitlist' ) }">
@@ -77,7 +77,7 @@
 </MvFUNCTION>
 
 <MvFUNCTION NAME = "Module_Uninstall_Store" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = "" ERROROUTPUTLEVEL = "">
-	<MvIF EXPR = "{ [ g.Module_Feature_TUI_DB ].Page_Load_Code( 'WatilistEmailTemplate', l.waitlist_email_page ) }">
+	<MvIF EXPR = "{ [ g.Module_Feature_TUI_DB ].Page_Load_Code( 'WaitlistEmailTemplate', l.waitlist_email_page ) }">
 		<MvASSIGN NAME = "l.success" VALUE = "{ [ g.Module_Feature_TUI_MGR ].TemplateManager_Delete_Page( l.waitlist_email_page ) }">
 	</MvIF>
 	<MvASSIGN NAME = "l.success" VALUE = "{ [ g.Module_Library_DB ].StoreKey_Delete( 'TGWaitlist' ) }">
@@ -617,7 +617,7 @@
 		<MvFUNCTIONRETURN VALUE = 0 />
 	</MvIF>
 
-	<MvDO FILE = "{ g.Module_Feature_TUI_DB }" NAME = "l.loaded" VALUE = "{ Page_Load_Code( 'WatilistEmailTemplate', l.page) }">
+	<MvDO FILE = "{ g.Module_Feature_TUI_DB }" NAME = "l.loaded" VALUE = "{ Page_Load_Code( 'WaitlistEmailTemplate', l.page) }">
 
 	<MvIF EXPR = "{ [ g.Module_Feature_TUI_DB ].ManagedTemplate_Load_ID( l.page:templ_id, l.waitlist_email_template ) }">
 
@@ -707,7 +707,7 @@
 		<MvDO FILE = "{ g.Module_Feature_INV_RT }" NAME = "l.continue" VALUE = "{ Inventory_Is_Available_LowLevel( l.waitlist:product, 1 ) }">
 	</MvIF>
 
-	<MvIF EXPR = "{ [ g.Module_Feature_TUI_DB ].Page_Load_Code( 'WatilistEmailLogic', l.logic_page) }">
+	<MvIF EXPR = "{ [ g.Module_Feature_TUI_DB ].Page_Load_Code( 'WaitlistEmailLogic', l.logic_page) }">
 		<MvIF EXPR = "{ [ g.Module_Feature_TUI_DB ].ManagedTemplate_Load_ID( l.logic_page:templ_id, l.waitlist_logic_template ) }">
 
 			<MvCOMMENT>
