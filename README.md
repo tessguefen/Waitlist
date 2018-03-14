@@ -3,7 +3,7 @@ Current Module Version: 1.005
 
 ## UPDATING FROM 1.004 AND BELOW, TO 1.005
 Please Change the following page codes:
-- `WaitlistEmailTemplate` TO `WaitlistEmailTemplate`
+- `WatilistEmailTemplate` TO `WaitlistEmailTemplate`
 - `WatilistEmailLogic` TO `WaitlistEmailLogic` (if you were using this)
 
 ## Coming Soon!
