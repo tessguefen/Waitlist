@@ -1,7 +1,7 @@
 # Waitlist
-Current Module Version: 1.004
+Current Module Version: 1.005
 
-## UPDATING FROM 1.003 AND BELOW, TO 1.004
+## UPDATING FROM 1.004 AND BELOW, TO 1.005
 Please Change the following page codes:
 - `WaitlistEmailTemplate` TO `WaitlistEmailTemplate`
 - `WatilistEmailLogic` TO `WaitlistEmailLogic` (if you were using this)
