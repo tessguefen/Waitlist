@@ -154,7 +154,7 @@ Optional Inputs:
 var waitlist_api = '&mvtj:waitlist_url;';
 // ---- Update Display When Attribute Machine Fires ---- //
 var waitlist_form = document.getElementsByName( 'waitlist_add' )[0];
-var watilist_ajax_msg = document.getElementById( 'jsWaitlist_Message');
+var waitlist_ajax_msg = document.getElementById( 'jsWaitlist_Message');
 MivaEvents.SubscribeToEvent('variant_changed', function (product_data) {
 	var WaitlistVariantID = document.getElementById( 'jsWaitlist_Variant_ID' );
 	if ( WaitlistVariantID ) {
@@ -197,13 +197,13 @@ if ( waitlist_form && waitlist_api ) {
 			if (this.status === 200) {
 				var wishlist_return = JSON.parse( this.responseText );
 				if ( wishlist_return.success === 0 ) {
-					watilist_ajax_msg.innerHTML = wishlist_return.error_message;
+					waitlist_ajax_msg.innerHTML = wishlist_return.error_message;
 				} else {
-					watilist_ajax_msg.innerHTML = 'Thank you for signing up!';
+					waitlist_ajax_msg.innerHTML = 'Thank you for signing up!';
 				}
 				console.log(wishlist_return);
 			} else {
-				watilist_ajax_msg.innerHTML = 'An error has occurred.';
+				waitlist_ajax_msg.innerHTML = 'An error has occurred.';
 			}
 		};
 		wishlist_call.send( waitlist_data );
