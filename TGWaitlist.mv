@@ -664,11 +664,10 @@
 		<MvDO FILE = "{ g.Module_Library_Utilities }" NAME = "l.email_sent"  VALUE = "{ SendEmail( l.waitlist:email, l.from, '', l.subject, l.email_headers, l.message) }">
 	</MvIF>
 
-	<MvIF EXPR = "{ l.email_sent }">
-		<MvASSIGN NAME = "l.success" VALUE = "{ [ g.Module_Admin ].Admin_Log_Action( 'TGWaitlist-SUCCESS-1000', 'Waitlist Email triggered to' $ l.waitlist:email ) }">
-		<MvIF EXPR = "{ NOT Waitlist_Delete( l.waitlist:id ) }">
-			<MvFUNCTIONRETURN VALUE = 0 />
-		</MvIF>
+	<MvASSIGN NAME = "l.success" VALUE = "{ [ g.Module_Admin ].Admin_Log_Action( 'TGWaitlist-SUCCESS-1000', 'Waitlist Email triggered to' $ l.waitlist:email ) }">
+	
+	<MvIF EXPR = "{ NOT Waitlist_Delete( l.waitlist:id ) }">
+		<MvFUNCTIONRETURN VALUE = 0 />
 	</MvIF>
 
 	<MvFUNCTIONRETURN VALUE = 1 />
