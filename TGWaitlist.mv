@@ -2,7 +2,7 @@
 	<MvASSIGN NAME = "l.module:code"		VALUE = "TGWaitlist">
 	<MvASSIGN NAME = "l.module:name"		VALUE = "Waitlist">
 	<MvASSIGN NAME = "l.module:provider"	VALUE = "Tess Guefen">
-	<MvASSIGN NAME = "l.module:version"		VALUE = "1.004">
+	<MvASSIGN NAME = "l.module:version"		VALUE = "1.005">
 	<MvASSIGN NAME = "l.module:api_ver"		VALUE = "9.06">
 	<MvASSIGN NAME = "l.module:description"	VALUE = "Make it easy for customers to quickly sign up for email alerts on out of stock products. When products are back in stock, emails will be automatically sent out by a Scheduled Task. This works on Products & Variants.">
 	<MvASSIGN NAME = "l.module:features"	VALUE = "data_store,not_prod,system,vis_system,json,clientside,scheduledtask,component">
