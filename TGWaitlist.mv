@@ -2,7 +2,7 @@
 	<MvASSIGN NAME = "l.module:code"		VALUE = "TGWaitlist">
 	<MvASSIGN NAME = "l.module:name"		VALUE = "Waitlist">
 	<MvASSIGN NAME = "l.module:provider"	VALUE = "Tess Guefen">
-	<MvASSIGN NAME = "l.module:version"		VALUE = "1.005">
+	<MvASSIGN NAME = "l.module:version"		VALUE = "1.006">
 	<MvASSIGN NAME = "l.module:api_ver"		VALUE = "9.06">
 	<MvASSIGN NAME = "l.module:description"	VALUE = "Make it easy for customers to quickly sign up for email alerts on out of stock products. When products are back in stock, emails will be automatically sent out by a Scheduled Task. This works on Products & Variants.">
 	<MvASSIGN NAME = "l.module:features"	VALUE = "data_store,not_prod,system,vis_system,json,clientside,scheduledtask,component">
@@ -122,7 +122,7 @@
 </MvCOMMENT>
 
 <MvFUNCTION NAME = "SystemModule_Action" PARAMETERS = "module var, action" STANDARDOUTPUTLEVEL = "compresswhitespace">
-	<MvIF EXPR = "{ 'WaitlistAdd' CIN l.action }">
+	<MvIF EXPR = "{ l.action EQ 'WaitlistAdd' }">
 		<MvASSIGN NAME = "l.success" VALUE = "{ Waitlist_Form_Add( g.Waitlist_Product_Code, g.Waitlist_Variant_ID, g.Waitlist_Email ) }">
 	</MvIF>
 	<MvFUNCTIONRETURN VALUE = 1>
@@ -790,25 +790,35 @@
 </MvFUNCTION>
 
 <MvFUNCTION NAME = "Waitlist_Form_Add" PARAMETERS = "product_code, variant_id, email" STANDARDOUTPUTLEVEL = "">
-	<MvIF EXPR = "{ NOT [ g.Module_Library_DB ].Product_Load_Code( l.product_code, l.product ) }">
-		<MvASSIGN NAME = "g.Waitlist_Error" VALUE = "{ l.product_code $ ' does not exist.' }">
+	<MvASSIGN NAME = "l.variant_id" VALUE = "{ int( l.variant_id ) }" />
+
+	<MvIF EXPR = "{ NOT [ g.Module_Admin ].Validate_Email( l.email ) }">
+		<MvASSIGN NAME = "g.Waitlist_Error" VALUE = "Please enter a valid email.">
 		<MvFUNCTIONRETURN VALUE = 0 />
 	</MvIF>
+
+	<MvIF EXPR = "{ NOT [ g.Module_Library_DB ].Product_Load_Code( l.product_code, l.product ) }">
+		<MvASSIGN NAME = "g.Waitlist_Error" VALUE = "{ encodeentities( l.product_code ) $ ' does not exist.' }">
+		<MvFUNCTIONRETURN VALUE = 0 />
+	</MvIF>
+
 	<MvIF EXPR = "{ NOT Waitlist_Add( l.product:id, l.variant_id, l.email ) }">
 		<MvFUNCTIONRETURN VALUE = 0 />
 	</MvIF>
-	<MvASSIGN NAME = "g.Waitlist_Message" VALUE = "{ 'Success! The email, <strong>' $ encodeentities( l.email ) $ '</strong>, has been added to the waitlist.' }" />
+
+	<MvASSIGN NAME = "g.Waitlist_Message" VALUE = "{ 'Success! You have been added to the waitlist.' }" />
+
 	<MvFUNCTIONRETURN VALUE = 1 />
 </MvFUNCTION>
 
 <MvFUNCTION NAME = "JSON_Waitlist_All_Load_Query" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = "text, html, compresswhitespace">
 	<MvASSIGN NAME = "g.Filter"			VALUE = "{ trim( g.Filter ) }">
 	<MvASSIGN NAME = "g.Sort"			VALUE = "{ trim( g.Sort ) }">
-	<MvASSIGN NAME = "g.Offset"			VALUE = "{ trim( g.Offset ) }">
-	<MvASSIGN NAME = "g.Count"			VALUE = "{ trim( g.Count ) }">
+	<MvASSIGN NAME = "g.Offset"			VALUE = "{ int( g.Offset ) }">
+	<MvASSIGN NAME = "g.Count"			VALUE = "{ int( g.Count ) }">
 	<MvASSIGN NAME = "l.search_query"	VALUE = "">
 
-	<MvEVAL EXPR = "{ [ g.Module_Library_DB ].SQL_Query_SELECT( l.search_query,'w.*, p.code as product_code, pv.code as variant_code, p.name as product_name, pv.name as variant_name' ) }">
+	<MvEVAL EXPR = "{ [ g.Module_Library_DB ].SQL_Query_SELECT( l.search_query,'w.*, p.code as product_code, pv.code as variant_code, pv.id as variant_product_id, p.name as product_name, pv.name as variant_name' ) }">
 
 	<MvEVAL EXPR = "{ [ g.Module_Library_DB ].SQL_Query_FROM( l.search_query, g.Store_Table_Prefix $ 'TGWaitlist', 'w' ) }">
 
@@ -847,7 +857,17 @@
 					"product_code" : "<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode( TGWaitlist.d.product_code ) }">",
 					"product_name" : "<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode( TGWaitlist.d.product_name ) }">",
 					"variant_code" : "<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode( TGWaitlist.d.variant_code ) }">",
-					"variant_name" : "<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode( TGWaitlist.d.variant_name ) }">"
+					"variant_name" : "<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode( TGWaitlist.d.variant_name ) }">",
+					<MvASSIGN NAME = "l.product_id" VALUE = "{ TGWaitlist.d.variant_product_id }">
+					<MvASSIGN NAME = "l.variant_id" VALUE = "{ TGWaitlist.d.variant_id }">
+					<MvASSIGN NAME = "l.output" VALUE = "NULL" />
+					<MvASSIGN NAME = "l.void" VALUE = "{ [ g.Module_Library_DB ].Product_Load_ID_WithRuntimeInventory( l.product_id, l.output ) }">
+					<MvASSIGN NAME = "l.void" VALUE = "{ [ g.Module_Feature_INV_RT ].Inventory_Load_Variant( l.output, l.variant_id ) }">
+					<MvIF EXPR = "{ l.output:inv_active }">
+						"inv_count" : "<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode( l.output:inv_available ) }">"
+					<MvELSE>
+						"inv_count" : "N/A"
+					</MvIF>
 					<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_ArrayElement_End() }">
 					<MvSKIP NAME = "Merchant" VIEW = "TGWaitlist" ROWS = 1>
 					</MvWHILE>

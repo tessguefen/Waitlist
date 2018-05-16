@@ -31,10 +31,13 @@ Waitlist_Batchlist.prototype.onCreateRootColumnList = function() {
 		.SetDisplayInMenu(false)
 		.SetDisplayInList(false)
 		.SetAdvancedSearchEnabled(false),
-		new MMBatchList_Column_Name( 'Variant ID', 'variant_id ', 'variant_id ')
+		new MMBatchList_Column_Name( 'Variant ID', 'variant_id ', 'variant_id')
 		.SetAdvancedSearchEnabled(false)
 		.SetDisplayInMenu(false)
-		.SetDisplayInList(false)
+		.SetDisplayInList(false),
+		new MMBatchList_Column_Name( 'Current Stock', 'inv_count', 'inv_count')
+		.SetAdvancedSearchEnabled(false)
+		.SetSortByField( '' )
 	];
 	return columnlist;
 }
