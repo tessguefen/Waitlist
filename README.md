@@ -1,13 +1,16 @@
 # Waitlist
-Current Module Version: 1.005
+Current Module Version: 1.006
 
-## UPDATING FROM 1.004 AND BELOW, TO 1.005
+## What's new in 1.006
+- Current Stock Column for Batchlist
+- Minor Validation
+
+## UPDATING FROM 1.004 AND BELOW
 Please Change the following page codes:
 - `WatilistEmailTemplate` TO `WaitlistEmailTemplate`
 - `WatilistEmailLogic` TO `WaitlistEmailLogic` (if you were using this)
 
 ## Coming Soon!
-- [ ] Inventory count?
 - [ ] Export of how many Users (#) are waiting per product
 
 ## Functionality
@@ -129,8 +132,8 @@ Optional Inputs:
 
 **Form Example**
 ```xml
-<mvt:if expr="g.Waitlist_Error"><div style="background: #e74c3c; color: #fff; font-size: 11px; padding: 5px 10px;">Error: &mvt:global:Waitlist_Error;</div></mvt:if>
-<mvt:if expr="g.Waitlist_Message"><div style="background: #16a085; color: #fff; font-size: 11px; padding: 5px 10px;">&mvt:global:Waitlist_Message;</div></mvt:if>
+<mvt:if expr="g.Waitlist_Error"><div style="background: #e74c3c; color: #fff; font-size: 11px; padding: 5px 10px;">Error: &mvte:global:Waitlist_Error;</div></mvt:if>
+<mvt:if expr="g.Waitlist_Message"><div style="background: #16a085; color: #fff; font-size: 11px; padding: 5px 10px;">&mvte:global:Waitlist_Message;</div></mvt:if>
 
 <form name="waitlist_add" method="post" action="&mvte:product:link;" style="display:none;">
 	<div style="font-size: 11px; background: #ecf0f1; text-align: center; padding: 10px 5px; margin-bottom: 0.75rem;">Sign up with your email to be notified when this product is back in stock!</div>
