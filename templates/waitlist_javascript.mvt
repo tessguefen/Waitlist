@@ -36,7 +36,7 @@ if ( waitlist_form && waitlist_api ) {
 		var Waitlist_Variant_ID = document.getElementsByName( 'Waitlist_Variant_ID' )[0].value;
 		var Waitlist_Email = document.getElementsByName( 'Waitlist_Email' )[0].value;
 
-		var waitlist_data = 'WaitlistFunction=Waitlist_Add&Product_Code=' + Waitlist_Product_Code + '&Variant_ID=' + Waitlist_Variant_ID + '&Email=' + Waitlist_Email;
+		var waitlist_data = 'WaitlistFunction=Waitlist_Add&Product_Code=' + encodeURIComponent( Waitlist_Product_Code ) + '&Variant_ID=' + encodeURIComponent( Waitlist_Variant_ID ) + '&Email=' + encodeURIComponent( Waitlist_Email );
 
 		var wishlist_call = new XMLHttpRequest();
 		wishlist_call.open('POST', waitlist_api, true);
@@ -46,17 +46,15 @@ if ( waitlist_form && waitlist_api ) {
 			if (this.status === 200) {
 				var wishlist_return = JSON.parse( this.responseText );
 				if ( wishlist_return.success === 0 ) {
-					watilist_ajax_msg.innerHTML = wishlist_return.error_message;
+					watilist_ajax_msg.textContent = wishlist_return.error_message;
 				} else {
-					watilist_ajax_msg.innerHTML = 'Thank you for signing up!';
+					watilist_ajax_msg.textContent = 'Thank you for signing up!';
 				}
-				console.log(wishlist_return);
 			} else {
-				watilist_ajax_msg.innerHTML = 'An error has occurred.';
+				watilist_ajax_msg.textContent = 'An error has occurred.';
 			}
 		};
 		wishlist_call.send( waitlist_data );
-
 	}
 }
 </script>

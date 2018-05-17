@@ -176,9 +176,9 @@
 																	</mvt:if>
 																	<mvt:do file="g.Module_Feature_URI_UT" name="l.settings:waitlist:product:link" value="Store_Product_URL(l.settings:waitlist:product, l.flags)" />
 																	<mvt:if expr="l.settings:waitlist:variant_id GT 0">
-																		<mvt:assign name="l.settings:waitlist:product:link" value="l.settings:waitlist:product:link $ 'variant_id=' $ l.settings:waitlist:variant_id" />
+																		<mvt:assign name="l.settings:waitlist:product:link" value="l.settings:waitlist:product:link $ 'variant_id=' $ encodeattribute ( l.settings:waitlist:variant_id )" />
 																	</mvt:if>
-																	You requested to be added to the waitlist for <strong><a href="&mvt:waitlist:product:link;">&mvt:waitlist:product:name;</a></strong> on <strong>&mvt:waitlist:formatted_date;</strong>, and it's back in stock!
+																	You requested to be added to the waitlist for <strong><a href="&mvt:waitlist:product:link;">&mvte:waitlist:product:name;</a></strong> on <strong>&mvte:waitlist:formatted_date;</strong>, and it's back in stock!
 																	<mvt:assign name="l.settings:total_options" value="miva_array_elements( l.settings:waitlist:options )" />
 																	<mvt:if expr="l.settings:total_options GT 0">
 																		<mvt:assign name="l.counter" value="0" />

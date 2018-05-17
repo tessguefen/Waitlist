@@ -192,9 +192,11 @@
 		<MvEVAL EXPR = "{ JSON_Waitlist_All_Load_Query( l.module ) }">
 	</MvIF>
 	<MvIF EXPR = "{ g.Module_Function EQ 'Waitlist_Delete' }">
-		<MvFUNCTIONRETURN VALUE = "{ JSON_Waitlist_Delete( g.waitlist_id ) }">
+		<MvASSIGN NAME = "g.Waitlist_ID" VALUE = "{ [ g.Module_JSON ].JSON_Decode( g.Waitlist_ID ) }">
+		<MvFUNCTIONRETURN VALUE = "{ JSON_Waitlist_Delete( g.Waitlist_ID ) }">
 	</MvIF>
 	<MvIF EXPR = "{ g.Module_Function EQ 'Waitlist_Trigger_Emails' }">
+		<MvASSIGN NAME = "g.Waitlists" VALUE = "{ [ g.Module_JSON ].JSON_Decode( g.Waitlists ) }">
 		<MvFUNCTIONRETURN VALUE = "{ JSON_Waitlist_Trigger_Emails( g.Waitlists ) }">
 	</MvIF>
 </MvFUNCTION>
@@ -433,7 +435,7 @@
 				FIELDS	= "l.waitlist_id">
 
 	<MvIF EXPR = "{ g.MvOPENVIEW_Error }">
-		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-CHECK-1001:', 'An error occured while checking a record. Error:' $ g.MvQUERY_Error ) }">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-CHECK-1001:', 'An error occured while checking a record.' }">
 	</MvIF>
 
 	<MvASSIGN NAME = "l.waitlist" MEMBER = "id"				VALUE = "{ TGWaitlistLoad.d.id }">
@@ -453,11 +455,11 @@
 </MvFUNCTION>
 
 <MvFUNCTION NAME = "Waitlist_Add_Lowlevel" PARAMETERS = "timestamp, product_id, variant_id, email, cust_id" STANDARDOUTPUTLEVEL = "">
-	<MvASSIGN NAME = "l.timestamp"		VALUE = "{ trim( l.timestamp ) }">
-	<MvASSIGN NAME = "l.product_id"		VALUE = "{ trim( l.product_id ) }">
-	<MvASSIGN NAME = "l.variant_id"		VALUE = "{ trim( l.variant_id ) }">
+	<MvASSIGN NAME = "l.timestamp"		VALUE = "{ int( l.timestamp ) }">
+	<MvASSIGN NAME = "l.product_id"		VALUE = "{ int( l.product_id ) }">
+	<MvASSIGN NAME = "l.variant_id"		VALUE = "{ int( l.variant_id ) }">
 	<MvASSIGN NAME = "l.email"			VALUE = "{ trim( l.email ) }">
-	<MvASSIGN NAME = "l.cust_id"		VALUE = "{ trim( l.cust_id ) }">
+	<MvASSIGN NAME = "l.cust_id"		VALUE = "{ int( l.cust_id ) }">
 
 	<MvIF EXPR = "{ ( ISNULL l.timestamp ) }">
 		<MvASSIGN NAME = "g.Waitlist_Error" VALUE = "Missing Timestamp.">
@@ -506,17 +508,17 @@
 				FIELDS = "l.id, l.timestamp, l.product_id, l.variant_id, l.email, l.cust_id">
 
 	<MvIF EXPR = "{ g.MvQUERY_Error }">
-		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-INSERT-1000:', 'An error occured while inserting a new record. Error:' $ g.MvQUERY_Error ) }">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-INSERT-1000:', 'An error occured while inserting a new record.' }">
 	</MvIF>
 
 	<MvFUNCTIONRETURN VALUE = 1 />
 </MvFUNCTION>
 
 <MvFUNCTION NAME = "WaitlistXCheck" PARAMETERS = "product_id, variant_id, email, data var" STANDARDOUTPUTLEVEL = "">
-	<MvASSIGN NAME = "l.product_id"		VALUE = "{ trim( l.product_id ) }">
-	<MvASSIGN NAME = "l.variant_id"		VALUE = "{ trim( l.variant_id ) }">
+	<MvASSIGN NAME = "l.product_id"		VALUE = "{ int( l.product_id ) }">
+	<MvASSIGN NAME = "l.variant_id"		VALUE = "{ int( l.variant_id ) }">
 	<MvASSIGN NAME = "l.email"			VALUE = "{ trim( l.email ) }">
-	<MvASSIGN NAME = "l.cust_id"		VALUE = "{ trim( l.cust_id ) }">
+	<MvASSIGN NAME = "l.cust_id"		VALUE = "{ int( l.cust_id ) }">
 
 	<MvIF EXPR = "{ ISNULL l.variant_id }">
 		<MvASSIGN NAME = "l.variant_id" VALUE = "0" />
@@ -531,7 +533,7 @@
 				FIELDS	= "l.product_id, l.variant_id, l.email">
 
 	<MvIF EXPR = "{ g.MvOPENVIEW_Error }">
-		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-CHECK-1000:', 'An error occured while checking a record. Error:' $ g.MvQUERY_Error ) }">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-CHECK-1000:', 'An error occured while checking a record.' }">
 	</MvIF>
 
 	<MvEVAL EXPR = "{ Waitlist_Read( l.data ) }">
@@ -588,7 +590,7 @@
 				FIELDS	= "l.waitlist:product_id, l.waitlist:variant_id">
 
 	<MvIF EXPR = "{ g.MvOPENVIEW_Error }">
-		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-CHECK-1003:', 'An error occured while checking a record. Error:' $ g.MvQUERY_Error ) }">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-CHECK-1003:', 'An error occured while checking a record.' }">
 	</MvIF>
 
 	<MvASSIGN NAME = "g.WaitlistCount" VALUE = "0">
@@ -812,6 +814,9 @@
 </MvFUNCTION>
 
 <MvFUNCTION NAME = "JSON_Waitlist_All_Load_Query" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = "text, html, compresswhitespace">
+	<MvIF EXPR = "{ NOT [ g.Module_JSON ].JSON_Store_Open() }">
+		<MvFUNCTIONRETURN>
+	</MvIF>
 	<MvASSIGN NAME = "g.Filter"			VALUE = "{ trim( g.Filter ) }">
 	<MvASSIGN NAME = "g.Sort"			VALUE = "{ trim( g.Sort ) }">
 	<MvASSIGN NAME = "g.Offset"			VALUE = "{ int( g.Offset ) }">
@@ -837,7 +842,7 @@
 	<MvIF EXPR = "{ NOT [ g.Module_Library_DB ].SQL_Query_Count( l.search_query, l.total_count ) }">
 		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error(g.Error_Code, g.Error_Message ) }">
 	<MvELSEIF EXPR = "{ NOT [ g.Module_Library_Native_DBAPI ].DB_OPENVIEW_Range('Merchant', 'TGWaitlist', l.search_sql, l.search_fields, g.Offset, g.Count) }">
-		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error( 'TGWaitlist-MOD-2005',g.MvOPENVIEW_Error ) }">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error( 'TGWaitlist-MOD-2005', 'An error occured.' ) }">
 	</MvIF>
 
 	<MvASSIGN NAME = "l.count" VALUE = 0>
@@ -881,6 +886,10 @@
 </MvFUNCTION>
 
 <MvFUNCTION NAME = "JSON_Waitlist_Delete" PARAMETERS = "id" STANDARDOUTPUTLEVEL = "">
+	<MvIF EXPR = "{ NOT [ g.Module_JSON ].JSON_Store_Open() }">
+		<MvFUNCTIONRETURN>
+	</MvIF>
+	<MvASSIGN NAME = "l.id" VALUE = "{ int( l.id ) }" />
 	<MvIF EXPR = "{ NOT Waitlist_Delete( l.id ) }">
 		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_FieldError( 'time_added', g.MvQUERY_Error ) }">
 	</MvIF>
@@ -888,6 +897,9 @@
 </MvFUNCTION>
 
 <MvFUNCTION NAME = "JSON_Waitlist_Trigger_Emails" PARAMETERS = "waitlists" STANDARDOUTPUTLEVEL = "">
+	<MvIF EXPR = "{ NOT [ g.Module_JSON ].JSON_Store_Open() }">
+		<MvFUNCTIONRETURN>
+	</MvIF>
 	<MvFOREACH ITERATOR = "l.waitlist_id" ARRAY = "l.waitlist_array" COUNT = "{ [ g.Module_JSON ].JSON_Array_Integer( l.waitlists, l.waitlist_array ) }">
 		<MvASSIGN NAME = "l.success" VALUE = "{ Waitlist_Trigger_Email( l.waitlist_id ) }">
 	</MvFOREACH>
@@ -900,7 +912,7 @@
 				QUERY 	= "{ 'SELECT * FROM ' $ g.Store_Table_Prefix $ 'TGWaitlist GROUP BY product_id, variant_id' }">
 
 	<MvIF EXPR = "{ g.MvOPENVIEW_Error }">
-		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-CHECK-1004:', 'An error occured while loading in records. Error:' $ g.MvQUERY_Error ) }">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-CHECK-1004:', 'An error occured while loading in records.' }">
 	</MvIF>
 
 	<MvASSIGN NAME = "g.WaitlistCount" VALUE = "0">
@@ -929,6 +941,11 @@
 	|			g.Product_Code, g.Variant_ID, g.Email		
 	|
 	</MvCOMMENT>
+	<MvASSIGN NAME = "g.WaitlistFunction" VALUE = "{ [ g.Module_JSON ].JSON_Decode( g.WaitlistFunction ) }">
+	<MvASSIGN NAME = "g.Email" VALUE = "{ [ g.Module_JSON ].JSON_Decode( g.Email ) }">
+	<MvASSIGN NAME = "g.Product_Code" VALUE = "{ [ g.Module_JSON ].JSON_Decode( g.Product_Code ) }">
+	<MvASSIGN NAME = "g.Variant_ID" VALUE = "{ [ g.Module_JSON ].JSON_Decode( g.Variant_ID ) }">
+
 	<MvIF EXPR = "{ ISNULL g.WaitlistFunction }">
 		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error( 'WaitlistFunction', 'Missing Function' ) }">
 	</MvIF>
@@ -962,7 +979,7 @@
 				FIELDS	= "l.product_id, l.variant_id">
 
 	<MvIF EXPR = "{ g.MvOPENVIEW_Error }">
-		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-CHECK-1001:', 'An error occured while checking a record. Error:' $ g.MvQUERY_Error ) }">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-CHECK-1001:', 'An error occured while checking a record.' }">
 	</MvIF>
 
 	<MvASSIGN NAME = "l.return" VALUE = "{ TGWaitlistCount.d.total_count }">
@@ -988,7 +1005,7 @@
 				FIELDS	= "l.cust_id">
 
 	<MvIF EXPR = "{ g.MvOPENVIEW_Error }">
-		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-CHECK-1005:', 'An error occured while loading in records. Error:' $ g.MvQUERY_Error ) }">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-CHECK-1005:', 'An error occured while loading in records.' }">
 	</MvIF>
 
 	<MvASSIGN NAME = "g.WaitlistCount" VALUE = "0">
@@ -1020,7 +1037,7 @@
 				FIELDS	= "l.email">
 
 	<MvIF EXPR = "{ g.MvOPENVIEW_Error }">
-		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-CHECK-1005:', 'An error occured while loading in records. Error:' $ g.MvQUERY_Error ) }">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-CHECK-1005:', 'An error occured while loading in records.' }">
 	</MvIF>
 
 	<MvASSIGN NAME = "g.WaitlistCount" VALUE = "0">
