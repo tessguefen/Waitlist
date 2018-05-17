@@ -420,7 +420,7 @@
 	<MvASSIGN NAME = "l.waitlist" MEMBER = "cust_id" 		VALUE = "{ TGWaitlist.d.cust_id }">
 </MvFUNCTION>
 
-<MvFUNCTION NAME = "Waitlist_Load_ID" PARAMETERS = "waitlist_id, waitlist var" STANDARDOUTPUTLEVEL = "">
+<MvFUNCTION NAME = "Waitlist_Load_ID" PARAMETERS = "waitlist_id, waitlist var" STANDARDOUTPUTLEVEL = ""  ERROROUTPUTLEVEL = "">
 	<MvASSIGN NAME = "l.waitlist_id" VALUE = "{ trim( l.waitlist_id ) }">
 
 	<MvIF EXPR = "{ ( l.waitlist_id EQ 0 ) OR ( ISNULL l.waitlist_id ) }">
@@ -454,7 +454,7 @@
 	<MvFUNCTIONRETURN VALUE = 0 />
 </MvFUNCTION>
 
-<MvFUNCTION NAME = "Waitlist_Add_Lowlevel" PARAMETERS = "timestamp, product_id, variant_id, email, cust_id" STANDARDOUTPUTLEVEL = "">
+<MvFUNCTION NAME = "Waitlist_Add_Lowlevel" PARAMETERS = "timestamp, product_id, variant_id, email, cust_id" STANDARDOUTPUTLEVEL = ""  ERROROUTPUTLEVEL = "">
 	<MvASSIGN NAME = "l.timestamp"		VALUE = "{ int( l.timestamp ) }">
 	<MvASSIGN NAME = "l.product_id"		VALUE = "{ int( l.product_id ) }">
 	<MvASSIGN NAME = "l.variant_id"		VALUE = "{ int( l.variant_id ) }">
@@ -514,7 +514,7 @@
 	<MvFUNCTIONRETURN VALUE = 1 />
 </MvFUNCTION>
 
-<MvFUNCTION NAME = "WaitlistXCheck" PARAMETERS = "product_id, variant_id, email, data var" STANDARDOUTPUTLEVEL = "">
+<MvFUNCTION NAME = "WaitlistXCheck" PARAMETERS = "product_id, variant_id, email, data var" STANDARDOUTPUTLEVEL = ""  ERROROUTPUTLEVEL = "">
 	<MvASSIGN NAME = "l.product_id"		VALUE = "{ int( l.product_id ) }">
 	<MvASSIGN NAME = "l.variant_id"		VALUE = "{ int( l.variant_id ) }">
 	<MvASSIGN NAME = "l.email"			VALUE = "{ trim( l.email ) }">
@@ -554,7 +554,7 @@
 	<MvFUNCTIONRETURN VALUE = 1 />
 </MvFUNCTION>
 
-<MvFUNCTION NAME = "Waitlist_Delete" PARAMETERS = "waitlist_id" STANDARDOUTPUTLEVEL = "">
+<MvFUNCTION NAME = "Waitlist_Delete" PARAMETERS = "waitlist_id" STANDARDOUTPUTLEVEL = ""  ERROROUTPUTLEVEL = "">
 	<MvQUERY NAME 	= "Merchant"
 			 QUERY 	= "{ 'DELETE FROM ' $ g.Store_Table_Prefix $ 'TGWaitlist WHERE id = ?' }"
 			 FIELDS = "l.waitlist_id">
@@ -579,7 +579,7 @@
 	<MvFUNCTIONRETURN VALUE = "{ Waitlist_Trigger_Email_Lowlevel( l.waitlist ) }" />
 </MvFUNCTION>
 
-<MvFUNCTION NAME = "Waitlist_Trigger_EmailsXProduct" PARAMETERS = "product_id, variant_id" STANDARDOUTPUTLEVEL = "">
+<MvFUNCTION NAME = "Waitlist_Trigger_EmailsXProduct" PARAMETERS = "product_id, variant_id" STANDARDOUTPUTLEVEL = ""  ERROROUTPUTLEVEL = "">
 	<MvIF EXPR = "{ NOT Waitlist_Product_Check( l.product_id, l.variant_id, l.waitlist) }">
 		<MvFUNCTIONRETURN VALUE = 0 />
 	</MvIF>
@@ -781,7 +781,7 @@
 	<MvFUNCTIONRETURN VALUE = "{ l.options }" />
 </MvFUNCTION>
 
-<MvFUNCTION NAME = "Waitlist_Delete_Product" PARAMETERS = "product_id" STANDARDOUTPUTLEVEL = "">
+<MvFUNCTION NAME = "Waitlist_Delete_Product" PARAMETERS = "product_id" STANDARDOUTPUTLEVEL = "" ERROROUTPUTLEVEL = "">
 	<MvQUERY NAME 	= "Merchant"
 			 QUERY 	= "{ 'DELETE FROM ' $ g.Store_Table_Prefix $ 'TGWaitlist WHERE product_id = ?' }"
 			 FIELDS = "l.product_id">
@@ -906,7 +906,7 @@
 	<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Success() }">
 </MvFUNCTION>
 
-<MvFUNCTION NAME = "Waitlists_Trigger_All" PARAMETERS = "" STANDARDOUTPUTLEVEL = "">
+<MvFUNCTION NAME = "Waitlists_Trigger_All" PARAMETERS = "" STANDARDOUTPUTLEVEL = ""  ERROROUTPUTLEVEL = "">
 	<MvOPENVIEW NAME	= "Merchant"
 				VIEW 	= "TGWaitlist"
 				QUERY 	= "{ 'SELECT * FROM ' $ g.Store_Table_Prefix $ 'TGWaitlist GROUP BY product_id, variant_id' }">
@@ -968,7 +968,7 @@
 	<MvFUNCTIONRETURN VALUE = 1>
 </MvFUNCTION>
 
-<MvFUNCTION NAME = "CurrentWaitlistCount" PARAMETERS = "product_id, variant_id, return var" STANDARDOUTPUTLEVEL = "">
+<MvFUNCTION NAME = "CurrentWaitlistCount" PARAMETERS = "product_id, variant_id, return var" STANDARDOUTPUTLEVEL = ""  ERROROUTPUTLEVEL = "">
 	<MvIF EXPR = "{ ISNULL l.variant_id }">
 		<MvASSIGN NAME = "l.variant_id" VALUE = "0">
 	</MvIF>
@@ -989,7 +989,7 @@
 	<MvFUNCTIONRETURN VALUE = 1>
 </MvFUNCTION>
 
-<MvFUNCTION NAME = "WaitlistXCustomer_Load" PARAMETERS = "cust_id, return var" STANDARDOUTPUTLEVEL = "">
+<MvFUNCTION NAME = "WaitlistXCustomer_Load" PARAMETERS = "cust_id, return var" STANDARDOUTPUTLEVEL = ""   ERROROUTPUTLEVEL = "">
 	<MvIF EXPR = "{ ISNULL l.cust_id }">
 		<MvASSIGN NAME = "l.return" VALUE = "0">
 		<MvFUNCTIONRETURN VALUE = 0>
@@ -1024,7 +1024,7 @@
 	<MvFUNCTIONRETURN VALUE = 1>
 </MvFUNCTION>
 
-<MvFUNCTION NAME = "WaitlistXEmail_Load" PARAMETERS = "email, return var" STANDARDOUTPUTLEVEL = "">
+<MvFUNCTION NAME = "WaitlistXEmail_Load" PARAMETERS = "email, return var" STANDARDOUTPUTLEVEL = ""  ERROROUTPUTLEVEL = "">
 	<MvIF EXPR = "{ ISNULL l.email }">
 		<MvASSIGN NAME = "l.return" VALUE = "0">
 		<MvFUNCTIONRETURN VALUE = 0>
