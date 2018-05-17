@@ -435,7 +435,7 @@
 				FIELDS	= "l.waitlist_id">
 
 	<MvIF EXPR = "{ g.MvOPENVIEW_Error }">
-		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-CHECK-1001:', 'An error occured while checking a record.' }">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-CHECK-1001:', 'An error occured while checking a record.' ) }">
 	</MvIF>
 
 	<MvASSIGN NAME = "l.waitlist" MEMBER = "id"				VALUE = "{ TGWaitlistLoad.d.id }">
@@ -508,7 +508,7 @@
 				FIELDS = "l.id, l.timestamp, l.product_id, l.variant_id, l.email, l.cust_id">
 
 	<MvIF EXPR = "{ g.MvQUERY_Error }">
-		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-INSERT-1000:', 'An error occured while inserting a new record.' }">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-INSERT-1000:', 'An error occured while inserting a new record.' ) }">
 	</MvIF>
 
 	<MvFUNCTIONRETURN VALUE = 1 />
@@ -533,7 +533,7 @@
 				FIELDS	= "l.product_id, l.variant_id, l.email">
 
 	<MvIF EXPR = "{ g.MvOPENVIEW_Error }">
-		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-CHECK-1000:', 'An error occured while checking a record.' }">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-CHECK-1000:', 'An error occured while checking a record.' ) }">
 	</MvIF>
 
 	<MvEVAL EXPR = "{ Waitlist_Read( l.data ) }">
@@ -590,7 +590,7 @@
 				FIELDS	= "l.waitlist:product_id, l.waitlist:variant_id">
 
 	<MvIF EXPR = "{ g.MvOPENVIEW_Error }">
-		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-CHECK-1003:', 'An error occured while checking a record.' }">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-CHECK-1003:', 'An error occured while checking a record.' ) }">
 	</MvIF>
 
 	<MvASSIGN NAME = "g.WaitlistCount" VALUE = "0">
@@ -912,7 +912,7 @@
 				QUERY 	= "{ 'SELECT * FROM ' $ g.Store_Table_Prefix $ 'TGWaitlist GROUP BY product_id, variant_id' }">
 
 	<MvIF EXPR = "{ g.MvOPENVIEW_Error }">
-		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-CHECK-1004:', 'An error occured while loading in records.' }">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-CHECK-1004:', 'An error occured while loading in records.' ) }">
 	</MvIF>
 
 	<MvASSIGN NAME = "g.WaitlistCount" VALUE = "0">
@@ -979,7 +979,7 @@
 				FIELDS	= "l.product_id, l.variant_id">
 
 	<MvIF EXPR = "{ g.MvOPENVIEW_Error }">
-		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-CHECK-1001:', 'An error occured while checking a record.' }">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-CHECK-1001:', 'An error occured while checking a record.' ) }">
 	</MvIF>
 
 	<MvASSIGN NAME = "l.return" VALUE = "{ TGWaitlistCount.d.total_count }">
@@ -1005,7 +1005,7 @@
 				FIELDS	= "l.cust_id">
 
 	<MvIF EXPR = "{ g.MvOPENVIEW_Error }">
-		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-CHECK-1005:', 'An error occured while loading in records.' }">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-CHECK-1005:', 'An error occured while loading in records.' ) }">
 	</MvIF>
 
 	<MvASSIGN NAME = "g.WaitlistCount" VALUE = "0">
@@ -1037,7 +1037,7 @@
 				FIELDS	= "l.email">
 
 	<MvIF EXPR = "{ g.MvOPENVIEW_Error }">
-		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-CHECK-1005:', 'An error occured while loading in records.' }">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-CHECK-1005:', 'An error occured while loading in records.' ) }">
 	</MvIF>
 
 	<MvASSIGN NAME = "g.WaitlistCount" VALUE = "0">
