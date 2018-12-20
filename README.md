@@ -340,10 +340,13 @@ If `g.Waitlist_Email_Continue` is not set, it will use the original determinatio
 <a name="json_api"></a>
 
 The following functions may be used:
-- Waitlist_Load_Query
+- [Waitlist_Load_Query](#Waitlist_Load_Query)
 	- Use this to load in all the waitlist users.
+- [Waitlist_Trigger_All](#Waitlist_Trigger_All)
+	- This will run a function to trigger any waitlst emails, that need to be sent.
 
 ### Waitlist_Load_Query
+<a name="Waitlist_Load_Query"></a>
 
 The following may be sorted/ filtered:
 
@@ -370,16 +373,30 @@ Example:
 	"Module_Function": "Waitlist_Load_Query",
 	"sort": "email",
 	"Filter":[  
-      {  
-         "name":"search",
-         "value":[  
-            {  
-               "field": "product_code",
-               "operator": "NE",
-               "value": "What_Up_Wit_Dat"
-            }
-         ]
-      }
-   ]
+		{  
+			"name":"search",
+			"value":[  
+				{  
+					"field": "product_code",
+					"operator": "EQ",
+					"value": "My_Product_Code"
+				}
+			]
+		}
+	]
+}
+```
+
+### Waitlist_Trigger_All
+<a name="Waitlist_Trigger_All"></a>
+
+Example:
+
+```json
+{
+	"Store_Code": "YOUR_STORE_CODE",
+	"Function": "Module",
+	"Module_Code": "TGWaitlist",
+	"Module_Function": "Waitlist_Trigger_All"
 }
 ```

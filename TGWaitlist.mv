@@ -1101,7 +1101,7 @@
 	<MvIF EXPR = "{ NOT [ g.Module_Library_DB ].SQL_Query_Count( l.search_query, l.total_count ) }">
 		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error(g.Error_Code, g.Error_Message ) }">
 	<MvELSEIF EXPR = "{ NOT [ g.Module_Library_Native_DBAPI ].DB_OPENVIEW_Range('Merchant', 'TGWaitlist', l.search_sql, l.search_fields, l.offset, l.count) }">
-		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error( 'TGWaitlist-MOD-2005', 'An error occured.' ) }">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error( 'TGWAITLIST-JSON-ERROR-0001', 'An error occured.' ) }">
 	</MvIF>
 
 	<MvASSIGN NAME = "l.counter" VALUE = 0>
@@ -1145,9 +1145,13 @@
 </MvFUNCTION>
 
 <MvFUNCTION NAME = "JSON_API_Waitlist_Trigger_All" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = ""  ERROROUTPUTLEVEL = "">
+	<MvIF EXPR = "{ NOT [ g.Module_JSON ].JSON_Store_Open() }"><MvFUNCTIONRETURN></MvIF>
+	<MvIF EXPR = "{ Waitlists_Trigger_All() }"><MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Success() }"></MvIF>
+	<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error( 'TGWAITLIST-JSON-ERROR-0002', 'Waitlists Not Triggered.' ) }">
 </MvFUNCTION>
 
 <MvFUNCTION NAME = "JSON_API_Waitlist_Load_Email" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = ""  ERROROUTPUTLEVEL = "">
+	<MvIF EXPR = "{ NOT [ g.Module_JSON ].JSON_Store_Open() }"><MvFUNCTIONRETURN></MvIF>
 </MvFUNCTION>
 
 
