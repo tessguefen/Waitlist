@@ -1,11 +1,11 @@
-<MvFUNCTION NAME = "Module_Description" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = "compresswhitespace">
+<MvFUNCTION NAME = "Module_Description" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = "">
 	<MvASSIGN NAME = "l.module:code"		VALUE = "TGWaitlist">
 	<MvASSIGN NAME = "l.module:name"		VALUE = "Waitlist">
 	<MvASSIGN NAME = "l.module:provider"	VALUE = "Tess Guefen">
-	<MvASSIGN NAME = "l.module:version"		VALUE = "1.006">
-	<MvASSIGN NAME = "l.module:api_ver"		VALUE = "9.06">
+	<MvASSIGN NAME = "l.module:version"		VALUE = "1.007">
+	<MvASSIGN NAME = "l.module:api_ver"		VALUE = "9.12">
 	<MvASSIGN NAME = "l.module:description"	VALUE = "Make it easy for customers to quickly sign up for email alerts on out of stock products. When products are back in stock, emails will be automatically sent out by a Scheduled Task. This works on Products & Variants.">
-	<MvASSIGN NAME = "l.module:features"	VALUE = "data_store,not_prod,system,vis_system,json,clientside,scheduledtask,component">
+	<MvASSIGN NAME = "l.module:features"	VALUE = "data_store,not_prod,system,vis_system,json,clientside,scheduledtask,component,json_api">
 </MvFUNCTION>
 
 <MvCOMMENT>
@@ -14,7 +14,7 @@
 | ============================
 </MvCOMMENT>
 
-<MvFUNCTION NAME = "Module_Install_Store" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = "text, html, compresswhitespace" ERROROUTPUTLEVEL = "">
+<MvFUNCTION NAME = "Module_Install_Store" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = "" ERROROUTPUTLEVEL = "">
 
 	<MvASSIGN NAME = "l.waitlist_email_page:admin"		VALUE = "0">
 	<MvASSIGN NAME = "l.waitlist_email_page:code"		VALUE = "WaitlistEmailTemplate">
@@ -62,17 +62,44 @@
 				 					email			' $ [ g.Module_Library_Native_DBAPI ].DB_Type_CHAR( 255 )		$ ',
 				 					cust_id			' $ [ g.Module_Library_Native_DBAPI ].DB_Type_NUMBER( 0, 0 )	$ '
 								)' }">
+	<MvQUERY	NAME	= "Merchant"
+				QUERY	= "{ 'CREATE TABLE ' $ g.Store_Table_Prefix $ 'TGWaitlist_Sent
+								(
+									id				' $ [ g.Module_Library_Native_DBAPI ].DB_Type_NUMBER( 0, 0 )	$ ',
+									time_added		' $ [ g.Module_Library_Native_DBAPI ].DB_Type_NUMBER( 0, 0 )	$ ',
+									time_sent		' $ [ g.Module_Library_Native_DBAPI ].DB_Type_NUMBER( 0, 0 )	$ ',
+									product_id		' $ [ g.Module_Library_Native_DBAPI ].DB_Type_NUMBER( 0, 0 )	$ ',
+									variant_id		' $ [ g.Module_Library_Native_DBAPI ].DB_Type_NUMBER( 0, 0 )	$ ',
+				 					email			' $ [ g.Module_Library_Native_DBAPI ].DB_Type_CHAR( 255 )		$ ',
+				 					cust_id			' $ [ g.Module_Library_Native_DBAPI ].DB_Type_NUMBER( 0, 0 )	$ '
+								)' }">
 	<MvIF EXPR = "{ g.MvQUERY_Error }">
 		<MvIF EXPR = "{ [ g.Module_Feature_TUI_DB ].Page_Load_Code( 'WaitlistEmailTemplate', l.waitlist_email_page ) }">
 			<MvASSIGN NAME = "l.success" VALUE = "{ [ g.Module_Feature_TUI_MGR ].TemplateManager_Delete_Page( l.waitlist_email_page ) }">
 		</MvIF>
 		<MvASSIGN NAME = "l.success" VALUE = "{ [ g.Module_Library_DB ].StoreKey_Delete( 'TGWaitlist' ) }">
-		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-INSTALL-3000:', 'An error occured while creating the table ' $  g.Store_Table_Prefix $ 'TGWaitlist. Please make sure this table was not already created.' ) }">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-INSTALL-3000:', 'An error occured while creating the table ' $  g.Store_Table_Prefix $ 'TGWaitlist or ' $ g.Store_Table_Prefix $ 'TGWaitlist_Sent. Please make sure these tables were not already created.' ) }">
 	</MvIF>
 	<MvFUNCTIONRETURN VALUE = 1>
 </MvFUNCTION>
 
 <MvFUNCTION NAME = "Module_Upgrade_Store" PARAMETERS = "module var, version" STANDARDOUTPUTLEVEL = "" ERROROUTPUTLEVEL = "">
+	<MvIF EXPR = "{ l.version LT 1.007 }">
+		<MvQUERY	NAME	= "Merchant"
+				QUERY	= "{ 'CREATE TABLE ' $ g.Store_Table_Prefix $ 'TGWaitlist_Sent
+								(
+									id				' $ [ g.Module_Library_Native_DBAPI ].DB_Type_NUMBER( 0, 0 )	$ ',
+									time_added		' $ [ g.Module_Library_Native_DBAPI ].DB_Type_NUMBER( 0, 0 )	$ ',
+									time_sent		' $ [ g.Module_Library_Native_DBAPI ].DB_Type_NUMBER( 0, 0 )	$ ',
+									product_id		' $ [ g.Module_Library_Native_DBAPI ].DB_Type_NUMBER( 0, 0 )	$ ',
+									variant_id		' $ [ g.Module_Library_Native_DBAPI ].DB_Type_NUMBER( 0, 0 )	$ ',
+				 					email			' $ [ g.Module_Library_Native_DBAPI ].DB_Type_CHAR( 255 )		$ ',
+				 					cust_id			' $ [ g.Module_Library_Native_DBAPI ].DB_Type_NUMBER( 0, 0 )	$ '
+								)' }">
+		<MvIF EXPR = "{ g.MvQUERY_Error }">
+			<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-UPDATE-1000:', 'An error occured while creating the table ' $  g.Store_Table_Prefix $ 'TGWaitlist_Sent. Please make sure this table was not already created.' ) }">
+		</MvIF>
+	</MvIF>
 	<MvFUNCTIONRETURN VALUE = 1>
 </MvFUNCTION>
 
@@ -82,6 +109,7 @@
 	</MvIF>
 	<MvASSIGN NAME = "l.success" VALUE = "{ [ g.Module_Library_DB ].StoreKey_Delete( 'TGWaitlist' ) }">
 	<MvQUERY NAME = "Merchant" QUERY = "{ 'DROP TABLE ' $  g.Store_Table_Prefix $ 'TGWaitlist' }">
+	<MvQUERY NAME = "Merchant" QUERY = "{ 'DROP TABLE ' $  g.Store_Table_Prefix $ 'TGWaitlist_Sent' }">
 	<MvFUNCTIONRETURN VALUE = 1>
 </MvFUNCTION>
 
@@ -94,16 +122,17 @@
 | ============================
 </MvCOMMENT>
 
-<MvFUNCTION NAME = "Module_Notify_Product_Delete" PARAMETERS = "module var, product var" STANDARDOUTPUTLEVEL = "compresswhitespace" ERROROUTPUTLEVEL = "">
+<MvFUNCTION NAME = "Module_Notify_Product_Delete" PARAMETERS = "module var, product var" STANDARDOUTPUTLEVEL = "" ERROROUTPUTLEVEL = "">
 	<MvASSIGN NAME = "l.success" VALUE = "{ Waitlist_Delete_Product( l.product:id ) }">
+	<MvASSIGN NAME = "l.success" VALUE = "{ Waitlist_Sent_Delete_Product( l.product:id ) }">
 	<MvFUNCTIONRETURN VALUE = 1>
 </MvFUNCTION>
 
-<MvFUNCTION NAME = "Module_Notify_Product_Insert" PARAMETERS = "module var, product var" STANDARDOUTPUTLEVEL = "compresswhitespace" ERROROUTPUTLEVEL = "">
+<MvFUNCTION NAME = "Module_Notify_Product_Insert" PARAMETERS = "module var, product var" STANDARDOUTPUTLEVEL = "" ERROROUTPUTLEVEL = "">
 	<MvFUNCTIONRETURN VALUE = 1>
 </MvFUNCTION>
 
-<MvFUNCTION NAME = "Module_Notify_Product_Update" PARAMETERS = "module var, product var" STANDARDOUTPUTLEVEL = "compresswhitespace" ERROROUTPUTLEVEL = "">
+<MvFUNCTION NAME = "Module_Notify_Product_Update" PARAMETERS = "module var, product var" STANDARDOUTPUTLEVEL = "" ERROROUTPUTLEVEL = "">
 	<MvCOMMENT>
 	|
 	|	9.7 Feature -- Trigger waitlist sched. task later.
@@ -121,18 +150,18 @@
 | ====
 </MvCOMMENT>
 
-<MvFUNCTION NAME = "SystemModule_Action" PARAMETERS = "module var, action" STANDARDOUTPUTLEVEL = "compresswhitespace">
+<MvFUNCTION NAME = "SystemModule_Action" PARAMETERS = "module var, action" STANDARDOUTPUTLEVEL = "">
 	<MvIF EXPR = "{ l.action EQ 'WaitlistAdd' }">
 		<MvASSIGN NAME = "l.success" VALUE = "{ Waitlist_Form_Add( g.Waitlist_Product_Code, g.Waitlist_Variant_ID, g.Waitlist_Email ) }">
 	</MvIF>
 	<MvFUNCTIONRETURN VALUE = 1>
 </MvFUNCTION>
 
-<MvFUNCTION NAME = "SystemModule_Screen" PARAMETERS = "module var, screen" STANDARDOUTPUTLEVEL = "compresswhitespace">
+<MvFUNCTION NAME = "SystemModule_Screen" PARAMETERS = "module var, screen" STANDARDOUTPUTLEVEL = "">
 	<MvFUNCTIONRETURN VALUE = 1>
 </MvFUNCTION>
 
-<MvFUNCTION NAME = "SystemModule_UIException" PARAMETERS = "module var, exception" STANDARDOUTPUTLEVEL = "compresswhitespace">
+<MvFUNCTION NAME = "SystemModule_UIException" PARAMETERS = "module var, exception" STANDARDOUTPUTLEVEL = "">
 	<MvFUNCTIONRETURN VALUE = 1>
 </MvFUNCTION>
 
@@ -150,6 +179,9 @@
 	<MvIF EXPR = "{ l.tab EQ 'TGWaitlist'}">
 		<MvEVAL EXPR = "{ [ g.Module_Admin ].Element_MMBatchList_HTML() }">
 		<div id="jsWaitlist_Batchlist"></div>
+	<MvELSEIF EXPR = "{ l.tab EQ 'TGWaitlist_Sent' }">
+		<MvEVAL EXPR = "{ [ g.Module_Admin ].Element_MMBatchList_HTML() }">
+		<div id="jsWaitlist_Sent_Batchlist"></div>
 	</MvIF>
 	<MvFUNCTIONRETURN VALUE = 1>
 </MvFUNCTION>
@@ -163,15 +195,23 @@
 		<script language="JavaScript">
 			MMScreen_LoadFinished( function() { new Waitlist_Batchlist(); } );
 		</script>
+	<MvELSEIF EXPR = "{ l.tab EQ 'TGWaitlist_Sent'}">
+		<MvEVAL EXPR = "{ [ g.Module_Admin ].Element_MMBatchList_JavaScript() }">
+		<MvEVAL EXPR = "{ [ g.Module_Admin ].Element_MMBatchList_CSS() }">
+		<script language="JavaScript" src="{ g.clientside_url $ 'Module_Code=' $ encodeattribute( l.module:code ) $ '&Filename=Waitlist_Sent_Functions.js' }"></script>
+		<script language="JavaScript" src="{ g.clientside_url $ 'Module_Code=' $ encodeattribute( l.module:code ) $ '&Filename=Waitlist_Sent_Batchlist.js' }"></script>
+		<script language="JavaScript">
+			MMScreen_LoadFinished( function() { new Waitlist_Sent_Batchlist(); } );
+		</script>
 	</MvIF>
 	<MvFUNCTIONRETURN VALUE = 1>
 </MvFUNCTION>
 
-<MvFUNCTION NAME = "Module_System_Tabs" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = "compresswhitespace">
-	<MvFUNCTIONRETURN VALUE = "TGWaitlist:Waitlist">
+<MvFUNCTION NAME = "Module_System_Tabs" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = "">
+	<MvFUNCTIONRETURN VALUE = "TGWaitlist:Waitlist,TGWaitlist_Sent:Waitlist - Sent">
 </MvFUNCTION>
 
-<MvFUNCTION NAME = "Module_System_Update" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = "compresswhitespace">
+<MvFUNCTION NAME = "Module_System_Update" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = "">
 	<MvFUNCTIONRETURN VALUE = 1>
 </MvFUNCTION>
 
@@ -189,7 +229,7 @@
 		<MvFUNCTIONRETURN>
 	</MvIF>
 	<MvIF EXPR = "{ g.Module_Function EQ 'Waitlist_All_Load_Query' }">
-		<MvEVAL EXPR = "{ JSON_Waitlist_All_Load_Query( l.module ) }">
+		<MvFUNCTIONRETURN VALUE = "{ JSON_Waitlist_All_Load_Query( l.module ) }">
 	</MvIF>
 	<MvIF EXPR = "{ g.Module_Function EQ 'Waitlist_Delete' }">
 		<MvASSIGN NAME = "g.Waitlist_ID" VALUE = "{ [ g.Module_JSON ].JSON_Decode( g.Waitlist_ID ) }">
@@ -198,6 +238,13 @@
 	<MvIF EXPR = "{ g.Module_Function EQ 'Waitlist_Trigger_Emails' }">
 		<MvASSIGN NAME = "g.Waitlists" VALUE = "{ [ g.Module_JSON ].JSON_Decode( g.Waitlists ) }">
 		<MvFUNCTIONRETURN VALUE = "{ JSON_Waitlist_Trigger_Emails( g.Waitlists ) }">
+	</MvIF>
+	<MvIF EXPR = "{ g.Module_Function EQ 'Waitlist_Sent_All_Load_Query' }">
+		<MvFUNCTIONRETURN VALUE = "{ JSON_Waitlist_Sent_All_Load_Query( l.module ) }">
+	</MvIF>
+	<MvIF EXPR = "{ g.Module_Function EQ 'Waitlist_Sent_Delete' }">
+		<MvASSIGN NAME = "g.Waitlist_ID" VALUE = "{ [ g.Module_JSON ].JSON_Decode( g.Waitlist_ID ) }">
+		<MvFUNCTIONRETURN VALUE = "{ JSON_Waitlist_Sent_Delete( g.Waitlist_ID ) }">
 	</MvIF>
 </MvFUNCTION>
 
@@ -209,10 +256,20 @@
 </MvCOMMENT>
 <MvFUNCTION NAME = "Module_Clientside" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = "text,compresswhitespace" ERROROUTPUTLEVEL = "">
 	<MvIF EXPR = "{ g.Filename EQ 'Waitlist_Batchlist.js' }">
+		<MvEVAL EXPR = "{ [ g.Module_Clientside ].Module_Content_Type( l.module, 'text/javascript' ) }">
 		<MvINCLUDE FILE = "js/Waitlist_Batchlist.js">
 	</MvIF>
 	<MvIF EXPR = "{ g.Filename EQ 'Waitlist_Functions.js' }">
+		<MvEVAL EXPR = "{ [ g.Module_Clientside ].Module_Content_Type( l.module, 'text/javascript' ) }">
 		<MvINCLUDE FILE = "js/Waitlist_Functions.js">
+	</MvIF>
+	<MvIF EXPR = "{ g.Filename EQ 'Waitlist_Sent_Batchlist.js' }">
+		<MvEVAL EXPR = "{ [ g.Module_Clientside ].Module_Content_Type( l.module, 'text/javascript' ) }">
+		<MvINCLUDE FILE = "js/Waitlist_Sent_Batchlist.js">
+	</MvIF>
+	<MvIF EXPR = "{ g.Filename EQ 'Waitlist_Sent_Functions.js' }">
+		<MvEVAL EXPR = "{ [ g.Module_Clientside ].Module_Content_Type( l.module, 'text/javascript' ) }">
+		<MvINCLUDE FILE = "js/Waitlist_Sent_Functions.js">
 	</MvIF>
 </MvFUNCTION>
 
@@ -278,42 +335,42 @@
 | ============================
 </MvCOMMENT>
 
-<MvFUNCTION NAME = "ComponentModule_Initialize" PARAMETERS = "module var, item, all_settings var, settings var" STANDARDOUTPUTLEVEL = "compresswhitespace">
+<MvFUNCTION NAME = "ComponentModule_Initialize" PARAMETERS = "module var, item, all_settings var, settings var" STANDARDOUTPUTLEVEL = "">
 	<MvFUNCTIONRETURN VALUE = 1>
 </MvFUNCTION>
 
-<MvFUNCTION NAME = "ComponentModule_Render_End" PARAMETERS = "module var, item, all_settings var, settings var, param" STANDARDOUTPUTLEVEL = "compresswhitespace">
+<MvFUNCTION NAME = "ComponentModule_Render_End" PARAMETERS = "module var, item, all_settings var, settings var, param" STANDARDOUTPUTLEVEL = "">
 </MvFUNCTION>
 
-<MvFUNCTION NAME = "ComponentModule_Tabs" PARAMETERS = "module var, item, settings var" STANDARDOUTPUTLEVEL = "compresswhitespace">
+<MvFUNCTION NAME = "ComponentModule_Tabs" PARAMETERS = "module var, item, settings var" STANDARDOUTPUTLEVEL = "">
 </MvFUNCTION>
 
-<MvFUNCTION NAME = "ComponentModule_Validate" PARAMETERS = "module var, item, field_prefix, fields var" STANDARDOUTPUTLEVEL = "compresswhitespace">
+<MvFUNCTION NAME = "ComponentModule_Validate" PARAMETERS = "module var, item, field_prefix, fields var" STANDARDOUTPUTLEVEL = "">
 	<MvFUNCTIONRETURN VALUE = 1>
 </MvFUNCTION>
 
-<MvFUNCTION NAME = "ComponentModule_Update" PARAMETERS = "module var, item, field_prefix, fields var, settings var" STANDARDOUTPUTLEVEL = "compresswhitespace">
+<MvFUNCTION NAME = "ComponentModule_Update" PARAMETERS = "module var, item, field_prefix, fields var, settings var" STANDARDOUTPUTLEVEL = "">
 	<MvFUNCTIONRETURN VALUE = 1>
 </MvFUNCTION>
 
-<MvFUNCTION NAME = "ComponentModule_Content" PARAMETERS = "module var, item, tab, load_fields, field_prefix, fields var, settings var" STANDARDOUTPUTLEVEL = "compresswhitespace">
+<MvFUNCTION NAME = "ComponentModule_Content" PARAMETERS = "module var, item, tab, load_fields, field_prefix, fields var, settings var" STANDARDOUTPUTLEVEL = "">
 </MvFUNCTION>
 
-<MvFUNCTION NAME = "ComponentModule_Defaults" PARAMETERS = "module var, settings var" STANDARDOUTPUTLEVEL = "compresswhitespace">
+<MvFUNCTION NAME = "ComponentModule_Defaults" PARAMETERS = "module var, settings var" STANDARDOUTPUTLEVEL = "">
 </MvFUNCTION>
 
-<MvFUNCTION NAME = "ComponentModule_Page_Assign" PARAMETERS = "module var, page var, item, settings var" STANDARDOUTPUTLEVEL = "compresswhitespace">
+<MvFUNCTION NAME = "ComponentModule_Page_Assign" PARAMETERS = "module var, page var, item, settings var" STANDARDOUTPUTLEVEL = "">
 	<MvFUNCTIONRETURN VALUE = 1>
 </MvFUNCTION>
 
-<MvFUNCTION NAME = "ComponentModule_Page_Unassign" PARAMETERS = "module var, page var, item, settings var" STANDARDOUTPUTLEVEL = "compresswhitespace">
+<MvFUNCTION NAME = "ComponentModule_Page_Unassign" PARAMETERS = "module var, page var, item, settings var" STANDARDOUTPUTLEVEL = "">
 	<MvFUNCTIONRETURN VALUE = 1>
 </MvFUNCTION>
 
-<MvFUNCTION NAME = "ComponentModule_Prerender" PARAMETERS = "module var, item, all_settings var, settings var, param" STANDARDOUTPUTLEVEL = "compresswhitespace">
+<MvFUNCTION NAME = "ComponentModule_Prerender" PARAMETERS = "module var, item, all_settings var, settings var, param" STANDARDOUTPUTLEVEL = "">
 </MVFUNCTION>
 
-<MvFUNCTION NAME = "ComponentModule_Render_Start" PARAMETERS = "module var, item, all_settings var, settings var, param" STANDARDOUTPUTLEVEL = "compresswhitespace">
+<MvFUNCTION NAME = "ComponentModule_Render_Start" PARAMETERS = "module var, item, all_settings var, settings var, param" STANDARDOUTPUTLEVEL = "">
 	<MvIF EXPR = "{ NOT Parse_Function_Parameters( l.param, l.function_name, l.parameters, l.parameter_count ) }">
 		<MvFUNCTIONRETURN VALUE = 0>
 	</MvIF>
@@ -373,6 +430,22 @@
 </MvFUNCTION>
 
 <MvCOMMENT>
+| ====================================================================================
+|	JSON_API
+| ====================================================================================
+</MvCOMMENT>
+
+<MvFUNCTION NAME = "Module_JSON_API" PARAMETERS = "module var, function" STANDARDOUTPUTLEVEL = "">
+	<MvASSIGN NAME = "l.void" VALUE = "{ miva_output_header( 'Content-Type', 'application/json' ) }" >
+	<MvIF EXPR = "{ l.function EQ 'Waitlist_Load_Query' }">				<MvFUNCTIONRETURN VALUE = "{ JSON_API_Waitlist_Load_Query( l.module ) }">
+	<MvELSEIF EXPR = "{ l.function EQ 'Waitlist_Trigger_All' }">		<MvFUNCTIONRETURN VALUE = "{ JSON_API_Waitlist_Trigger_All( l.module ) }">
+	<MvELSEIF EXPR = "{ l.function EQ 'Waitlist_Load_Email' }">			<MvFUNCTIONRETURN VALUE = "{ JSON_API_Waitlist_Load_Email( l.module ) }">
+	</MvIF>
+
+	<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error( 'TGWAITLIST-ERROR-0001', 'Invalid function.' ) }">
+</MvFUNCTION>
+
+<MvCOMMENT>
 |
 |	Custom Functions
 |		Waitlist_Read( waitlist var )
@@ -380,7 +453,7 @@
 |		Waitlist_Add_Lowlevel( timestamp, product_id, variant_id, email, cust_id )
 |		WaitlistXCheck( product_id, variant_id, email )
 |		Waitlist_Add( product_id, variant_id, email )
-|		Waitlist_Delete( time_added, email )
+|		Waitlist_Delete( id )
 |		Waitlist_Trigger_Email( waitlist )
 |		Waitlist_Trigger_EmailsXProduct( product_id, variant_id )
 |		Waitlist_Trigger_Email_Lowlevel( waitlist var )
@@ -389,6 +462,13 @@
 |		Waitlist_Delete_Product( product_id )
 |		Waitlist_Form_Add( product_code, variant_id, email )
 |		Waitlists_Trigger_All()
+|
+|		Waitlist_Sent_Read( waitlist var )
+|		Waitlist_Sent_Add_Lowlevel( waitlist var )
+|		Waitlist_Sent_Add( waitlist var )
+|		Waitlist_Sent_Delete( waitlist_id )
+|		Waitlist_Sent_Delete_Product( product_id )
+|		
 |
 |	Waitlist API
 |		Waitlist_API()
@@ -401,8 +481,15 @@
 |
 |	JSON/ Batchlist Functions
 |		JSON_Waitlist_All_Load_Query( module var )
-|		JSON_Waitlist_Delete( time_added, email )
+|		JSON_Waitlist_Delete( id )
 |		JSON_Waitlist_Trigger_Emails( waitlists )
+|		JSON_Waitlist_Sent_All_Load_Query( module var )
+|		JSON_Waitlist_Sent_Delete( id )
+|
+|	JSON API
+|		JSON_API_Waitlist_Load_Query( module var )
+|		JSON_API_Waitlist_Trigger_All( module var )
+|		JSON_API_Waitlist_Load_Email( module var )
 |
 |	Component Helpers
 |		Parse_Function_Parameters( string, function_name var, parameters var, parameter_count var )
@@ -667,6 +754,8 @@
 	</MvIF>
 
 	<MvASSIGN NAME = "l.success" VALUE = "{ [ g.Module_Admin ].Admin_Log_Action( 'TGWaitlist-SUCCESS-1000', 'Waitlist Email triggered to' $ l.waitlist:email ) }">
+
+	<MvASSIGN NAME = "l.void" VALUE = "{ Waitlist_Sent_Add( l.waitlist ) }">
 	
 	<MvIF EXPR = "{ NOT Waitlist_Delete( l.waitlist:id ) }">
 		<MvFUNCTIONRETURN VALUE = 0 />
@@ -906,6 +995,162 @@
 	<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Success() }">
 </MvFUNCTION>
 
+<MvFUNCTION NAME = "JSON_Waitlist_Sent_All_Load_Query" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = "text, html, compresswhitespace">
+	<MvIF EXPR = "{ NOT [ g.Module_JSON ].JSON_Store_Open() }">
+		<MvFUNCTIONRETURN>
+	</MvIF>
+	<MvASSIGN NAME = "g.Filter"			VALUE = "{ trim( g.Filter ) }">
+	<MvASSIGN NAME = "g.Sort"			VALUE = "{ trim( g.Sort ) }">
+	<MvASSIGN NAME = "g.Offset"			VALUE = "{ int( g.Offset ) }">
+	<MvASSIGN NAME = "g.Count"			VALUE = "{ int( g.Count ) }">
+	<MvASSIGN NAME = "l.search_query"	VALUE = "">
+
+	<MvEVAL EXPR = "{ [ g.Module_Library_DB ].SQL_Query_SELECT( l.search_query,'ws.*, p.code as product_code, pv.code as variant_code, pv.id as variant_product_id, p.name as product_name, pv.name as variant_name' ) }">
+
+	<MvEVAL EXPR = "{ [ g.Module_Library_DB ].SQL_Query_FROM( l.search_query, g.Store_Table_Prefix $ 'TGWaitlist_Sent', 'ws' ) }">
+
+	<MvEVAL EXPR = "{ [ g.Module_Library_DB ].SQL_Query_LEFT_OUTER_JOIN( l.search_query, 'ws', g.Store_Table_Prefix $ 'Products', 'p', 'ws.product_id = p.id', '' ) }">
+
+	<MvEVAL EXPR = "{ [ g.Module_Library_DB ].SQL_Query_LEFT_OUTER_JOIN( l.search_query, 'ws', g.Store_Table_Prefix $ 'ProductVariantParts', 'pvp', 'ws.variant_id = pvp.variant_id AND ws.product_id = pvp.product_id', '' ) }">
+
+	<MvEVAL EXPR = "{ [ g.Module_Library_DB ].SQL_Query_LEFT_OUTER_JOIN( l.search_query, 'ws', g.Store_Table_Prefix $ 'Products', 'pv', 'pvp.part_id = pv.id', '' ) }">
+
+	<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Filter( l.search_query, g.Filter,'id:ws.id,time_added:ws.time_added,time_sent:ws.time_sent,product_id:ws.product_id,variant_id:ws.variant_id,email:ws.email,cust_id:ws.cust_id,product_code:p.code,variant_code:pv.code,product_name:p.name,variant_name:pv.name' ) }">
+
+	<MvEVAL EXPR = "{ [ g.Module_Library_DB ].SQL_Query_OrderBy_Fields(l.search_query, g.Sort, 'id:ws.id,time_added:ws.time_added,time_sent:ws.time_sent,product_id:ws.product_id,variant_id:ws.variant_id,email:ws.email,cust_id:ws.cust_id,product_code:p.code,variant_code:pv.code,product_name:p.name,variant_name:pv.name', 'ws.time_sent' ) }">
+
+	<MvASSIGN NAME = "l.search_sql" VALUE = "{ [ g.Module_Library_DB].SQL_Query_Build( l.search_query, l.search_fields ) }">
+
+	<MvIF EXPR = "{ NOT [ g.Module_Library_DB ].SQL_Query_Count( l.search_query, l.total_count ) }">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error(g.Error_Code, g.Error_Message ) }">
+	<MvELSEIF EXPR = "{ NOT [ g.Module_Library_Native_DBAPI ].DB_OPENVIEW_Range('Merchant', 'TGWaitlist_Sent', l.search_sql, l.search_fields, g.Offset, g.Count) }">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error( 'TGWaitlist-MOD-5005', 'An error occured.' ) }">
+	</MvIF>
+
+	<MvASSIGN NAME = "l.count" VALUE = 0>
+
+	<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Response_Start() }">
+		{
+			"data":
+				[
+					<MvWHILE EXPR = "{ ( NOT TGWaitlist_Sent.d.EOF ) AND ( ( g.Count EQ 0 ) OR (l.count LT g.Count ) ) }">
+					<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_ArrayElement_Start( l.count )}">
+					"id": <MvEVAL EXPR = "{ int( TGWaitlist_Sent.d.id ) }">,
+					"time_added": <MvEVAL EXPR = "{ int( TGWaitlist_Sent.d.time_added ) }">,
+					"time_sent": <MvEVAL EXPR = "{ int( TGWaitlist_Sent.d.time_sent ) }">,
+					"product_id" : <MvEVAL EXPR = "{ int( TGWaitlist_Sent.d.product_id ) }">,
+					"variant_id" : <MvEVAL EXPR = "{ int( TGWaitlist_Sent.d.variant_id ) }">,
+					"email" : "<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode( TGWaitlist_Sent.d.email ) }">",
+					"cust_id" : <MvEVAL EXPR = "{ int( TGWaitlist_Sent.d.cust_id ) }">,
+					"product_code" : "<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode( TGWaitlist_Sent.d.product_code ) }">",
+					"product_name" : "<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode( TGWaitlist_Sent.d.product_name ) }">",
+					"variant_code" : "<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode( TGWaitlist_Sent.d.variant_code ) }">",
+					"variant_name" : "<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode( TGWaitlist_Sent.d.variant_name ) }">"
+					<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_ArrayElement_End() }">
+					<MvSKIP NAME = "Merchant" VIEW = "TGWaitlist_Sent" ROWS = 1>
+					</MvWHILE>
+				],
+
+			"total_count": <MvEVAL EXPR = "{ int( l.total_count ) }">,
+			"start_offset": <MvEVAL EXPR = "{ int( g.Offset ) }">
+		}
+		<MvCLOSEVIEW NAME = "Merchant" VIEW = "TGWaitlist_Sent">
+	}
+</MvFUNCTION>
+
+<MvFUNCTION NAME = "JSON_Waitlist_Sent_Delete" PARAMETERS = "id" STANDARDOUTPUTLEVEL = "">
+	<MvIF EXPR = "{ NOT [ g.Module_JSON ].JSON_Store_Open() }"><MvFUNCTIONRETURN></MvIF>
+	<MvASSIGN NAME = "l.id" VALUE = "{ int( l.id ) }" />
+	<MvIF EXPR = "{ NOT Waitlist_Sent_Delete( l.id ) }">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_FieldError( 'time_sent', g.MvQUERY_Error ) }">
+	</MvIF>
+	<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Success() }">
+</MvFUNCTION>
+
+<MvFUNCTION NAME = "JSON_API_Waitlist_Load_Query" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = "text, compresswhitespace"  ERROROUTPUTLEVEL = "">
+	<MvIF EXPR = "{ NOT [ g.Module_JSON ].JSON_Store_Open() }"><MvFUNCTIONRETURN></MvIF>
+
+	<MvASSIGN NAME = "l.filter"						VALUE = "">
+	<MvASSIGN NAME = "l.sort"						VALUE = "">
+	<MvASSIGN NAME = "l.offset"						VALUE = 0>
+	<MvASSIGN NAME = "l.count"						VALUE = 0>
+
+	<MvIF EXPR = "{ NOT [ g.Module_JSON ].JSON_Input_Filter(	'o', 'Filter',		l.filter )				OR
+					NOT [ g.Module_JSON ].JSON_Input_Text(		'o', 'Sort',		l.sort )				OR
+					NOT [ g.Module_JSON ].JSON_Input_Number(	'o', 'Offset',		l.offset,	-1, -1 )	OR
+					NOT [ g.Module_JSON ].JSON_Input_Number(	'o', 'Count',		l.count,	-1, -1 ) }">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_InputErrors() }">
+	</MvIF>
+
+	<MvEVAL EXPR = "{ [ g.Module_Library_DB ].SQL_Query_SELECT( l.search_query,'w.*, p.code as product_code, pv.code as variant_code, pv.id as variant_product_id, p.name as product_name, pv.name as variant_name' ) }">
+
+	<MvEVAL EXPR = "{ [ g.Module_Library_DB ].SQL_Query_FROM( l.search_query, g.Store_Table_Prefix $ 'TGWaitlist', 'w' ) }">
+
+	<MvEVAL EXPR = "{ [ g.Module_Library_DB ].SQL_Query_LEFT_OUTER_JOIN( l.search_query, 'w', g.Store_Table_Prefix $ 'Products', 'p', 'w.product_id = p.id', '' ) }">
+
+	<MvEVAL EXPR = "{ [ g.Module_Library_DB ].SQL_Query_LEFT_OUTER_JOIN( l.search_query, 'w', g.Store_Table_Prefix $ 'ProductVariantParts', 'pvp', 'w.variant_id = pvp.variant_id AND w.product_id = pvp.product_id', '' ) }">
+
+	<MvEVAL EXPR = "{ [ g.Module_Library_DB ].SQL_Query_LEFT_OUTER_JOIN( l.search_query, 'w', g.Store_Table_Prefix $ 'Products', 'pv', 'pvp.part_id = pv.id', '' ) }">
+
+	<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Filter( l.search_query, l.filter,'id:w.id,time_added:w.time_added,product_id:w.product_id,variant_id:w.variant_id,email:w.email,cust_id:w.cust_id,product_code:p.code,variant_code:pv.code,product_name:p.name,variant_name:pv.name' ) }">
+
+	<MvEVAL EXPR = "{ [ g.Module_Library_DB ].SQL_Query_OrderBy_Fields(l.search_query, l.sort, 'id:w.id,time_added:w.time_added,product_id:w.product_id,variant_id:w.variant_id,email:w.email,cust_id:w.cust_id,product_code:p.code,variant_code:pv.code,product_name:p.name,variant_name:pv.name', 'w.time_added' ) }">
+
+	<MvASSIGN NAME = "l.search_sql" VALUE = "{ [ g.Module_Library_DB].SQL_Query_Build( l.search_query, l.search_fields ) }">
+
+	<MvIF EXPR = "{ NOT [ g.Module_Library_DB ].SQL_Query_Count( l.search_query, l.total_count ) }">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error(g.Error_Code, g.Error_Message ) }">
+	<MvELSEIF EXPR = "{ NOT [ g.Module_Library_Native_DBAPI ].DB_OPENVIEW_Range('Merchant', 'TGWaitlist', l.search_sql, l.search_fields, l.offset, l.count) }">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error( 'TGWaitlist-MOD-2005', 'An error occured.' ) }">
+	</MvIF>
+
+	<MvASSIGN NAME = "l.counter" VALUE = 0>
+
+	<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Response_Start() }">
+		{
+			"data":
+				[
+					<MvWHILE EXPR = "{ ( NOT TGWaitlist.d.EOF ) AND ( ( l.count EQ 0 ) OR (l.counter LT l.count ) ) }">
+					<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_ArrayElement_Start( l.counter )}">
+					"id": <MvEVAL EXPR = "{ int( TGWaitlist.d.id ) }">,
+					"time_added": <MvEVAL EXPR = "{ int( TGWaitlist.d.time_added ) }">,
+					"product_id" : <MvEVAL EXPR = "{ int( TGWaitlist.d.product_id ) }">,
+					"variant_id" : <MvEVAL EXPR = "{ int( TGWaitlist.d.variant_id ) }">,
+					"email" : "<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode( TGWaitlist.d.email ) }">",
+					"cust_id" : <MvEVAL EXPR = "{ int( TGWaitlist.d.cust_id ) }">,
+					"product_code" : "<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode( TGWaitlist.d.product_code ) }">",
+					"product_name" : "<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode( TGWaitlist.d.product_name ) }">",
+					"variant_code" : "<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode( TGWaitlist.d.variant_code ) }">",
+					"variant_name" : "<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode( TGWaitlist.d.variant_name ) }">",
+					<MvASSIGN NAME = "l.product_id" VALUE = "{ TGWaitlist.d.variant_product_id }">
+					<MvASSIGN NAME = "l.variant_id" VALUE = "{ TGWaitlist.d.variant_id }">
+					<MvASSIGN NAME = "l.output" VALUE = "NULL" />
+					<MvASSIGN NAME = "l.void" VALUE = "{ [ g.Module_Library_DB ].Product_Load_ID_WithRuntimeInventory( l.product_id, l.output ) }">
+					<MvASSIGN NAME = "l.void" VALUE = "{ [ g.Module_Feature_INV_RT ].Inventory_Load_Variant( l.output, l.variant_id ) }">
+					<MvIF EXPR = "{ l.output:inv_active }">
+						"inv_count" : "<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode( l.output:inv_available ) }">"
+					<MvELSE>
+						"inv_count" : "N/A"
+					</MvIF>
+					<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_ArrayElement_End() }">
+					<MvSKIP NAME = "Merchant" VIEW = "TGWaitlist" ROWS = 1>
+					</MvWHILE>
+				],
+
+			"total_count": <MvEVAL EXPR = "{ int( l.total_count ) }">,
+			"start_offset": <MvEVAL EXPR = "{ int( g.Offset ) }">
+		}
+		<MvCLOSEVIEW NAME = "Merchant" VIEW = "TGWaitlist">
+	}
+</MvFUNCTION>
+
+<MvFUNCTION NAME = "JSON_API_Waitlist_Trigger_All" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = ""  ERROROUTPUTLEVEL = "">
+</MvFUNCTION>
+
+<MvFUNCTION NAME = "JSON_API_Waitlist_Load_Email" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = ""  ERROROUTPUTLEVEL = "">
+</MvFUNCTION>
+
+
 <MvFUNCTION NAME = "Waitlists_Trigger_All" PARAMETERS = "" STANDARDOUTPUTLEVEL = ""  ERROROUTPUTLEVEL = "">
 	<MvOPENVIEW NAME	= "Merchant"
 				VIEW 	= "TGWaitlist"
@@ -930,6 +1175,81 @@
 		<MvASSIGN NAME = "l.success" VALUE = "{ Waitlist_Trigger_EmailsXProduct( l.waitlist:product_id, l.waitlist:variant_id ) }">
 	</MvFOREACH>
 
+	<MvFUNCTIONRETURN VALUE = 1>
+</MvFUNCTION>
+
+<MvFUNCTION NAME = "Waitlist_Sent_Read" PARAMETERS = "waitlist var" STANDARDOUTPUTLEVEL = "" ERROROUTPUTLEVEL = "">
+	<MvASSIGN NAME = "l.waitlist" MEMBER = "id"				VALUE = "{ TGWaitlist_Sent.d.id }">
+	<MvASSIGN NAME = "l.waitlist" MEMBER = "time_added"		VALUE = "{ TGWaitlist_Sent.d.time_added }">
+	<MvASSIGN NAME = "l.waitlist" MEMBER = "time_added"		VALUE = "{ TGWaitlist_Sent.d.time_sent }">
+	<MvASSIGN NAME = "l.waitlist" MEMBER = "product_id"		VALUE = "{ TGWaitlist_Sent.d.product_id }">
+	<MvASSIGN NAME = "l.waitlist" MEMBER = "variant_id"		VALUE = "{ TGWaitlist_Sent.d.variant_id }">
+	<MvASSIGN NAME = "l.waitlist" MEMBER = "email"			VALUE = "{ TGWaitlist_Sent.d.email }">
+	<MvASSIGN NAME = "l.waitlist" MEMBER = "cust_id" 		VALUE = "{ TGWaitlist_Sent.d.cust_id }">
+</MVFUNCTION>
+
+<MvFUNCTION NAME = "Waitlist_Sent_Add_Lowlevel" PARAMETERS = "waitlist var" STANDARDOUTPUTLEVEL = "" ERROROUTPUTLEVEL = "">
+	<MvQUERY	NAME = "Merchant"
+				QUERY = "{ 'INSERT INTO ' $ g.Store_Table_Prefix $ 'TGWaitlist_Sent
+							( id, time_added, time_sent, product_id, variant_id, email, cust_id )
+							VALUES
+							( ?, ?, ?, ?, ?, ?, ?)' }"
+				FIELDS = "l.waitlist:id, l.waitlist:time_added, l.waitlist:time_sent, l.waitlist:product_id, l.waitlist:variant_id, l.waitlist:email, l.waitlist:cust_id">
+
+	<MvIF EXPR = "{ g.MvQUERY_Error }">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-INSERT-5000:', 'An error occured while inserting a new record.' ) }">
+	</MvIF>
+
+	<MvFUNCTIONRETURN VALUE = 1 />
+</MvFUNCTION>
+
+<MvFUNCTION NAME = "Waitlist_Sent_Add" PARAMETERS = "waitlist var" STANDARDOUTPUTLEVEL = "" ERROROUTPUTLEVEL = "">
+	<MvASSIGN NAME = "l.waitlist:id"			VALUE = "{ int( l.waitlist:id ) }">
+	<MvASSIGN NAME = "l.waitlist:time_added"	VALUE = "{ int( l.waitlist:time_added ) }">
+	<MvASSIGN NAME = "l.waitlist:time_sent"		VALUE = "{ s.dyn_time_t }">
+	<MvASSIGN NAME = "l.waitlist:product_id"	VALUE = "{ int( l.waitlist:product_id ) }">
+	<MvASSIGN NAME = "l.waitlist:variant_id"	VALUE = "{ int( l.waitlist:variant_id ) }">
+	<MvASSIGN NAME = "l.waitlist:email"			VALUE = "{ trim( l.waitlist:email ) }">
+	<MvASSIGN NAME = "l.waitlist:cust_id"		VALUE = "{ int( l.waitlist:cust_id ) }">
+
+	<MvIF EXPR = "{
+			NOT l.waitlist:id			OR
+			NOT l.waitlist:time_added	OR
+			NOT l.waitlist:product_id	OR
+			NOT l.waitlist:email
+		}">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-INSERT-5001:', 'Missing a Required field: id, time_added, time_sent, product_id, email.' ) }">
+	</MvIF>
+
+	<MvIF EXPR = "{ NOT [ g.Module_Library_DB ].Product_Load_ID( l.waitlist:product_id, l.loaded_product ) }">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-INSERT-5002:', 'Product with ID \'' $ l.waitlist:product_id $ '\' does not exist.' ) }">
+	</MvIF>
+
+	<MvIF EXPR = "{ ( l.variant_id GT 0 )  AND ( NOT [ g.Module_Library_DB ].ProductVariantList_Load_Variant( l.product_id, l.variant_id, l.product_variants ) ) }">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-INSERT-5003:', 'Product Variant could not be found.' ) }">
+	</MvIF>
+
+	<MvFUNCTIONRETURN VALUE = "{ Waitlist_Sent_Add_Lowlevel( l.waitlist ) }">
+</MvFUNCTION>
+
+<MvFUNCTION NAME = "Waitlist_Sent_Delete" PARAMETERS = "waitlist_id" STANDARDOUTPUTLEVEL = "" ERROROUTPUTLEVEL = "">
+	<MvQUERY NAME 	= "Merchant"
+			 QUERY 	= "{ 'DELETE FROM ' $ g.Store_Table_Prefix $ 'TGWaitlist_Sent WHERE id = ?' }"
+			 FIELDS = "l.waitlist_id">
+	<MvIF EXPR = "{ g.MvQUERY_Error }">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-DELETE-5002:', g.MvQUERY_Error ) }">
+	</MvIF>
+	
+	<MvFUNCTIONRETURN VALUE = 1>
+</MvFUNCTION>
+
+<MvFUNCTION NAME = "Waitlist_Sent_Delete_Product" PARAMETERS = "product_id" STANDARDOUTPUTLEVEL = "" ERROROUTPUTLEVEL = "">
+	<MvQUERY NAME 	= "Merchant"
+			 QUERY 	= "{ 'DELETE FROM ' $ g.Store_Table_Prefix $ 'TGWaitlist_Sent WHERE product_id = ?' }"
+			 FIELDS = "l.product_id">
+	<MvIF EXPR = "{ g.MvQUERY_Error }">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-DELETE-5001:', g.MvQUERY_Error ) }">
+	</MvIF>
 	<MvFUNCTIONRETURN VALUE = 1>
 </MvFUNCTION>
 

@@ -1,6 +1,12 @@
 # Waitlist
 Current Module Version: 1.006
 
+1.007 coming soon.
+
+## What's new in 1.007
+- Log of which emails got sent ( Waitlist - Sent )
+- [JSON API Hooks](#json_api)
+
 ## What's new in 1.006
 - Current Stock Column for Batchlist
 - Minor Validation
@@ -327,4 +333,51 @@ If `g.Waitlist_Email_Continue` is not set, it will use the original determinatio
 :waitlist:product_id
 :waitlist:time_added
 :waitlist:variant_id
+```
+
+
+## Miva JSON API
+<a name="json_api"></a>
+
+The following functions may be used:
+- Waitlist_Load_Query
+	- Use this to load in all the waitlist users.
+
+### Waitlist_Load_Query
+
+The following may be sorted/ filtered:
+| Code         | Description                                                        | 
+|--------------|--------------------------------------------------------------------| 
+| id           | Waitlist ID; Unique                                                | 
+| time_added   | Timestamp of when the User signed up for the waitlist              | 
+| product_id   | Product ID                                                         | 
+| variant_id   | Variant ID (if applicable)                                         | 
+| email        | Email of User who signed up for the waitlist                       | 
+| cust_id      | Customer ID of user who signed up for the waitlist (if applicable) | 
+| product_code | Product Code                                                       | 
+| variant_code | Variant Part(s) Product Code                                       | 
+| product_name | Product Name                                                       | 
+| variant_name | Variant Part(s) Product Name                                       | 
+
+Example
+```json
+{
+	"Store_Code": "YOUR_STORE_CODE",
+	"Function": "Module",
+	"Module_Code": "TGWaitlist",
+	"Module_Function": "Waitlist_Load_Query",
+	"sort": "email",
+	"Filter":[  
+      {  
+         "name":"search",
+         "value":[  
+            {  
+               "field": "product_code",
+               "operator": "NE",
+               "value": "What_Up_Wit_Dat"
+            }
+         ]
+      }
+   ]
+}
 ```
