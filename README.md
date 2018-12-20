@@ -344,6 +344,8 @@ The following functions may be used:
 	- Use this to load in all the waitlist users.
 - [Waitlist_Trigger_All](#Waitlist_Trigger_All)
 	- This will run a function to trigger any waitlst emails, that need to be sent.
+- [Waitlist_Load_Email](#Waitlist_Load_Email)
+	- Load the Waitlists for a specific Email
 
 ### Waitlist_Load_Query
 <a name="Waitlist_Load_Query"></a>
@@ -398,5 +400,20 @@ Example:
 	"Function": "Module",
 	"Module_Code": "TGWaitlist",
 	"Module_Function": "Waitlist_Trigger_All"
+}
+```
+
+### Waitlist_Load_Email
+<a name="Waitlist_Load_Email"></a>
+
+Example:
+
+```json
+{
+	"Store_Code": "YOUR_STORE_CODE",
+	"Function": "Module",
+	"Module_Code": "TGWaitlist",
+	"Module_Function": "Waitlist_Load_Email",
+	"Email": "email@email.com"
 }
 ```

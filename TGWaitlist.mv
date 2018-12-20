@@ -429,6 +429,9 @@
 
 </MvFUNCTION>
 
+<MvFUNCTION NAME = "ComponentModule_Render_Head" PARAMETERS = "module var, item, all_settings var, settings var" STANDARDOUTPUTLEVEL = "">
+</MvFUNCTION>
+
 <MvCOMMENT>
 | ====================================================================================
 |	JSON_API
@@ -1152,6 +1155,40 @@
 
 <MvFUNCTION NAME = "JSON_API_Waitlist_Load_Email" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = ""  ERROROUTPUTLEVEL = "">
 	<MvIF EXPR = "{ NOT [ g.Module_JSON ].JSON_Store_Open() }"><MvFUNCTIONRETURN></MvIF>
+	<MvIF EXPR = "{ NOT [ g.Module_JSON ].JSON_Input_Text( 'R', 'Email', l.email ) }"><MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_InputErrors() }"></MvIF>
+	<MvIF EXPR = "{ NOT WaitlistXEmail_Load( l.email, l.return ) }">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error( 'TGWAITLIST-JSON-ERROR-0003', 'Error Occurred.' ) }">
+	</MvIF>
+	<MvEVAL EXPR = "{ JSON_WaitlistXEmail_Load( l.return ) }">
+</MvFUNCTION>
+
+<MvFUNCTION NAME = "JSON_WaitlistXEmail_Load" PARAMETERS = "return var" STANDARDOUTPUTLEVEL = "text, html, compresswhitespace"  ERROROUTPUTLEVEL = "">
+	<MvASSIGN NAME = "l.counter" VALUE = "0">
+	{
+		"success": 1,
+		"data": {
+			"data":
+				[
+					<MvFOREACH ITERATOR = "l.waitlist" ARRAY = "l.return">
+						<MvASSIGN NAME = "l.counter" VALUE = "{ l.counter + 1 }">
+						<MvIF EXPR = "{ l.counter GT 1 }">,</MvIF>
+						{
+							"id": <MvEVAL EXPR = "{ int( l.waitlist:id ) }">,
+							"time_added": <MvEVAL EXPR = "{ int(  l.waitlist:time_added ) }">,
+							"product_id" : <MvEVAL EXPR = "{ int(  l.waitlist:product_id ) }">,
+							"variant_id" : <MvEVAL EXPR = "{ int(  l.waitlist:variant_id ) }">,
+							"email" : "<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode(  l.waitlist:email ) }">",
+							"cust_id" : <MvEVAL EXPR = "{ int(  l.waitlist:cust_id ) }">,
+							"product_code" : "<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode(  l.waitlist:product_code ) }">",
+							"product_name" : "<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode(  l.waitlist:product_name ) }">",
+							"variant_code" : "<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode(  l.waitlist:variant_code ) }">",
+							"variant_name" : "<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode(  l.waitlist:variant_name ) }">"
+						}
+					</MvFOREACH>
+				],
+			"total_count": <MvEVAL EXPR = "{ int( l.counter ) }">
+		}
+	}
 </MvFUNCTION>
 
 
@@ -1353,7 +1390,6 @@
 		<MvASSIGN NAME = "l.return" VALUE = "0">
 		<MvFUNCTIONRETURN VALUE = 0>
 	</MvIF>
-
 
 	<MvOPENVIEW NAME	= "Merchant"
 				VIEW 	= "TGWaitlist"
