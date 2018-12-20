@@ -1170,6 +1170,10 @@
 			"data":
 				[
 					<MvFOREACH ITERATOR = "l.waitlist" ARRAY = "l.return">
+						<MvASSIGN NAME = "l.void" VALUE = "{ [ g.Module_Library_DB ].Product_Load_ID( l.waitlist:product_id, l.waitlist:product ) }">
+						<MvIF EXPR = "{ ( l.waitlist:variant_id GT 0 )  AND ( NOT [ g.Module_Library_DB ].ProductVariantList_Load_Variant( l.product_id, l.variant_id, l.waitlist:variants ) ) }">
+							<MvASSIGN NAME = "l.void" VALUE = "{ [ g.Module_Library_DB ].Product_Load_ID( l.waitlist:variants[1]:part_id, l.waitlist:variant ) }">
+						</MvIF>
 						<MvASSIGN NAME = "l.counter" VALUE = "{ l.counter + 1 }">
 						<MvIF EXPR = "{ l.counter GT 1 }">,</MvIF>
 						{
@@ -1179,10 +1183,10 @@
 							"variant_id" : <MvEVAL EXPR = "{ int(  l.waitlist:variant_id ) }">,
 							"email" : "<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode(  l.waitlist:email ) }">",
 							"cust_id" : <MvEVAL EXPR = "{ int(  l.waitlist:cust_id ) }">,
-							"product_code" : "<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode(  l.waitlist:product_code ) }">",
-							"product_name" : "<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode(  l.waitlist:product_name ) }">",
-							"variant_code" : "<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode(  l.waitlist:variant_code ) }">",
-							"variant_name" : "<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode(  l.waitlist:variant_name ) }">"
+							"product_code" : "<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode(  l.waitlist:product:code ) }">",
+							"product_name" : "<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode(  l.waitlist:product:name ) }">",
+							"variant_code" : "<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode(  l.waitlist:variant:code ) }">",
+							"variant_name" : "<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode(  l.waitlist:variant:name ) }">"
 						}
 					</MvFOREACH>
 				],
