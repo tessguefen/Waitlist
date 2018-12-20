@@ -346,6 +346,7 @@ The following functions may be used:
 ### Waitlist_Load_Query
 
 The following may be sorted/ filtered:
+
 | Code         | Description                                                        | 
 |--------------|--------------------------------------------------------------------| 
 | id           | Waitlist ID; Unique                                                | 
@@ -359,7 +360,8 @@ The following may be sorted/ filtered:
 | product_name | Product Name                                                       | 
 | variant_name | Variant Part(s) Product Name                                       | 
 
-Example
+Example:
+
 ```json
 {
 	"Store_Code": "YOUR_STORE_CODE",
