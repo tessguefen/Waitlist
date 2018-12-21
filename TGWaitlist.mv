@@ -91,7 +91,7 @@
 	<MvASSIGN NAME = "l.task:enabled"		VALUE = 1>
 	<MvASSIGN NAME = "l.task:trig"			VALUE = "waitlist_trigger">
 	<MvASSIGN NAME = "l.task:trig_delay"	VALUE = 60>
-	<MvASSIGN NAME = "l.task:runint"		VALUE = 10800>
+	<MvASSIGN NAME = "l.task:runint"		VALUE = 7200>
 	<MvASSIGN NAME = "l.task:runonce"		VALUE = 0>
 	<MvASSIGN NAME = "l.task:mnt_mode"		VALUE = 0>
 	<MvASSIGN NAME = "l.task:mnt_advnce"	VALUE = 0>

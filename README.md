@@ -1,7 +1,5 @@
 # Waitlist
-Current Module Version: 1.006
-
-1.007 coming soon.
+Current Module Version: 1.007
 
 ## What's new in 1.007
 - Log of which emails got sent ( Waitlist - Sent )
@@ -434,7 +432,7 @@ Example:
 
 ### Waitlist_Add
 <a name="Waitlist_Add"></a>
-*`Variant_ID` & `Customer_ID` is optional.*
+*`Variant_ID` & `Customer_ID` are optional.*
 
 Example:
 
