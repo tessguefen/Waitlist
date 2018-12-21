@@ -173,7 +173,7 @@
 
 <MvFUNCTION NAME = "SystemModule_Action" PARAMETERS = "module var, action" STANDARDOUTPUTLEVEL = "">
 	<MvIF EXPR = "{ l.action EQ 'WaitlistAdd' }">
-		<MvASSIGN NAME = "l.success" VALUE = "{ Waitlist_Form_Add( g.Waitlist_Product_Code, g.Waitlist_Variant_ID, g.Waitlist_Email ) }">
+		<MvASSIGN NAME = "l.success" VALUE = "{ Waitlist_Form_Add( g.Waitlist_Product_Code, g.Waitlist_Variant_ID, g.Waitlist_Email, g.Basket:cust_id ) }">
 	</MvIF>
 	<MvFUNCTIONRETURN VALUE = 1>
 </MvFUNCTION>
@@ -664,8 +664,8 @@
 	<MvFUNCTIONRETURN VALUE = 0>
 </MvFUNCTION>
 
-<MvFUNCTION NAME = "Waitlist_Add" PARAMETERS = "product_id, variant_id, email" STANDARDOUTPUTLEVEL = "">
-	<MvIF EXPR = "{ NOT Waitlist_Add_Lowlevel( s.dyn_time_t, l.product_id, l.variant_id, l.email, g.Customer:id ) }">
+<MvFUNCTION NAME = "Waitlist_Add" PARAMETERS = "product_id, variant_id, email, customer_id" STANDARDOUTPUTLEVEL = "">
+	<MvIF EXPR = "{ NOT Waitlist_Add_Lowlevel( s.dyn_time_t, l.product_id, l.variant_id, l.email, l.customer_id ) }">
 		<MvFUNCTIONRETURN VALUE = 0 />
 	</MvIF>
 	<MvFUNCTIONRETURN VALUE = 1 />
@@ -910,7 +910,7 @@
 	<MvFUNCTIONRETURN VALUE = 1>
 </MvFUNCTION>
 
-<MvFUNCTION NAME = "Waitlist_Form_Add" PARAMETERS = "product_code, variant_id, email" STANDARDOUTPUTLEVEL = "">
+<MvFUNCTION NAME = "Waitlist_Form_Add" PARAMETERS = "product_code, variant_id, email, customer_id" STANDARDOUTPUTLEVEL = "">
 	<MvASSIGN NAME = "l.variant_id" VALUE = "{ int( l.variant_id ) }" />
 
 	<MvIF EXPR = "{ NOT [ g.Module_Admin ].Validate_Email( l.email ) }">
@@ -932,7 +932,7 @@
 		<MvFUNCTIONRETURN VALUE = 0 />
 	</MvIF>
 
-	<MvIF EXPR = "{ NOT Waitlist_Add( l.product:id, l.variant_id, l.email ) }">
+	<MvIF EXPR = "{ NOT Waitlist_Add( l.product:id, l.variant_id, l.email, l.customer_id ) }">
 		<MvFUNCTIONRETURN VALUE = 0 />
 	</MvIF>
 
@@ -1275,12 +1275,13 @@
 
 <MvFUNCTION NAME = "JSON_API_Waitlist_Add" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = "" ERROROUTPUTLEVEL = "">
 <MvIF EXPR = "{ NOT [ g.Module_JSON ].JSON_Store_Open() }"><MvFUNCTIONRETURN></MvIF>
-	<MvIF EXPR = "{	NOT [ g.Module_JSON ].JSON_Input_Text( 'R', 'Product_Code', l.product_code )	OR
-					NOT [ g.Module_JSON ].JSON_Input_Text( 'R', 'Email', l.email )					OR
-					NOT [ g.Module_JSON ].JSON_Input_Number( 'o', 'Variant_ID',	l.variant_id,	-1, -1 ) }">
+	<MvIF EXPR = "{	NOT [ g.Module_JSON ].JSON_Input_Text( 'R', 'Product_Code', l.product_code )			OR
+					NOT [ g.Module_JSON ].JSON_Input_Text( 'R', 'Email', l.email )							OR
+					NOT [ g.Module_JSON ].JSON_Input_Number( 'o', 'Variant_ID',	l.variant_id, -1, -1 )	OR
+					NOT [ g.Module_JSON ].JSON_Input_Number( 'o', 'Customer_ID', l.customer_id, -1, -1 ) }">
 		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_InputErrors() }">
 	</MvIF>
-	<MvIF EXPR = "{ NOT Waitlist_Form_Add( l.product_code, l.variant_id, l.email ) }">
+	<MvIF EXPR = "{ NOT Waitlist_Form_Add( l.product_code, l.variant_id, l.email, l.customer_id ) }">
 		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error( 'TGWAITLIST-JSON-ERROR-0004', g.Waitlist_Error ) }">
 	</MvIF>
 	<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Success() }">	
@@ -1411,7 +1412,7 @@
 		<MvIF EXPR = "{ ISNULL g.Email }">
 			<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error( 'Waitlist_Add', 'Missing Email' ) }">
 		</MvIF>
-		<MvIF EXPR = "{ NOT Waitlist_Form_Add( g.Product_Code, g.Variant_ID, g.Email ) }">
+		<MvIF EXPR = "{ NOT Waitlist_Form_Add( g.Product_Code, g.Variant_ID, g.Email, g.Basket:cust_id ) }">
 			<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error( 'Waitlist_Add', g.Waitlist_Error ) }">
 		</MvIF>
 		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Success() }">

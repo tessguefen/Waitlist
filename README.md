@@ -341,6 +341,10 @@ The following functions may be used:
 	- This will run a function to trigger any waitlist emails, that need to be sent.
 - [Waitlist_Load_Email](#Waitlist_Load_Email)
 	- Load the Waitlists for a specific Email
+- [Waitlist_Load_Customer](#Waitlist_Load_Customer)
+	- Load the Waitlists for a specific Customer (using Customer's ID)
+- [Waitlist_Add](#Waitlist_Add)
+	- Add a user to a waitlist.
 
 ### Waitlist_Load_Query
 <a name="Waitlist_Load_Query"></a>
@@ -430,7 +434,7 @@ Example:
 
 ### Waitlist_Add
 <a name="Waitlist_Add"></a>
-*Variant ID is optional.*
+*`Variant_ID` & `Customer_ID` is optional.*
 
 Example:
 
@@ -442,6 +446,7 @@ Example:
 	"Module_Function": "Waitlist_Add",
 	"Product_Code": "My_Product_Code",
 	"Email": "hello@email.com",
+	"Customer_ID": 2,
 	"Variant_ID": 2
 }
 ```
