@@ -464,6 +464,8 @@
 	<MvIF EXPR = "{ l.function EQ 'Waitlist_Load_Query' }">				<MvFUNCTIONRETURN VALUE = "{ JSON_API_Waitlist_Load_Query( l.module ) }">
 	<MvELSEIF EXPR = "{ l.function EQ 'Waitlist_Trigger_All' }">		<MvFUNCTIONRETURN VALUE = "{ JSON_API_Waitlist_Trigger_All( l.module ) }">
 	<MvELSEIF EXPR = "{ l.function EQ 'Waitlist_Load_Email' }">			<MvFUNCTIONRETURN VALUE = "{ JSON_API_Waitlist_Load_Email( l.module ) }">
+	<MvELSEIF EXPR = "{ l.function EQ 'Waitlist_Load_Customer' }">		<MvFUNCTIONRETURN VALUE = "{ JSON_API_Waitlist_Load_Customer( l.module ) }">
+	<MvELSEIF EXPR = "{ l.function EQ 'Waitlist_Add' }">				<MvFUNCTIONRETURN VALUE = "{ JSON_API_Waitlist_Add( l.module ) }">
 	</MvIF>
 
 	<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error( 'TGWAITLIST-ERROR-0001', 'Invalid function.' ) }">
@@ -514,6 +516,10 @@
 |		JSON_API_Waitlist_Load_Query( module var )
 |		JSON_API_Waitlist_Trigger_All( module var )
 |		JSON_API_Waitlist_Load_Email( module var )
+|		JSON_WaitlistXEmail_Load( return var )
+|		JSON_API_Waitlist_Load_Customer( module var)
+|		JSON_WaitlistXCustomer_Load( return var )
+|		JSON_API_Waitlist_Add( module var )
 |
 |	Component Helpers
 |		Parse_Function_Parameters( string, function_name var, parameters var, parameter_count var )
@@ -917,6 +923,15 @@
 		<MvFUNCTIONRETURN VALUE = 0 />
 	</MvIF>
 
+	<MvIF EXPR = "{ NOT l.variant_id }">
+		<MvASSIGN NAME = "l.void" VALUE = "{ [ g.Module_Library_Utilities ].Validate_Attributes_DetermineVariant( l.product, 0, l.attributes, 0, l.basketoptions, l.basketoption_count, l.variant_id ) }">
+	</MvIF>
+
+	<MvIF EXPR = "{ l.variant_id EQ -1 }">
+		<MvASSIGN NAME = "g.Waitlist_Error" VALUE = "A valid variant was not found.">
+		<MvFUNCTIONRETURN VALUE = 0 />
+	</MvIF>
+
 	<MvIF EXPR = "{ NOT Waitlist_Add( l.product:id, l.variant_id, l.email ) }">
 		<MvFUNCTIONRETURN VALUE = 0 />
 	</MvIF>
@@ -1216,6 +1231,60 @@
 	}
 </MvFUNCTION>
 
+<MvFUNCTION NAME = "JSON_API_Waitlist_Load_Customer" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = "" ERROROUTPUTLEVEL = "">
+	<MvIF EXPR = "{ NOT [ g.Module_JSON ].JSON_Store_Open() }"><MvFUNCTIONRETURN></MvIF>
+	<MvIF EXPR = "{ NOT [ g.Module_JSON ].JSON_Input_Number( 'o', 'Customer_ID', l.customer_id, -1, -1 ) }"><MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_InputErrors() }"></MvIF>
+	<MvIF EXPR = "{ NOT WaitlistXCustomer_Load( l.customer_id, l.return ) }">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error( 'TGWAITLIST-JSON-ERROR-0005', 'Error Occurred.' ) }">
+	</MvIF>
+	<MvEVAL EXPR = "{ JSON_WaitlistXCustomer_Load( l.return ) }">
+</MvFUNCTION>
+
+<MvFUNCTION NAME = "JSON_WaitlistXCustomer_Load" PARAMETERS = "return var" STANDARDOUTPUTLEVEL = "text, html, compresswhitespace"  ERROROUTPUTLEVEL = "">
+	<MvASSIGN NAME = "l.counter" VALUE = "0">
+	{
+		"success": 1,
+		"data": {
+			"data":
+				[
+					<MvFOREACH ITERATOR = "l.waitlist" ARRAY = "l.return">
+						<MvASSIGN NAME = "l.void" VALUE = "{ [ g.Module_Library_DB ].Product_Load_ID( l.waitlist:product_id, l.waitlist:product ) }">
+						<MvIF EXPR = "{ ( l.waitlist:variant_id GT 0 )  AND ( NOT [ g.Module_Library_DB ].ProductVariantList_Load_Variant( l.product_id, l.variant_id, l.waitlist:variants ) ) }">
+							<MvASSIGN NAME = "l.void" VALUE = "{ [ g.Module_Library_DB ].Product_Load_ID( l.waitlist:variants[1]:part_id, l.waitlist:variant ) }">
+						</MvIF>
+						<MvASSIGN NAME = "l.counter" VALUE = "{ l.counter + 1 }">
+						<MvIF EXPR = "{ l.counter GT 1 }">,</MvIF>
+						{
+							"id": <MvEVAL EXPR = "{ int( l.waitlist:id ) }">,
+							"time_added": <MvEVAL EXPR = "{ int(  l.waitlist:time_added ) }">,
+							"product_id" : <MvEVAL EXPR = "{ int(  l.waitlist:product_id ) }">,
+							"variant_id" : <MvEVAL EXPR = "{ int(  l.waitlist:variant_id ) }">,
+							"email" : "<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode(  l.waitlist:email ) }">",
+							"cust_id" : <MvEVAL EXPR = "{ int(  l.waitlist:cust_id ) }">,
+							"product_code" : "<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode(  l.waitlist:product:code ) }">",
+							"product_name" : "<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode(  l.waitlist:product:name ) }">",
+							"variant_code" : "<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode(  l.waitlist:variant:code ) }">",
+							"variant_name" : "<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode(  l.waitlist:variant:name ) }">"
+						}
+					</MvFOREACH>
+				],
+			"total_count": <MvEVAL EXPR = "{ int( l.counter ) }">
+		}
+	}
+</MvFUNCTION>
+
+<MvFUNCTION NAME = "JSON_API_Waitlist_Add" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = "" ERROROUTPUTLEVEL = "">
+<MvIF EXPR = "{ NOT [ g.Module_JSON ].JSON_Store_Open() }"><MvFUNCTIONRETURN></MvIF>
+	<MvIF EXPR = "{	NOT [ g.Module_JSON ].JSON_Input_Text( 'R', 'Product_Code', l.product_code )	OR
+					NOT [ g.Module_JSON ].JSON_Input_Text( 'R', 'Email', l.email )					OR
+					NOT [ g.Module_JSON ].JSON_Input_Number( 'o', 'Variant_ID',	l.variant_id,	-1, -1 ) }">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_InputErrors() }">
+	</MvIF>
+	<MvIF EXPR = "{ NOT Waitlist_Form_Add( l.product_code, l.variant_id, l.email ) }">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error( 'TGWAITLIST-JSON-ERROR-0004', g.Waitlist_Error ) }">
+	</MvIF>
+	<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Success() }">	
+</MvFUNCTION>
 
 <MvFUNCTION NAME = "Waitlists_Trigger_All" PARAMETERS = "" STANDARDOUTPUTLEVEL = ""  ERROROUTPUTLEVEL = "">
 	<MvOPENVIEW NAME	= "Merchant"

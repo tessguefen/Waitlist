@@ -20,7 +20,7 @@ Waitlist_Sent_Batchlist.prototype.onCreateRootColumnList = function() {
 		.SetDisplayInList(false)
 		.SetAdvancedSearchEnabled(false),
 		new MMBatchList_Column_DateTime( 'Date Added', 'time_added', 'time_added'),
-		new MMBatchList_Column_DateTime( 'Date Added', 'time_sent', 'time_sent'),
+		new MMBatchList_Column_DateTime( 'Date Sent', 'time_sent', 'time_sent'),
 		new MMBatchList_Column_Name( 'Email', 'email', 'email'),
 		new MMBatchList_Column_Name( 'Product Code', 'product_code', 'product_code'),
 		new MMBatchList_Column_Name( 'Product Name', 'product_name', 'product_name'),

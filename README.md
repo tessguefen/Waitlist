@@ -16,9 +16,6 @@ Please Change the following page codes:
 - `WatilistEmailTemplate` TO `WaitlistEmailTemplate`
 - `WatilistEmailLogic` TO `WaitlistEmailLogic` (if you were using this)
 
-## Coming Soon!
-- [ ] Export of how many Users (#) are waiting per product
-
 ## Functionality
 - [x] Waitlist Batchlist
 	- [x] Trigger Emails via Batchlist
@@ -34,9 +31,7 @@ Please Change the following page codes:
 	- [x] Tie this functionality to a scheduled task
 - [x] Create if statement for form (hide/ shown on PROD page)
 - [x] Create an API version of form submission
-- [ ] Run check for Waitlist add Product, with no variant, but should be with a variant (only adding the master product should not be allowed)
-- [ ] Admin > Product View, show batchlist for JUST that product? (Can technically be done with an advanced search on Batchlist)
-- [ ] Return `g.Waitlist_Message_ID`, for use elsewhere (for customizations on Messages)
+- [x] Run check for Waitlist add Product, with no variant, but should be with a variant (only adding the master product should not be allowed)
 - [x] Custom Page to determine if an email should be triggered. [View Details here](#customized-email-trigger-logic-v-1001)
 
 ## Item Functionality
@@ -343,7 +338,7 @@ The following functions may be used:
 - [Waitlist_Load_Query](#Waitlist_Load_Query)
 	- Use this to load in all the waitlist users.
 - [Waitlist_Trigger_All](#Waitlist_Trigger_All)
-	- This will run a function to trigger any waitlst emails, that need to be sent.
+	- This will run a function to trigger any waitlist emails, that need to be sent.
 - [Waitlist_Load_Email](#Waitlist_Load_Email)
 	- Load the Waitlists for a specific Email
 
@@ -415,5 +410,38 @@ Example:
 	"Module_Code": "TGWaitlist",
 	"Module_Function": "Waitlist_Load_Email",
 	"Email": "email@email.com"
+}
+```
+
+### Waitlist_Load_Customer
+<a name="Waitlist_Load_Customer"></a>
+
+Example:
+
+```json
+{
+	"Store_Code": "YOUR_STORE_CODE",
+	"Function": "Module",
+	"Module_Code": "TGWaitlist",
+	"Module_Function": "Waitlist_Load_Customer",
+	"Customer_ID": 5
+}
+```
+
+### Waitlist_Add
+<a name="Waitlist_Add"></a>
+*Variant ID is optional.*
+
+Example:
+
+```json
+{
+	"Store_Code": "YOUR_STORE_CODE",
+	"Function": "Module",
+	"Module_Code": "TGWaitlist",
+	"Module_Function": "Waitlist_Add",
+	"Product_Code": "My_Product_Code",
+	"Email": "hello@email.com",
+	"Variant_ID": 2
 }
 ```
