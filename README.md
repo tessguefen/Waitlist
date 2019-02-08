@@ -1,5 +1,5 @@
 # Waitlist
-Current Module Version: 1.007
+Current Module Version: 1.008
 
 ## What's new in 1.007
 - Log of which emails got sent ( Waitlist - Sent )
