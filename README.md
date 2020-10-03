@@ -1,5 +1,6 @@
 # Waitlist
 Current Module Version: 1.009
+
 Last Updated: 10/02/2020
 
 ## What's new in 1.007
