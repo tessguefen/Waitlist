@@ -1,5 +1,7 @@
 # Waitlist
-Current Module Version: 1.008
+Current Module Version: 1.009
+
+Last Updated: 10/02/2020
 
 ## What's new in 1.007
 - Log of which emails got sent ( Waitlist - Sent )
@@ -333,16 +335,23 @@ If `g.Waitlist_Email_Continue` is not set, it will use the original determinatio
 <a name="json_api"></a>
 
 The following functions may be used:
-- [Waitlist_Load_Query](#Waitlist_Load_Query)
-	- Use this to load in all the waitlist users.
-- [Waitlist_Trigger_All](#Waitlist_Trigger_All)
-	- This will run a function to trigger any waitlist emails, that need to be sent.
-- [Waitlist_Load_Email](#Waitlist_Load_Email)
-	- Load the Waitlists for a specific Email
-- [Waitlist_Load_Customer](#Waitlist_Load_Customer)
-	- Load the Waitlists for a specific Customer (using Customer's ID)
-- [Waitlist_Add](#Waitlist_Add)
-	- Add a user to a waitlist.
+- [Waitlist](#waitlist)
+	- [What's new in 1.007](#whats-new-in-1007)
+	- [What's new in 1.006](#whats-new-in-1006)
+	- [UPDATING FROM 1.004 AND BELOW](#updating-from-1004-and-below)
+	- [Functionality](#functionality)
+	- [Item Functionality](#item-functionality)
+	- [Form Submission](#form-submission)
+	- [Email Template Example](#email-template-example)
+	- [Customized Email Trigger Logic (v 1.001)](#customized-email-trigger-logic-v-1001)
+			- [When l.settings:waitlist:variant_id is greater than 0:](#when-lsettingswaitlistvariant_id-is-greater-than-0)
+			- [When There is no variant:](#when-there-is-no-variant)
+	- [Miva JSON API](#miva-json-api)
+		- [Waitlist_Load_Query](#waitlist_load_query)
+		- [Waitlist_Trigger_All](#waitlist_trigger_all)
+		- [Waitlist_Load_Email](#waitlist_load_email)
+		- [Waitlist_Load_Customer](#waitlist_load_customer)
+		- [Waitlist_Add](#waitlist_add)
 
 ### Waitlist_Load_Query
 <a name="Waitlist_Load_Query"></a>
