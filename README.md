@@ -408,7 +408,7 @@ Example:
 	"Module_Function": "Waitlist_Trigger_All"
 }
 ```
-
+NO LONGER AVAILABLE IN 2.00 - please uise the list load with a filter.
 ### Waitlist_Load_Email
 <a name="Waitlist_Load_Email"></a>
 
@@ -424,6 +424,7 @@ Example:
 }
 ```
 
+NO LONGER AVAILABLE IN 2.00 - please uise the list load with a filter.
 ### Waitlist_Load_Customer
 <a name="Waitlist_Load_Customer"></a>
 
