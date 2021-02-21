@@ -1,0 +1,27 @@
+<<<
+
+[[_scheduledTasks]]
+== Scheduled Tasks
+
+There is one scheduled task that should be created during the installation process:
+
+* Description: *Trigger Waitlist Emails*
+* Operation: *Waitlist: Trigger Waitlist Emails*
+
+[[__setUpScheduledTask]]
+=== Setting up the Trigger Waitlist Emails
+
+. Navigate to *Store Settings*
+. Click the *Scheduled Tasks* tab
+. Click *Create New Scheduled Task*
+. Add a description to the new task (ex. Trigger Waitlist Emails)
+. Select the operation *Waitlist: Trigger Waitlist Emails*
+. Set up your schedule (_Recommended to be every 2 hours_)
+
+If you want your scheduled task to run after a product update, you can add the following fields to your scheduled task:
+
+* Trigger: *waitlist_trigger*
+* Trigger Delay: *60* second(s)
+
+*Please Note:* Scheduled tasks with triggers will still run if in-active. This is important if you have development stores, or if you have processes in place that trigger many product updates, it will schedule the *Next Run* based on the trigger delay.
+

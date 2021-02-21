@@ -1,0 +1,7 @@
+:source-highlighter: rouge
+include::titlepage.adoc[]
+include::setup.adoc[]
+include::scheduledtasks.adoc[]
+include::technical-setup.adoc[]
+include::waitlist-item.adoc[]
+include::waitlist-runtime-api.adoc[]

@@ -1,0 +1,131 @@
+<<<
+
+[[_waitlistItem]]
+== waitlist Item
+
+[[__waitlistAPIURL]]
+=== Waitlist_API_URL
+
+``Waitlist_API_URL( return var )``
+
+This will return the URL to utilize the <<_waitlistRuntimeAPI,Waitlist Runtime API>>
+
+[source,xml]
+----
+<mvt:item name="waitlist" param="Waitlist_API_URL( l.all_settings:waitlist_url )" />
+----
+
+[[__currentWaitlistCount]]
+=== CurrentWaitlistCount
+
+``CurrentWaitlistCount( product_id, variant_id, return var )``
+
+Return the number of people on the waitlist for a specific product
+
+[source,xml]
+----
+<mvt:item name="waitlist" param="CurrentWaitlistCount( l.all_settings:product:id, l.all_settings:variant_id, l.all_settings:waitlist_count )" />
+----
+
+[[__waitlistXCustomer_Load]]
+=== WaitlistXCustomer_Load
+
+``WaitlistXCustomer_Load( cust_id, return var  )``
+
+Load in all waitlists a customer is currently waiting on (via `cust_id`)
+
+[source,xml]
+----
+<mvt:item name="waitlist" param="WaitlistXCustomer_Load( g.Basket:cust_id, l.all_settings:customer_waitlists )" />
+----
+
+[[__waitlistXEmail_Load]]
+=== WaitlistXEmail_Load
+
+``WaitlistXEmail_Load( email, return var )``
+
+This will load in all waitlists a customer is currently waiting on (via `email`)
+
+[source,xml]
+----
+<mvt:item name="waitlist" param="WaitlistXEmail_Load( g.User_Email, l.all_settings:user_waitlists )" />
+----
+
+The following is an example of the return for both `WaitlistXCustomer_Load` & `WaitlistXEmail_Load`:
+__[x] denotes array__
+
+[source,xml]
+----
+[x]:cust_id
+[x]:email
+[x]:id
+[x]:options[x]:attmpat_id
+[x]:options[x]:attr_id
+[x]:options[x]:attribute:attemp_id
+[x]:options[x]:attribute:code
+[x]:options[x]:attribute:cost
+[x]:options[x]:attribute:default_id
+[x]:options[x]:attribute:disp_order
+[x]:options[x]:attribute:id
+[x]:options[x]:attribute:inventory
+[x]:options[x]:attribute:price
+[x]:options[x]:attribute:product_id
+[x]:options[x]:attribute:prompt
+[x]:options[x]:attribute:required
+[x]:options[x]:attribute:type
+[x]:options[x]:attribute:weight
+[x]:options[x]:dimensions
+[x]:options[x]:option:attr_id
+[x]:options[x]:option:code
+[x]:options[x]:option:cost
+[x]:options[x]:option:disp_order
+[x]:options[x]:option:id
+[x]:options[x]:option:price
+[x]:options[x]:option:product_id
+[x]:options[x]:option:prompt
+[x]:options[x]:option:weight
+[x]:options[x]:option_id
+[x]:options[x]:part_count
+[x]:options[x]:product_id
+[x]:options[x]:variant_id
+[x]:product:active
+[x]:product:agrpcount
+[x]:product:cancat_id
+[x]:product:catcount
+[x]:product:code
+[x]:product:cost
+[x]:product:disp_order
+[x]:product:dt_created
+[x]:product:dt_updated
+[x]:product:id
+[x]:product:name
+[x]:product:page_id
+[x]:product:pgrpcount
+[x]:product:price
+[x]:product:taxable
+[x]:product:weight
+[x]:product_id
+[x]:time_added
+[x]:variant_id
+[x]:variants[x]:part_id
+[x]:variants[x]:product:active
+[x]:variants[x]:product:agrpcount
+[x]:variants[x]:product:cancat_id
+[x]:variants[x]:product:catcount
+[x]:variants[x]:product:code
+[x]:variants[x]:product:cost
+[x]:variants[x]:product:disp_order
+[x]:variants[x]:product:dt_created
+[x]:variants[x]:product:dt_updated
+[x]:variants[x]:product:id
+[x]:variants[x]:product:name
+[x]:variants[x]:product:page_id
+[x]:variants[x]:product:pgrpcount
+[x]:variants[x]:product:price
+[x]:variants[x]:product:taxable
+[x]:variants[x]:product:weight
+[x]:variants[x]:product_id
+[x]:variants[x]:quantity
+[x]:variants[x]:variant_id
+----
+

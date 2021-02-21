@@ -1,0 +1,24 @@
+<<<
+
+[[_waitlistRuntimeAPI]
+== Waitlist Runtime API
+
+This is a runtime API that currently offers 1 function.
+
+[[__waitlistAdd]]
+=== Waitlist_Add
+
+Utilizing the <<__waitlistAPIURL,Waitlist API URL>>, you can make the following request (GET or POST).
+
+[[___waitlistAddParameters]]
+==== Request Parameters
+
+[stripes=odd,options="header",cols="25%,25%,50%"]
+|===
+|Key|Type|Description
+|WaitlistFunction|String|`Waitlist_Add`
+|Email|String|Email for the Waitlist Sign up
+|Variant_ID|Number|Variant ID for the waitlist sign up. Optional.
+|===
+
+This will run through the <<_preLogicTemplate,Pre-Logic Template>> (if applicable). If you need other fields to be passed through (like a reCAPTCHA field), make sure to pass it through here.

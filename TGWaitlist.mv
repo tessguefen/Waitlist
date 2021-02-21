@@ -85,6 +85,10 @@
 		<MvFUNCTIONRETURN VALUE = 0>
 	</MvIF>
 
+	<MvIF EXPR = "{ NOT [ g.Module_Feature_TUI_MGR ].TemplateManager_Create_Item( 'waitlist', l.module:code ) }">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( '#Error#', g.Error_Message ) }">
+	</MvIF>
+
 	<MvCOMMENT>
 	|
 	|	Scheduled Task
@@ -938,7 +942,7 @@
 	<MvASSIGN NAME = "g.Waitlist_Error"		VALUE = "">
 	<MvASSIGN NAME = "g.Waitlist_Message"	VALUE = "">
 
-	<MvIF EXPR = "{ NOT Waitlist_Form_Add_Runtime_LowLevel( g.Waitlist_Product_Code, g.Waitlist_Variant_ID, g.Waitlist_Email, g.Basket:cust_id ) }">
+	<MvIF EXPR = "{ NOT Waitlist_Form_Add_Runtime_LowLevel( g.Waitlist_Product_Code, g.Waitlist_Variant_ID, g.Waitlist_Email, g.Basket:cust_id, 1 ) }">
 		<MvASSIGN NAME = "g.Waitlist_Error" VALUE = "{ g.Error_Message }">
 		<MvFUNCTIONRETURN VALUE = 1>
 	</MvIF>
@@ -948,11 +952,12 @@
 	<MvFUNCTIONRETURN VALUE = 1>
 </MvFUNCTION>
 
-<MvFUNCTION NAME = "Waitlist_Form_Add_Runtime_LowLevel" PARAMETERS = "product_code, variant_id, email, cust_id" STANDARDOUTPUTLEVEL = "">
+<MvFUNCTION NAME = "Waitlist_Form_Add_Runtime_LowLevel" PARAMETERS = "product_code, variant_id, email, cust_id, prelogic" STANDARDOUTPUTLEVEL = "">
 	<MvASSIGN NAME = "l.product_code"	VALUE = "{ trim( l.product_code ) }">
 	<MvASSIGN NAME = "l.variant_id"		VALUE = "{ int( l.variant_id ) }">
 	<MvASSIGN NAME = "l.email"			VALUE = "{ trim( l.email ) }">
 	<MvASSIGN NAME = "l.cust_id"		VALUE = "{ int( l.cust_id ) }">
+	<MvASSIGN NAME = "l.prelogic"		VALUE = "{ int( l.prelogic ) }">
 
 	<MvIF EXPR = "{ NOT [ g.Module_Admin ].Validate_Email( l.email ) }">
 		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( '#Error#', 'Please enter a valid email.' ) }">
@@ -987,7 +992,66 @@
 		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( '#Error#', 'Email is already on the Waitlist for this product.' ) }">
 	</MvIF>
 
+	<MvIF EXPR = "{ l.prelogic EQ 1 }">
+		<MvIF EXPR = "{ NOT Waitlist_PreLogic_Override( l.waitlist ) }">
+			<MvFUNCTIONRETURN VALUE = 0>
+		</MvIF>
+	</MvIF>
+
 	<MvFUNCTIONRETURN VALUE = "{ Waitlist_Insert( l.waitlist ) }">
+</MvFUNCTION>
+
+<MvFUNCTION NAME = "Waitlist_PreLogic_Override" PARAMETERS = "waitlist var" STANDARDOUTPUTLEVEL = "">
+	<MvIF EXPR = "{ NOT [ g.Module_Feature_TUI_DB ].Page_Load_Code( 'WaitlistEmailPreLogic', l.logic_page ) }">
+		<MvFUNCTIONRETURN VALUE = 1>
+	</MvIF>
+
+	<MvIF EXPR = "{ NOT [ g.Module_Feature_TUI_DB ].ManagedTemplate_Load_ID( l.logic_page:templ_id, l.waitlist_logic_template ) }">
+		<MvFUNCTIONRETURN VALUE = 0>
+	</MvIF>
+
+	<MvCOMMENT>
+	|
+	| Load and initialize items
+	|
+	</MvCOMMENT>
+
+	<MvASSIGN NAME = "l.item_pos"			VALUE = 1>
+	<MvASSIGN NAME = "l.item_count"			VALUE = "{ [ g.Module_Feature_TUI_DB ].ItemModuleList_Load_Page_Render( l.logic_page:id,			l.logic_page:settings:_mgr ) }">
+	<MvASSIGN NAME = "l.extension_count"	VALUE = "{ [ g.Module_Feature_TUI_DB ].ItemExtensionModuleList_Load_Page_Render( l.logic_page:id,	l.logic_page:settings:_mgr ) }">
+
+	<MvWHILE EXPR = "{ l.item_pos LE l.item_count }">
+		<MvIF EXPR = "{ NOT [ g.Module_Feature_TUI_MGR ].TemplateManager_Initialize_Item_LowLevel( l.logic_page:settings, l.logic_page:settings:_mgr:items[ l.item_pos ] ) }">
+			<MvFUNCTIONRETURN VALUE = 0>
+		</MvIF>
+
+		<MvIF EXPR = "{ g.TemplateManager_Exception }">
+			<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( '#Error#', 'Item \'' $ l.logic_page:settings:_mgr:items[ l.item_pos ]:item_code $ '\' threw exception \'' $ g.TemplateManager_Exception_Code $ '\' during initialization' ) }">
+		</MvIF>
+
+		<MvASSIGN NAME = "l.item_pos"	VALUE = "{ l.item_pos + 1 }">
+	</MvWHILE>
+
+	<MvASSIGN NAME = "l.all_settings"			VALUE = "{ l.logic_page:settings }">
+	<MvASSIGN NAME = "l.all_settings:waitlist"	VALUE = "{ l.waitlist }">
+
+	<MvCOMMENT>
+	|
+	|	Looking for g.Waitlist_PreLogic_Continue (0/1)
+	|
+	</MvCOMMENT>
+
+	<MvASSIGN NAME = "g.Waitlist_PreLogic_Continue" VALUE = 1>
+
+	<MvCAPTURE VARIABLE = "l.success">
+		<MvDO FILE = "{ g.Store_Template_Path $ l.waitlist_logic_template:filename }" NAME = "l.success" VALUE = "{ Template_Render( l.settings, l.all_settings ) }">
+	</MvCAPTURE>
+
+	<MvIF EXPR = "{ g.Waitlist_PreLogic_Continue EQ 0 }">
+		<MvFUNCTIONRETURN VALUE = 0>
+	</MvIF>
+
+	<MvFUNCTIONRETURN VALUE = 1>
 </MvFUNCTION>
 
 <MvCOMMENT>
@@ -1273,7 +1337,7 @@
 </MvCOMMENT>
 
 <MvFUNCTION NAME = "JSON_API_Waitlist_Trigger_All" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = "text, html, compresswhitespace">
-	<MvIF EXPR = "{ g.Session_Type NE 'api' }">							<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Access_Denied() }">		</MvIF>
+	<MvIF EXPR = "{ g.Session_Type NE 'api' }">								<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Access_Denied() }">	</MvIF>
 	<MvIF EXPR = "{ NOT [ g.Module_JSON ].JSON_Store_Open() }">				<MvFUNCTIONRETURN>																	</MvIF>
 	<MvIF EXPR = "{ NOT [ g.Module_Admin ].CanI( 'SYSM', 0, 0, 1, 0 ) }">	<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Access_Denied() }">	</MvIF>
 
@@ -1281,7 +1345,6 @@
 
 	<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Response_Start() }">
 	{
-		"success": 1,
 		"session_id": "<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode( l.session_id ) }">"
 	}
 	<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_End() }">
@@ -1306,7 +1369,7 @@
 </MvFUNCTION>
 
 <MvFUNCTION NAME = "JSON_API_Waitlist_Add" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = "" ERROROUTPUTLEVEL = "">
-	<MvIF EXPR = "{ g.Session_Type NE 'api' }">							<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Access_Denied() }">		</MvIF>
+	<MvIF EXPR = "{ g.Session_Type NE 'api' }">								<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Access_Denied() }">	</MvIF>
 	<MvIF EXPR = "{ NOT [ g.Module_JSON ].JSON_Store_Open() }">				<MvFUNCTIONRETURN>																	</MvIF>
 	<MvIF EXPR = "{ NOT [ g.Module_Admin ].CanI( 'SYSM', 1, 0, 0, 0 ) }">	<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Access_Denied() }">	</MvIF>
 
@@ -1317,7 +1380,7 @@
 		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_InputErrors() }">
 	</MvIF>
 
-	<MvIF EXPR = "{ NOT Waitlist_Form_Add_Runtime_LowLevel( l.product_code, l.variant_id, l.email, l.customer_id ) }">
+	<MvIF EXPR = "{ NOT Waitlist_Form_Add_Runtime_LowLevel( l.product_code, l.variant_id, l.email, l.customer_id, 0 ) }">
 		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error( '#Error#', g.Error_Message ) }">
 	</MvIF>
 
@@ -1378,6 +1441,12 @@
 		<MvIF EXPR = "{ Waitlist_Check_Email( l.waitlist:product_id, l.waitlist:variant_id, l.waitlist:email, l.existing_waitlist ) }">
 			<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error( '#Error#', 'Email is already on the Waitlist for this product.' ) }">
 		</MvIF>
+
+		<MvIF EXPR = "{ l.prelogic EQ 1 }">
+			<MvIF EXPR = "{ NOT Waitlist_PreLogic_Override( l.waitlist ) }">
+				<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error( '#Error#', g.Error_Message ) }">
+			</MvIF>
+		</MvIF>
 	
 		<MvIF EXPR = "{ NOT Waitlist_Insert( l.waitlist ) }">
 			<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error( '#Error#', g.Error_Message ) }">
@@ -1401,89 +1470,89 @@
 	<MvFUNCTIONRETURN VALUE = 1>
 </MvFUNCTION>
 
-<MvFUNCTION NAME = "CurrentWaitlistCount" PARAMETERS = "product_id, variant_id, return var" STANDARDOUTPUTLEVEL = ""  ERROROUTPUTLEVEL = "">
-	<MvIF EXPR = "{ ISNULL l.variant_id }"> <MvASSIGN NAME = "l.variant_id" VALUE = 0> </MvIF>
-
-	<MvOPENVIEW NAME	= "Merchant"
-				VIEW 	= "TGWaitlistCount"
-				QUERY 	= "{ 'SELECT COUNT(id) as total_count FROM ' $ g.Store_Table_Prefix $ 'TGWaitlist WHERE product_id = ? AND variant_id = ? ' }"
-				FIELDS	= "l.product_id, l.variant_id">
-
-	<MvIF EXPR = "{ g.MvOPENVIEW_Error }">
-		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-CHECK-1001:', 'An error occured while checking a record.' ) }">
+<MvFUNCTION NAME = "CurrentWaitlistCount" PARAMETERS = "product_id, variant_id, count var" STANDARDOUTPUTLEVEL = ""  ERROROUTPUTLEVEL = "">
+	<MvIF EXPR = "{ ISNULL l.variant_id }">
+		<MvASSIGN NAME = "l.variant_id" VALUE = 0>
 	</MvIF>
 
-	<MvASSIGN NAME = "l.return" VALUE = "{ TGWaitlistCount.d.total_count }">
+	<MvOPENVIEW NAME	= "Merchant"
+				VIEW	= "TGWaitlist"
+				QUERY	= "{ 'SELECT COUNT( id ) AS total_count FROM ' $ g.Store_Table_Prefix $ 'TGWaitlist
+							  WHERE
+							  product_id	= ?,
+							  variant_id	= ?' }"
+				FIELDS	= "l.product_id, l.variant_id">
+	<MvIF EXPR = "{ g.MvOPENVIEW_Error }">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( '#Error', g.MvOPENVIEW_Error ) }">
+	</MvIF>
 
-	<MvCLOSEVIEW NAME = "Merchant" VIEW = "TGWaitlistCount">
-	
+	<MvIF EXPR = "{ TGWaitlist.d.EOF }">
+		<MvASSIGN NAME = "l.count"	VALUE = 0>
+
+		<MvCLOSEVIEW NAME = "Merchant" VIEW = "TGWaitlist">
+		<MvFUNCTIONRETURN VALUE = 1>
+	</MvIF>
+
+	<MvASSIGN NAME = "l.count"		VALUE = "{ TGWaitlist.d.total_count }">
+	<MvCLOSEVIEW NAME = "Merchant" VIEW = "Reports">
+
 	<MvFUNCTIONRETURN VALUE = 1>
 </MvFUNCTION>
 
 <MvFUNCTION NAME = "WaitlistXCustomer_Load" PARAMETERS = "cust_id, return var" STANDARDOUTPUTLEVEL = ""   ERROROUTPUTLEVEL = "">
-	<MvCOMMENT> <MvIF EXPR = "{ ISNULL l.cust_id }">
-		<MvASSIGN NAME = "l.return" VALUE = "0">
-		<MvFUNCTIONRETURN VALUE = 0>
-	</MvIF>
-	<MvIF EXPR = "{ l.cust_id LE 0 }">
-		<MvASSIGN NAME = "l.return" VALUE = "0">
-		<MvFUNCTIONRETURN VALUE = 0>
-	</MvIF>
-
 	<MvOPENVIEW NAME	= "Merchant"
-				VIEW 	= "TGWaitlist"
-				QUERY 	= "{ 'SELECT * FROM ' $ g.Store_Table_Prefix $ 'TGWaitlist WHERE cust_id = ?' }"
+				VIEW	= "TGWaitlist"
+				QUERY	= "{ 'SELECT * FROM ' $ g.Store_Table_Prefix $ 'TGWaitlist
+							  WHERE
+							  cust_id	= ?' }"
 				FIELDS	= "l.cust_id">
-
 	<MvIF EXPR = "{ g.MvOPENVIEW_Error }">
-		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-CHECK-1005:', 'An error occured while loading in records.' ) }">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( '#Error', g.MvOPENVIEW_Error ) }">
 	</MvIF>
 
-	<MvASSIGN NAME = "g.WaitlistCount" VALUE = "0">
+	<MvASSIGN NAME = "l.waitlist_count" VALUE = 0>
+	<MvWHILE EXPR = "{ NOT TGWaitlist.d.EOF }">
+		<MvASSIGN NAME = "l.waitlist_count" VALUE = "{ l.waitlist_count + 1 }">
+		<MvEVAL EXPR = "{ Waitlist_Read( l.return[ l.waitlist_count ] ) }">
 
-	<MvWHILE EXPR = "{ ( NOT TGWaitlist.d.EOF ) AND ( ( g.WaitlistCount EQ 0 ) OR (l.waitlist_num LT ( g.WaitlistCount + 1) ) ) }">
-		<MvEVAL EXPR = "{ Waitlist_Read( l.waitlist ) }">
-		<MvASSIGN NAME = "l.success" VALUE = "{ Waitlist_Product_Check( l.waitlist:product_id, l.waitlist:variant_id, l.waitlist) }">
-		<MvASSIGN NAME = "l.success" VALUE = "{ miva_array_insert_var( l.all_waitlists, l.waitlist, -1) }">
-		<MvASSIGN NAME = "l.waitlist_num"	VALUE = "{ l.waitlist_num + 1 }">
 		<MvSKIP NAME = "Merchant" VIEW = "TGWaitlist" ROWS = 1>
 	</MvWHILE>
+
+	<MvFOREACH ITERATOR = "l.waitlist" ARRAY = "l.return" COUNT = "{ l.waitlist_count }">
+		<MvASSIGN NAME = "l.null" VALUE = "{ [ g.Module_Library_DB ].Runtime_Product_Load_ID( l.waitlist:product_id, l.waitlist:product ) }">
+		<MvEVAL EXPR = "{ Waitlist_Email_Format( l.waitlist ) }">
+	</MvFOREACH>
+
 	<MvCLOSEVIEW NAME = "Merchant" VIEW = "TGWaitlist">
-
-	<MvASSIGN NAME = "l.return" VALUE = "{ l.all_waitlists }">
-
-	<MvFUNCTIONRETURN VALUE = 1> </MvCOMMENT>
+	<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_DB ].ListLoad_EOF_Return( '#Error#', l.waitlist_count ) }">
 </MvFUNCTION>
 
 <MvFUNCTION NAME = "WaitlistXEmail_Load" PARAMETERS = "email, return var" STANDARDOUTPUTLEVEL = ""  ERROROUTPUTLEVEL = "">
-	<MvCOMMENT> <MvIF EXPR = "{ ISNULL l.email }">
-		<MvASSIGN NAME = "l.return" VALUE = "0">
-		<MvFUNCTIONRETURN VALUE = 0>
-	</MvIF>
-
 	<MvOPENVIEW NAME	= "Merchant"
-				VIEW 	= "TGWaitlist"
-				QUERY 	= "{ 'SELECT * FROM ' $ g.Store_Table_Prefix $ 'TGWaitlist WHERE email = ?' }"
+				VIEW	= "TGWaitlist"
+				QUERY	= "{ 'SELECT * FROM ' $ g.Store_Table_Prefix $ 'TGWaitlist
+							  WHERE
+							  email	= ?' }"
 				FIELDS	= "l.email">
-
 	<MvIF EXPR = "{ g.MvOPENVIEW_Error }">
-		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'TGWaitlist-CHECK-1005:', 'An error occured while loading in records.' ) }">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( '#Error', g.MvOPENVIEW_Error ) }">
 	</MvIF>
 
-	<MvASSIGN NAME = "g.WaitlistCount" VALUE = "0">
+	<MvASSIGN NAME = "l.waitlist_count" VALUE = 0>
+	<MvWHILE EXPR = "{ NOT TGWaitlist.d.EOF }">
+		<MvASSIGN NAME = "l.waitlist_count" VALUE = "{ l.waitlist_count + 1 }">
+		<MvEVAL EXPR = "{ Waitlist_Read( l.return[ l.waitlist_count ] ) }">
 
-	<MvWHILE EXPR = "{ ( NOT TGWaitlist.d.EOF ) AND ( ( g.WaitlistCount EQ 0 ) OR (l.waitlist_num LT ( g.WaitlistCount + 1) ) ) }">
-		<MvEVAL EXPR = "{ Waitlist_Read( l.waitlist ) }">
-		<MvASSIGN NAME = "l.success" VALUE = "{ Waitlist_Product_Check( l.waitlist:product_id, l.waitlist:variant_id, l.waitlist) }">
-		<MvASSIGN NAME = "l.success" VALUE = "{ miva_array_insert_var( l.all_waitlists, l.waitlist, -1) }">
-		<MvASSIGN NAME = "l.waitlist_num"	VALUE = "{ l.waitlist_num + 1 }">
 		<MvSKIP NAME = "Merchant" VIEW = "TGWaitlist" ROWS = 1>
 	</MvWHILE>
+
+	<MvFOREACH ITERATOR = "l.waitlist" ARRAY = "l.return" COUNT = "{ l.waitlist_count }">
+		<MvASSIGN NAME = "l.null" VALUE = "{ [ g.Module_Library_DB ].Runtime_Product_Load_ID( l.waitlist:product_id, l.waitlist:product ) }">
+		<MvEVAL EXPR = "{ Waitlist_Email_Format( l.waitlist ) }">
+	</MvFOREACH>
+
 	<MvCLOSEVIEW NAME = "Merchant" VIEW = "TGWaitlist">
-
-	<MvASSIGN NAME = "l.return" VALUE = "{ l.all_waitlists }">
-
-	<MvFUNCTIONRETURN VALUE = 1> </MvCOMMENT>
+	<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_DB ].ListLoad_EOF_Return( '#Error#', l.waitlist_count ) }">
 </MvFUNCTION>
 
 <MvFUNCTION NAME = "Parse_Function_Parameters" PARAMETERS = "string, function_name var, parameters var, parameter_count var" STANDARDOUTPUTLEVEL = "">	
