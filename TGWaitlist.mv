@@ -2,7 +2,7 @@
 	<MvASSIGN NAME = "l.module:code"		VALUE = "TGWaitlist">
 	<MvASSIGN NAME = "l.module:name"		VALUE = "Waitlist">
 	<MvASSIGN NAME = "l.module:provider"	VALUE = "Tess Guefen">
-	<MvASSIGN NAME = "l.module:version"		VALUE = "1.009">
+	<MvASSIGN NAME = "l.module:version"		VALUE = "2.000">
 	<MvASSIGN NAME = "l.module:api_ver"		VALUE = "9.12">
 	<MvASSIGN NAME = "l.module:description"	VALUE = "Make it easy for customers to quickly sign up for email alerts on out of stock products. When products are back in stock, emails will be automatically sent out by a Scheduled Task. This works on Products & Variants.">
 	<MvASSIGN NAME = "l.module:features"	VALUE = "data_store,not_prod,system,vis_system,json,clientside,scheduledtask,component,json_api">
@@ -216,31 +216,41 @@
 </MvFUNCTION>
 
 <MvFUNCTION NAME = "Module_System_Content" PARAMETERS = "module var, tab, load_fields" STANDARDOUTPUTLEVEL = "text, html, compresswhitespace">
-	<MvIF EXPR = "{ l.tab EQ 'TGWaitlist'}">
-		<MvEVAL EXPR = "{ [ g.Module_Admin ].Element_MMBatchList_HTML() }">
-		<div id="jsWaitlist_Batchlist"></div>
-	<MvELSEIF EXPR = "{ l.tab EQ 'TGWaitlist_Sent' }">
-		<MvEVAL EXPR = "{ [ g.Module_Admin ].Element_MMBatchList_HTML() }">
-		<div id="jsWaitlist_Sent_Batchlist"></div>
+	<MvIF EXPR = "{ l.tab NE 'TGWaitlist' AND l.tab NE 'TGWaitlist_Sent' }">
+		<MvFUNCTIONRETURN VALUE = 1>
+	<MvELSEIF EXPR = "{ NOT [ g.Module_Admin ].CanI( 'SYSM', 1, 0, 0, 0 ) }">
+		<MvFUNCTIONRETURN VALUE = 1>
 	</MvIF>
+
+	<MvIF EXPR = "{ l.tab EQ 'TGWaitlist' }">
+		<MvEVAL EXPR = "{ Element_Waitlist_List_HTML( l.module ) }">
+	<MvELSEIF EXPR = "{ l.tab EQ 'TGWaitlist_Sent' }">
+		<MvEVAL EXPR = "{ Element_Waitlist_Sent_List_HTML( l.module ) }">
+	</MvIF>
+
+	<MvEVAL EXPR = "{ [ g.Module_Admin ].DrawButtons_Suppress( '[UPDATE]' ) }">
 
 	<MvFUNCTIONRETURN VALUE = 1>
 </MvFUNCTION>
 
 <MvFUNCTION NAME = "Module_System_Head" PARAMETERS = "module var, tab" STANDARDOUTPUTLEVEL = "html, text, compresswhitespace">
-	<MvIF EXPR = "{ l.tab EQ 'TGWaitlist'}">
-		<MvEVAL EXPR = "{ [ g.Module_Admin ].Element_MMBatchList_JavaScript() }">
-		<MvEVAL EXPR = "{ [ g.Module_Admin ].Element_MMBatchList_CSS() }">
-		<script language="JavaScript" src="{ g.clientside_url $ 'Module_Code=' $ encodeattribute( l.module:code ) $ '&Filename=Waitlist_Functions.js' }"></script>
-		<script language="JavaScript" src="{ g.clientside_url $ 'Module_Code=' $ encodeattribute( l.module:code ) $ '&Filename=Waitlist_Batchlist.js' }"></script>
+	<MvIF EXPR = "{ l.tab NE 'TGWaitlist' AND l.tab NE 'TGWaitlist_Sent' }">
+		<MvFUNCTIONRETURN VALUE = 1>
+	<MvELSEIF EXPR = "{ NOT [ g.Module_Admin ].CanI( 'SYSM', 1, 0, 0, 0 ) }">
+		<MvFUNCTIONRETURN VALUE = 1>
+	</MvIF>
+
+	<MvIF EXPR = "{ l.tab EQ 'TGWaitlist' }">
+		<MvEVAL EXPR = "{ Element_Waitlist_List_CSS( l.module ) }">
+		<MvEVAL EXPR = "{ Element_Waitlist_List_JavaScript( l.module ) }">
+
 		<script language="JavaScript">
 			MMScreen_LoadFinished( function() { new Waitlist_Batchlist(); } );
 		</script>
 	<MvELSEIF EXPR = "{ l.tab EQ 'TGWaitlist_Sent'}">
-		<MvEVAL EXPR = "{ [ g.Module_Admin ].Element_MMBatchList_JavaScript() }">
-		<MvEVAL EXPR = "{ [ g.Module_Admin ].Element_MMBatchList_CSS() }">
-		<script language="JavaScript" src="{ g.clientside_url $ 'Module_Code=' $ encodeattribute( l.module:code ) $ '&Filename=Waitlist_Sent_Functions.js' }"></script>
-		<script language="JavaScript" src="{ g.clientside_url $ 'Module_Code=' $ encodeattribute( l.module:code ) $ '&Filename=Waitlist_Sent_Batchlist.js' }"></script>
+		<MvEVAL EXPR = "{ Element_Waitlist_Sent_List_CSS( l.module ) }">
+		<MvEVAL EXPR = "{ Element_Waitlist_Sent_List_JavaScript( l.module ) }">
+
 		<script language="JavaScript">
 			MMScreen_LoadFinished( function() { new Waitlist_Sent_Batchlist(); } );
 		</script>
@@ -250,6 +260,10 @@
 </MvFUNCTION>
 
 <MvFUNCTION NAME = "Module_System_Tabs" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = "">
+	<MvIF EXPR = "{ NOT [ g.Module_Admin ].CanI( 'SYSM', 1, 0, 0, 0 ) }">
+		<MvFUNCTIONRETURN VALUE = "">
+	</MvIF>
+
 	<MvFUNCTIONRETURN VALUE = "TGWaitlist:Waitlist,TGWaitlist_Sent:Waitlist - Sent">
 </MvFUNCTION>
 
@@ -292,14 +306,10 @@
 </MvFUNCTION>
 
 <MvFUNCTION NAME = "Module_Clientside_Output_File" PARAMETERS = "module var, filename" STANDARDOUTPUTLEVEL = "">
-	<MvIF EXPR = "{ l.filename EQ 'Waitlist_Batchlist.js' }">
-		<MIVA STANDARDOUTPUTLEVEL = "text, html"><MvINCLUDE INTERPRET = "off" FILE = "js/Waitlist_Batchlist.js"><MIVA STANDARDOUTPUTLEVEL = "">
-	<MvELSEIF EXPR = "{ l.filename EQ 'Waitlist_Functions.js' }">
-		<MIVA STANDARDOUTPUTLEVEL = "text, html"><MvINCLUDE INTERPRET = "off" FILE = "js/Waitlist_Functions.js"><MIVA STANDARDOUTPUTLEVEL = "">
+	<MvIF EXPR = "{ l.filename EQ 'Waitlist_List.js' }">
+		<MIVA STANDARDOUTPUTLEVEL = "text, html"><MvINCLUDE INTERPRET = "off" FILE = "js/Waitlist_List.js"><MIVA STANDARDOUTPUTLEVEL = "">
 	<MvELSEIF EXPR = "{ l.filename EQ 'Waitlist_Sent_Batchlist.js' }">
-		<MIVA STANDARDOUTPUTLEVEL = "text, html"><MvINCLUDE INTERPRET = "off" FILE = "js/Waitlist_Sent_Batchlist.js"><MIVA STANDARDOUTPUTLEVEL = "">
-	<MvELSEIF EXPR = "{ l.filename EQ 'Waitlist_Sent_Functions.js' }">
-		<MIVA STANDARDOUTPUTLEVEL = "text, html"><MvINCLUDE INTERPRET = "off" FILE = "js/Waitlist_Sent_Functions.js"><MIVA STANDARDOUTPUTLEVEL = "">
+		<MIVA STANDARDOUTPUTLEVEL = "text, html"><MvINCLUDE INTERPRET = "off" FILE = "js/Waitlist_Sent_List.js"><MIVA STANDARDOUTPUTLEVEL = "">
 	<MvELSE>
 		<MvFUNCTIONRETURN VALUE = 0>
 	</MvIF>
@@ -468,12 +478,6 @@
 
 	<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error( '#Error#', 'Invalid function' ) }">
 </MvFUNCTION>
-
-<mvcomment>
-	new
-	Waitlist_Product_Delete > Call two low levels.
-	Waitlist_Form_Add_Runtime > check for g. vars, including the recaptcha
-</mvcomment>
 
 <MvCOMMENT>
 |
@@ -674,7 +678,6 @@
 |	Waitlist Trigger Functions
 |
 </MvCOMMENT>
-
 
 <MvFUNCTION NAME = "Waitlist_Trigger_All" PARAMETERS = "" STANDARDOUTPUTLEVEL = ""  ERROROUTPUTLEVEL = "">
 	<MvOPENVIEW NAME	= "Merchant"
@@ -1356,13 +1359,12 @@
 
 <MvFUNCTION NAME = "Waitlist_API_URL" PARAMETERS = "module var, return var" STANDARDOUTPUTLEVEL = "">
 	<MvASSIGN NAME = "l.return" VALUE = "{ g.json_url $ 'Module_Code=' $ encodeattribute( l.module:code ) $ '&Store_Code=' $ encodeattribute( g.Store:code ) $ '&Function=Module&Module_Function=Waitlist_API' }">
+
 	<MvFUNCTIONRETURN VALUE = 1>
 </MvFUNCTION>
 
 <MvFUNCTION NAME = "CurrentWaitlistCount" PARAMETERS = "product_id, variant_id, return var" STANDARDOUTPUTLEVEL = ""  ERROROUTPUTLEVEL = "">
-	<MvIF EXPR = "{ ISNULL l.variant_id }">
-		<MvASSIGN NAME = "l.variant_id" VALUE = "0">
-	</MvIF>
+	<MvIF EXPR = "{ ISNULL l.variant_id }"> <MvASSIGN NAME = "l.variant_id" VALUE = 0> </MvIF>
 
 	<MvOPENVIEW NAME	= "Merchant"
 				VIEW 	= "TGWaitlistCount"
@@ -1381,7 +1383,7 @@
 </MvFUNCTION>
 
 <MvFUNCTION NAME = "WaitlistXCustomer_Load" PARAMETERS = "cust_id, return var" STANDARDOUTPUTLEVEL = ""   ERROROUTPUTLEVEL = "">
-	<MvIF EXPR = "{ ISNULL l.cust_id }">
+	<MvCOMMENT> <MvIF EXPR = "{ ISNULL l.cust_id }">
 		<MvASSIGN NAME = "l.return" VALUE = "0">
 		<MvFUNCTIONRETURN VALUE = 0>
 	</MvIF>
@@ -1412,11 +1414,11 @@
 
 	<MvASSIGN NAME = "l.return" VALUE = "{ l.all_waitlists }">
 
-	<MvFUNCTIONRETURN VALUE = 1>
+	<MvFUNCTIONRETURN VALUE = 1> </MvCOMMENT>
 </MvFUNCTION>
 
 <MvFUNCTION NAME = "WaitlistXEmail_Load" PARAMETERS = "email, return var" STANDARDOUTPUTLEVEL = ""  ERROROUTPUTLEVEL = "">
-	<MvIF EXPR = "{ ISNULL l.email }">
+	<MvCOMMENT> <MvIF EXPR = "{ ISNULL l.email }">
 		<MvASSIGN NAME = "l.return" VALUE = "0">
 		<MvFUNCTIONRETURN VALUE = 0>
 	</MvIF>
@@ -1443,7 +1445,7 @@
 
 	<MvASSIGN NAME = "l.return" VALUE = "{ l.all_waitlists }">
 
-	<MvFUNCTIONRETURN VALUE = 1>
+	<MvFUNCTIONRETURN VALUE = 1> </MvCOMMENT>
 </MvFUNCTION>
 
 <MvFUNCTION NAME = "Parse_Function_Parameters" PARAMETERS = "string, function_name var, parameters var, parameter_count var" STANDARDOUTPUTLEVEL = "">	
@@ -1576,4 +1578,76 @@
 	</MvIF>
 	
 	<MvFUNCTIONRETURN VALUE = 1>
+</MvFUNCTION>
+
+<MvCOMMENT>
+|
+|	Batchlist HTML/ CSS Output Functions
+|
+</MvCOMMENT>
+
+<MvFUNCTION NAME = "Element_Waitlist_List_CSS" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = "">
+	<MvIF EXPR = "{ g.Element_Waitlist_List_CSS }">
+		<MvFUNCTIONRETURN>
+	</MvIF>
+	
+	<MvASSIGN NAME = "g.Element_Waitlist_List_CSS" VALUE = 1>
+
+	<MvEVAL EXPR = "{ [ g.Module_Admin ].Element_MMBatchList_CSS() }">
+</MvFUNCTION>
+
+<MvFUNCTION NAME = "Element_Waitlist_Sent_List_CSS" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = "">
+	<MvIF EXPR = "{ g.Element_Waitlist_Sent_List_CSS }">
+		<MvFUNCTIONRETURN>
+	</MvIF>
+	
+	<MvASSIGN NAME = "g.Element_Waitlist_Sent_List_CSS" VALUE = 1>
+
+	<MvEVAL EXPR = "{ [ g.Module_Admin ].Element_MMBatchList_CSS() }">
+</MvFUNCTION>
+
+<MvFUNCTION NAME = "Element_Waitlist_List_JavaScript" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = "html, text, compresswhitespace">
+	<MvIF EXPR = "{ g.Element_Waitlist_List_JavaScript }">
+		<MvFUNCTIONRETURN>
+	</MvIF>
+	
+	<MvASSIGN NAME = "g.Element_Waitlist_List_JavaScript" VALUE = 1>
+
+	<MvEVAL EXPR = "{ [ g.Module_Admin ].Element_MMBatchList_JavaScript() }">
+	<script language="JavaScript" src="{ g.clientside_url $ 'Module_Code=' $ encodeattribute( l.module:code ) $ '&Filename=Waitlist_List.js' }"></script>
+</MvFUNCTION>
+
+<MvFUNCTION NAME = "Element_Waitlist_Sent_List_JavaScript" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = "html, text, compresswhitespace">
+	<MvIF EXPR = "{ g.Element_Waitlist_Sent_List_JavaScript }">
+		<MvFUNCTIONRETURN>
+	</MvIF>
+	
+	<MvASSIGN NAME = "g.Element_Waitlist_Sent_List_JavaScript" VALUE = 1>
+
+	<MvEVAL EXPR = "{ [ g.Module_Admin ].Element_MMBatchList_JavaScript() }">
+	<script language="JavaScript" src="{ g.clientside_url $ 'Module_Code=' $ encodeattribute( l.module:code ) $ '&Filename=Waitlist_Sent_List.js' }"></script>
+</MvFUNCTION>
+
+<MvFUNCTION NAME = "Element_Waitlist_List_HTML" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = "text, html, compresswhitespace">
+	<MvIF EXPR = "{ g.Element_Waitlist_List_HTML }">
+		<MvFUNCTIONRETURN>
+	</MvIF>
+
+	<MvASSIGN NAME = "g.Element_Waitlist_List_HTML" VALUE = 1>
+
+	<MvEVAL EXPR = "{ [ g.Module_Admin ].Element_MMBatchList_HTML() }">
+
+	<div id="jsWaitlist_Batchlist"></div>
+</MvFUNCTION>
+
+<MvFUNCTION NAME = "Element_Waitlist_Sent_List_HTML" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = "text, html, compresswhitespace">
+	<MvIF EXPR = "{ g.Element_Waitlist_Sent_List_HTML }">
+		<MvFUNCTIONRETURN>
+	</MvIF>
+
+	<MvASSIGN NAME = "g.Element_Waitlist_Sent_List_HTML" VALUE = 1>
+
+	<MvEVAL EXPR = "{ [ g.Module_Admin ].Element_MMBatchList_HTML() }">
+
+	<div id="jsWaitlist_Sent_Batchlist"></div>
 </MvFUNCTION>
