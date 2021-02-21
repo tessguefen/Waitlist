@@ -1442,10 +1442,8 @@
 			<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error( '#Error#', 'Email is already on the Waitlist for this product.' ) }">
 		</MvIF>
 
-		<MvIF EXPR = "{ l.prelogic EQ 1 }">
-			<MvIF EXPR = "{ NOT Waitlist_PreLogic_Override( l.waitlist ) }">
-				<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error( '#Error#', g.Error_Message ) }">
-			</MvIF>
+		<MvIF EXPR = "{ NOT Waitlist_PreLogic_Override( l.waitlist ) }">
+			<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error( '#Error#', g.Error_Message ) }">
 		</MvIF>
 	
 		<MvIF EXPR = "{ NOT Waitlist_Insert( l.waitlist ) }">

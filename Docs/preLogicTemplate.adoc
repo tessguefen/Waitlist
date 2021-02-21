@@ -1,0 +1,47 @@
+<<<
+
+[[_preLogicTemplate]]
+== Pre-Logic Template
+
+You can create a page with the code `WaitlistEmailPreLogic` and return a `0` in the variable `g.Waitlist_PreLogic_Continue` to hault the process of inserting the Waitlist. You can add more validation in this template that does not come default with the module. All default validation will run before this is called.
+
+You will need to output your own error messaging, and handle on the front-end.
+
+The Pre-Logic template will run in the Waitlist Runtime API, as well as the front-end submissions. It will not run when utilizing JSON API functions.
+
+If utilizing the Waitlist Runtime API, the error message will return as `g.Error_Message`.
+
+By default, you will have access to the following on the template:
+
+[source,xml]
+----
+l.settings:waitlist:cust_id
+l.settings:waitlist:email
+l.settings:waitlist:product_id
+l.settings:waitlist:variant_id
+----
+
+Example template code:
+
+[source,xml]
+----
+<mvt:comment>
+|
+|	reCAPTCHA check (v2)
+|
+</mvt:comment>
+
+<mvt:assign name="g.secret"			value="'MY SECRET KEY'" />
+<mvt:assign name="g.response"		value="miva_variable_value( 'g.g-recaptcha-response' )" />
+<mvt:assign name="g.remoteip"		value="s.remote_addr" />
+<mvt:assign name="l.google_response" value="''" />
+
+<mvt:call action="'https://www.google.com/recaptcha/api/siteverify'" method="'POST'" fields="'secret,response,remoteip'">
+	<mvt:assign name="l.google_response" value="l.google_response $ s.callvalue" />
+</mvt:call>
+
+<mvt:if expr="NOT miva_json_decode( l.google_response, l.data ) OR NOT l.data:success">
+	<mvt:assign name="g.Waitlist_PreLogic_Continue"	value="0" />
+	<mvt:assign name="g.Error_Message"				value="'Invalid reCAPTCHA'" />
+</mvt:if>
+----
