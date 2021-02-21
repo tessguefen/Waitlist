@@ -1675,7 +1675,7 @@
 
 	<MvEVAL EXPR = "{ [ g.Module_Admin ].Element_MMBatchList_HTML() }">
 
-	<div id="jsWaitlist_Batchlist"></div>
+	<div id="Waitlist_Batchlist"></div>
 </MvFUNCTION>
 
 <MvFUNCTION NAME = "Element_Waitlist_Sent_List_HTML" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = "text, html, compresswhitespace">
@@ -1687,5 +1687,5 @@
 
 	<MvEVAL EXPR = "{ [ g.Module_Admin ].Element_MMBatchList_HTML() }">
 
-	<div id="jsWaitlist_Sent_Batchlist"></div>
+	<div id="Waitlist_Sent_Batchlist"></div>
 </MvFUNCTION>

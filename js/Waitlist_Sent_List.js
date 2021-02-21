@@ -19,7 +19,7 @@ function Waitlist_Sent_Batchlist_Delete( id, callback, delegator )
 
 function Waitlist_Sent_Batchlist()
 {
-	MMBatchList.call( this, 'jsWaitlist_Sent_Batchlist' );
+	MMBatchList.call( this, 'Waitlist_Sent_Batchlist' );
 
 	this.Feature_SearchBar_SetPlaceholderText( 'Search Sent Waitlists...' );
 	this.SetDefaultSort( 'id', '-' );

@@ -27,7 +27,7 @@ function TriggerEmails_Execute( waitlist_items, callback, delegator )
 
 function Waitlist_Batchlist()
 {
-	MMBatchList.call( this, 'jsWaitlist_Batchlist' );
+	MMBatchList.call( this, 'Waitlist_Batchlist' );
 
 	this.Feature_SearchBar_SetPlaceholderText( 'Search Waitlists...' );
 	this.SetDefaultSort( 'id', '-' );
