@@ -16,7 +16,7 @@ function Waitlist_Batchlist_Delete( id, callback, delegator ) {
 }
 
 function TriggerEmails_Execute( waitlist_items, callback, delegator ) {
-	return AJAX_Call_Module_JSON( callback, 'admin', 'TGWaitlist', 'JSON_Waitlist_Trigger_Emails',
+	return AJAX_Call_Module_JSON( callback, 'admin', 'TGWaitlist', 'Waitlist_Trigger_Emails',
 	{
 		Waitlists:	waitlist_items
 	}, delegator );

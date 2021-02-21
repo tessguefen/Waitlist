@@ -945,7 +945,7 @@
 	</MvIF>
 
 	<MvIF EXPR = "{ l.variant_id EQ 0 }">
-		<MvASSIGN NAME = "l.null" VALUE = "{ [ g.Module_Library_Utilities ].Validate_Attributes_DetermineVariant( l.product, 0, l.null, 0, l.null, 0, l.variant_id_check ) }">
+		<MvASSIGN NAME = "l.null" VALUE = "{ [ g.Module_Library_Utilities ].Validate_Attributes_DetermineVariant( l.product, 0, l.null, 0, l.null, l.null, l.variant_id_check ) }">
 
 		<MvIF EXPR = "{ l.variant_id_check EQ -1 }">
 			<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( '#Error#', 'A valid variant was not found.' ) }">
@@ -1305,7 +1305,9 @@
 	|
 	</MvCOMMENT>
 
-	<MvASSIGN NAME = "g.WaitlistFunction" VALUE = "{ toupper( [ g.Module_JSON ].JSON_Decode( g.WaitlistFunction ) ) }">
+	<MvEVAL EXPR = "{ [ g.Module_Clientside ].Module_Content_Type( l.module, 'application/json' ) }">
+
+	<MvASSIGN NAME = "l.function" VALUE = "{ toupper( [ g.Module_JSON ].JSON_Decode( g.WaitlistFunction ) ) }">
 
 	<MvIF EXPR = "{ ISNULL l.function }">
 		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error( '#Error#', 'Missing WaitlistFunction' ) }">
@@ -1327,7 +1329,7 @@
 		</MvIF>
 	
 		<MvIF EXPR = "{ l.variant_id EQ 0 }">
-			<MvASSIGN NAME = "l.null" VALUE = "{ [ g.Module_Library_Utilities ].Validate_Attributes_DetermineVariant( l.product, 0, l.null, 0, l.null, 0, l.variant_id_check ) }">
+			<MvASSIGN NAME = "l.null" VALUE = "{ [ g.Module_Library_Utilities ].Validate_Attributes_DetermineVariant( l.product, 0, l.null, 0, l.null, l.null, l.variant_id_check ) }">
 	
 			<MvIF EXPR = "{ l.variant_id_check EQ -1 }">
 				<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error( '#Error#', 'A valid variant was not found.' ) }">
