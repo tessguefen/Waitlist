@@ -12,9 +12,10 @@ If `g.Waitlist_Email_Continue` is set to `0`, it will not send the email.
 If `g.Waitlist_Email_Continue` is not set, it will use the original determination from the module.
 
 You will have access to `l.settings:waitlist`. Below is an example of the data you will have access to:
+
 __[x] denotes array__
 
-*Please Note:* You will only have access to `l.settings:waitlist:variants` if the waitlist sign up was for a valid variant.
+*Please Note:* You will only have access to `l.settings:waitlist:variants` & `l.settings:waitlist:options` if the waitlist sign up was for a valid variant.
 
 [source,xml]
 ----
@@ -112,30 +113,5 @@ l.settings:waitlist:variants[x]:product:weight
 l.settings:waitlist:variants[x]:product_id
 l.settings:waitlist:variants[x]:quantity
 l.settings:waitlist:variants[x]:variant_id
-----
-
-Example template code, utilizing a call to reCAPTCHA (assuming the `g-recaptcha-response` came through)
-
-[source,xml]
-----
-<mvt:comment>
-|
-|	reCAPTCHA check (v2)
-|
-</mvt:comment>
-
-<mvt:assign name="g.secret"			value="'MY SECRET KEY'" />
-<mvt:assign name="g.response"		value="miva_variable_value( 'g.g-recaptcha-response' )" />
-<mvt:assign name="g.remoteip"		value="s.remote_addr" />
-<mvt:assign name="l.google_response" value="''" />
-
-<mvt:call action="'https://www.google.com/recaptcha/api/siteverify'" method="'POST'" fields="'secret,response,remoteip'">
-	<mvt:assign name="l.google_response" value="l.google_response $ s.callvalue" />
-</mvt:call>
-
-<mvt:if expr="NOT miva_json_decode( l.google_response, l.data ) OR NOT l.data:success">
-	<mvt:assign name="g.Waitlist_PreLogic_Continue"	value="0" />
-	<mvt:assign name="g.Error_Message"				value="'Invalid reCAPTCHA'" />
-</mvt:if>
 ----
 

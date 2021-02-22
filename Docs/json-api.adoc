@@ -1,0 +1,162 @@
+<<<
+
+[[_jsonAPI]]
+== JSON API
+
+The following functions are available via the JSON API for the module.
+
+[[__waitlistLoadQuery]]
+=== Waitlist_Load_Query
+
+This function is used to query one or more waitlists from the module.
+
+The following request parameters can also be used to sort/ filter.
+
+[[___waitlistLoadQueryParameters]]
+==== Request Parameters
+
+[stripes=odd,options="header",cols="25%,25%,50%"]
+|===
+|Key|Type|Description
+|id|Number|Waitlist ID - Unique
+|time_added|Number|Timestamp of when the User signed up for the waitlist
+|product_id|Number|Product ID
+|variant_id|Number|Variant ID
+|email|String|Email
+|cust_id|Number|Customer ID
+|product_code|String|Product Code
+|variant_code|String|Variant Code
+|product_name|String|Product Name
+|variant_name|String|Variant Name
+|===
+
+<<<
+
+[[___waitlistLoadQueryExampleRequest]]
+==== Example Request
+
+[source,json]
+----
+{
+	"Store_Code": "YOUR_STORE_CODE",
+	"Function": "Module",
+	"Module_Code": "TGWaitlist",
+	"Module_Function": "Waitlist_Load_Query",
+	"sort": "email",
+	"Filter":[  
+		{  
+			"name":"search",
+			"value":[  
+				{  
+					"field": "product_code",
+					"operator": "EQ",
+					"value": "My_Product_Code"
+				}
+			]
+		}
+	]
+}
+----
+
+<<<
+
+[[___waitlistLoadQueryExampleResponse]]
+==== Example Response
+
+[source,json]
+----
+{
+	"success": 1,
+	"data": {
+		"total_count": 1,
+		"start_offset": 0,
+		"data": [
+			{
+				"id": 1,
+				"time_added": 1613961342,
+				"product_id": 1,
+				"variant_id": 1,
+				"email": "myemail@website.com",
+				"cust_id": 1,
+				"product_code": "EXAMPLE01",
+				"product_name": "Example Product",
+				"variant_code": "EXAMPLE01_M",
+				"variant_name": "Example Product - Medium",
+				"inv_count": "6"
+			}
+		]
+	}
+}
+----
+
+<<<
+
+[[__waitlistTriggerAll]]
+=== Waitlist_Trigger_All
+
+This function allows you to spin off the asynchronous task for Waitlist Trigger. This is independent from scheduled tasks.
+
+[[___waitlistTriggerAllParameters]]
+==== Request Parameters
+
+There are no parameters
+
+[[___waitlistTriggerAllExampleRequest]]
+==== Example Request
+
+[source,json]
+----
+{
+	"Store_Code": "YOUR_STORE_CODE",
+	"Function": "Module",
+	"Module_Code": "TGWaitlist",
+	"Module_Function": "Waitlist_Trigger_All"
+}
+----
+
+[[___waitlistTriggerAllExampleResponse]]
+==== Example Response
+
+[source,json]
+----
+{
+	"success": 1
+}
+----
+
+<<<
+
+[[__waitlistAddJSON]]
+=== Waitlist_Add
+
+This function is used to add a new waitlist entry. This bypasses any pre-logic (if applicable).
+
+[[__waitlistAddJSONParameters]]
+==== Request Parameters
+
+[stripes=odd,options="header",cols="25%,25%,50%"]
+|===
+|Key|Type|Description
+|Customer_ID|Number|Customer ID
+|Email|String|Email
+|Product_Code|String|Product Code
+|Variant_ID|Number|Variant ID
+|===
+
+[[__waitlistAddJSONExampleRequest]]
+==== Example Request
+
+[source,json]
+----
+{
+	"Store_Code": "YOUR_STORE_CODE",
+	"Function": "Module",
+	"Module_Code": "TGWaitlist",
+	"Module_Function": "Waitlist_Add",
+	"Product_Code": "My_Product_Code",
+	"Email": "hello@email.com",
+	"Customer_ID": 1,
+	"Variant_ID": 1
+}
+----
+

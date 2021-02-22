@@ -52,6 +52,7 @@ This will load in all waitlists a customer is currently waiting on (via `email`)
 ----
 
 The following is an example of the return for both `WaitlistXCustomer_Load` & `WaitlistXEmail_Load`:
+
 __[x] denotes array__
 
 [source,xml]

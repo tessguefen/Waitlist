@@ -1,0 +1,12 @@
+<<<
+
+[[_uninstalling]]
+== Uninstalling the Module
+
+To uninstall the module, you will need to make sure that the *waitlist* item and any *Scheduled Tasks* that are using the *Waitlist* scheduled tasks are fully removed.
+
+Once these are both removed, navigate to *System Extension Settings*, and click on *Add/Remove Modules*.
+
+Find *Waitlist* and uninstall.
+
+The module will delete the Email template, but any custom logic templates must be manually deleted.
