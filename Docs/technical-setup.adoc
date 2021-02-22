@@ -110,3 +110,36 @@ Add the following code somewhere below the page, or utilize pieces of it to tie 
 
 *Please Note:* If you are utilizing deferred attribute machine, you may have issues reading `attributemachine`.
 
+If you don't want to utilize the AJAX'd version, and would rather have a normal form submission, you will just need the following:
+
+
+[[___waitlistFormParameters]]
+==== Form Parameters
+
+[stripes=odd,options="header",cols="25%,25%,50%"]
+|===
+|Key|Type|Description
+|Action |String|`WaitlistAdd`
+|Waitlist_Product_Code|String|Product Code for the Waitlist Sign up
+|Waitlist_Email|String|Email for the Waitlist Sign up
+|Waitlist_Variant_ID|Number|Variant ID for the waitlist sign up. Optional, but if the product requires a variant, it is required.
+|===
+
+Example Form
+
+[source,xml]
+----
+<mvt:if expr="g.Waitlist_Error"><div style="background: #e74c3c; color: #fff; font-size: 11px; padding: 5px 10px;">Error: &mvte:global:Waitlist_Error;</div></mvt:if>
+<mvt:if expr="g.Waitlist_Message"><div style="background: #16a085; color: #fff; font-size: 11px; padding: 5px 10px;">&mvte:global:Waitlist_Message;</div></mvt:if>
+
+<form name="waitlist_add" method="post" action="&mvte:product:link;">
+	<div style="font-size: 11px; background: #ecf0f1; text-align: center; padding: 10px 5px; margin-bottom: 0.75rem;">Sign up with your email to be notified when this product is back in stock!</div>
+	<input type="hidden" name="Action" value="WaitlistAdd" />
+	<input type="hidden" name="Waitlist_Product_Code" value="&mvt:product:code;" />
+	<input type="hidden" name="Waitlist_Variant_ID" id="jsWaitlist_Variant_ID" value="&mvt:attributemachine:variant_id;" />
+	<div style="display: flex;flex-direction: row;">
+		<input type="email" name="Waitlist_Email" value="&mvte:global:Waitlist_Email;" placeholder="Email" style="flex: 1 1 auto; padding: 5px; border: 1px solid #bdc3c7; border-right: 0;" />
+		<input type="submit" value="Sign up" class="button" style="flex: 1 1 auto; padding: 5px; border: 0; background-color: #3498db;" />
+	</div>
+</form>
+----

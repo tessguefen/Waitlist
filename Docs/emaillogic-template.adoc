@@ -1,0 +1,141 @@
+<<<
+
+[[_emailLogicTemplate]]
+== Email Trigger Logic Template
+
+You can create a page with the code `WaitlistEmailLogic` and return a `1` or `0` in the variable `g.Waitlist_Email_Continue` to either allow the waitlist email to trigger (`1`) or not trigger (`0`).
+
+If `g.Waitlist_Email_Continue` is set to `1`, it will send the email.
+
+If `g.Waitlist_Email_Continue` is set to `0`, it will not send the email.
+
+If `g.Waitlist_Email_Continue` is not set, it will use the original determination from the module.
+
+You will have access to `l.settings:waitlist`. Below is an example of the data you will have access to:
+__[x] denotes array__
+
+*Please Note:* You will only have access to `l.settings:waitlist:variants` if the waitlist sign up was for a valid variant.
+
+[source,xml]
+----
+l.settings:waitlist:cust_id
+l.settings:waitlist:email
+l.settings:waitlist:id
+l.settings:waitlist:options[X]:attmpat_id
+l.settings:waitlist:options[X]:attr_id
+l.settings:waitlist:options[X]:attribute:attemp_id
+l.settings:waitlist:options[X]:attribute:code
+l.settings:waitlist:options[X]:attribute:cost
+l.settings:waitlist:options[X]:attribute:default_id
+l.settings:waitlist:options[X]:attribute:disp_order
+l.settings:waitlist:options[X]:attribute:id
+l.settings:waitlist:options[X]:attribute:inventory
+l.settings:waitlist:options[X]:attribute:price
+l.settings:waitlist:options[X]:attribute:product_id
+l.settings:waitlist:options[X]:attribute:prompt
+l.settings:waitlist:options[X]:attribute:required
+l.settings:waitlist:options[X]:attribute:type
+l.settings:waitlist:options[X]:attribute:weight
+l.settings:waitlist:options[X]:dimensions
+l.settings:waitlist:options[X]:option:attr_id
+l.settings:waitlist:options[X]:option:code
+l.settings:waitlist:options[X]:option:cost
+l.settings:waitlist:options[X]:option:disp_order
+l.settings:waitlist:options[X]:option:id
+l.settings:waitlist:options[X]:option:price
+l.settings:waitlist:options[X]:option:product_id
+l.settings:waitlist:options[X]:option:prompt
+l.settings:waitlist:options[X]:option:weight
+l.settings:waitlist:options[X]:option_id
+l.settings:waitlist:options[X]:part_count
+l.settings:waitlist:options[X]:product_id
+l.settings:waitlist:options[X]:variant_id
+l.settings:waitlist:original_determination (Original Determination from the Module)
+l.settings:waitlist:product:active
+l.settings:waitlist:product:agrpcount
+l.settings:waitlist:product:cancat_id
+l.settings:waitlist:product:catcount
+l.settings:waitlist:product:code
+l.settings:waitlist:product:cost
+l.settings:waitlist:product:disp_order
+l.settings:waitlist:product:dt_created
+l.settings:waitlist:product:dt_updated
+l.settings:waitlist:product:id
+l.settings:waitlist:product:inv_active
+l.settings:waitlist:product:inv_available
+l.settings:waitlist:product:inv_instock
+l.settings:waitlist:product:inv_level
+l.settings:waitlist:product:inv_long
+l.settings:waitlist:product:inv_low_level
+l.settings:waitlist:product:inv_low_track
+l.settings:waitlist:product:inv_out_level
+l.settings:waitlist:product:inv_out_track
+l.settings:waitlist:product:inv_short
+l.settings:waitlist:product:name
+l.settings:waitlist:product:original_active
+l.settings:waitlist:product:page_id
+l.settings:waitlist:product:pgrpcount
+l.settings:waitlist:product:price
+l.settings:waitlist:product:taxable
+l.settings:waitlist:product:weight
+l.settings:waitlist:product_id
+l.settings:waitlist:time_added
+l.settings:waitlist:variant_id
+l.settings:waitlist:variants[x]:part_id
+l.settings:waitlist:variants[x]:product:active
+l.settings:waitlist:variants[x]:product:agrpcount
+l.settings:waitlist:variants[x]:product:cancat_id
+l.settings:waitlist:variants[x]:product:catcount
+l.settings:waitlist:variants[x]:product:code
+l.settings:waitlist:variants[x]:product:cost
+l.settings:waitlist:variants[x]:product:disp_order
+l.settings:waitlist:variants[x]:product:dt_created
+l.settings:waitlist:variants[x]:product:dt_updated
+l.settings:waitlist:variants[x]:product:id
+l.settings:waitlist:variants[x]:product:inv_active
+l.settings:waitlist:variants[x]:product:inv_available
+l.settings:waitlist:variants[x]:product:inv_instock
+l.settings:waitlist:variants[x]:product:inv_level
+l.settings:waitlist:variants[x]:product:inv_long
+l.settings:waitlist:variants[x]:product:inv_low_level
+l.settings:waitlist:variants[x]:product:inv_low_track
+l.settings:waitlist:variants[x]:product:inv_out_level
+l.settings:waitlist:variants[x]:product:inv_out_track
+l.settings:waitlist:variants[x]:product:inv_short
+l.settings:waitlist:variants[x]:product:name
+l.settings:waitlist:variants[x]:product:original_active
+l.settings:waitlist:variants[x]:product:page_id
+l.settings:waitlist:variants[x]:product:pgrpcount
+l.settings:waitlist:variants[x]:product:price
+l.settings:waitlist:variants[x]:product:taxable
+l.settings:waitlist:variants[x]:product:weight
+l.settings:waitlist:variants[x]:product_id
+l.settings:waitlist:variants[x]:quantity
+l.settings:waitlist:variants[x]:variant_id
+----
+
+Example template code, utilizing a call to reCAPTCHA (assuming the `g-recaptcha-response` came through)
+
+[source,xml]
+----
+<mvt:comment>
+|
+|	reCAPTCHA check (v2)
+|
+</mvt:comment>
+
+<mvt:assign name="g.secret"			value="'MY SECRET KEY'" />
+<mvt:assign name="g.response"		value="miva_variable_value( 'g.g-recaptcha-response' )" />
+<mvt:assign name="g.remoteip"		value="s.remote_addr" />
+<mvt:assign name="l.google_response" value="''" />
+
+<mvt:call action="'https://www.google.com/recaptcha/api/siteverify'" method="'POST'" fields="'secret,response,remoteip'">
+	<mvt:assign name="l.google_response" value="l.google_response $ s.callvalue" />
+</mvt:call>
+
+<mvt:if expr="NOT miva_json_decode( l.google_response, l.data ) OR NOT l.data:success">
+	<mvt:assign name="g.Waitlist_PreLogic_Continue"	value="0" />
+	<mvt:assign name="g.Error_Message"				value="'Invalid reCAPTCHA'" />
+</mvt:if>
+----
+

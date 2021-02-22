@@ -72,7 +72,7 @@
 	<MvASSIGN NAME = "l.page:admin"				VALUE = 1>
 	<MvASSIGN NAME = "l.page:settings"			VALUE = "">
 
-	<MvCAPTURE VARIABLE = "l.page:source">
+	<MvCAPTURE VARIABLE = "l.source">
 		<MIVA STANDARDOUTPUTLEVEL = "text, html"><MvINCLUDE FILE = "templates/WaitlistEmailTemplate.mvt" INTERPRET = "OFF"><MIVA STANDARDOUTPUTLEVEL = "">
 	</MvCAPTURE>
 
@@ -111,6 +111,10 @@
 	<MvASSIGN NAME = "l.task:config"		VALUE = "">
 
 	<MvIF EXPR = "{ NOT [ g.Module_Feature_SCH_DB ].ScheduledTask_Insert( l.task ) }">
+		<MvFUNCTIONRETURN VALUE = 0>
+	</MvIF>
+
+	<MvIF EXPR = "{ NOT [ g.Module_Library_DB ].StoreModule_Increment_ReferenceCount( l.module:id, 'scheduledtask' ) }">
 		<MvFUNCTIONRETURN VALUE = 0>
 	</MvIF>
 
@@ -423,46 +427,87 @@
 	</MvIF>
 
 	<MvIF EXPR = "{ l.function_name EQ 'waitlist_api_url' }">
-		<MvIF EXPR = "{ l.parameter_count EQ 1 }">
-			<MvIF EXPR = "{ NOT Is_Variable( l.parameters[1] ) }">
-				<MvFUNCTIONRETURN VALUE = "{ Parameter_Error( l.param, 'The first parameter must be a variable' ) }">
-			</MvIF>
-
-			<MvIF EXPR = "{ NOT Waitlist_API_URL( l.module, l.parameters[1] ) }">
-				<MvFUNCTIONRETURN>
-			</MvIF>
+		<MvIF EXPR = "{ l.parameter_count NE 1 }">
+			<MvFUNCTIONRETURN VALUE = "{ Parameter_Error( l.param, '\'' $ l.function_name $ '\' takes 1 parameter' ) }">
 		</MvIF>
+	
+		<MvIF EXPR = "{ NOT Is_Variable( l.parameters[1] ) }">
+			<MvFUNCTIONRETURN VALUE = "{ Parameter_Error( l.param, 'The first parameter must be a variable' ) }">
+		</MvIF>
+
+		<MvASSIGN NAME = "l.new_param" VALUE = "{ 'Component_' $ l.function_name $ '( l.module, l.param, l.settings, ' $ l.parameters $ ' )' }">
 	<MvELSEIF EXPR = "{ l.function_name EQ 'currentwaitlistcount' }">
-		<MvIF EXPR = "{ l.parameter_count EQ 3 }">
-			<MvIF EXPR = "{ NOT Is_Variable( l.parameters[3] ) }">
-				<MvFUNCTIONRETURN VALUE = "{ Parameter_Error( l.param, 'The third parameter must be a variable' ) }">
-			</MvIF>
-
-			<MvIF EXPR = "{ NOT CurrentWaitlistCount( l.parameters[1], l.parameters[2], l.parameters[3] ) }">
-				<MvFUNCTIONRETURN>
-			</MvIF>
+		<MvIF EXPR = "{ l.parameter_count NE 3 }">
+			<MvFUNCTIONRETURN VALUE = "{ Parameter_Error( l.param, '\'' $ l.function_name $ '\' takes 3 parameters' ) }">
 		</MvIF>
+	
+		<MvIF EXPR = "{ NOT Is_Variable( l.parameters[3] ) }">
+			<MvFUNCTIONRETURN VALUE = "{ Parameter_Error( l.param, 'The third parameter must be a variable' ) }">
+		</MvIF>
+
+		<MvASSIGN NAME = "l.new_param" VALUE = "{ 'Component_' $ l.function_name $ '( l.module, l.param, l.settings, ' $ l.parameters $ ' )' }">
 	<MvELSEIF EXPR = "{ l.function_name EQ 'waitlistxcustomer_load' }">
-		<MvIF EXPR = "{ l.parameter_count EQ 2 }">
-			<MvIF EXPR = "{ NOT Is_Variable( l.parameters[2] ) }">
-				<MvFUNCTIONRETURN VALUE = "{ Parameter_Error( l.param, 'The Second parameter must be a variable' ) }">
-			</MvIF>
-
-			<MvIF EXPR = "{ NOT WaitlistXCustomer_Load( l.parameters[1], l.parameters[2] ) }">
-				<MvFUNCTIONRETURN>
-			</MvIF>
+		<MvIF EXPR = "{ l.parameter_count NE 2 }">
+			<MvFUNCTIONRETURN VALUE = "{ Parameter_Error( l.param, '\'' $ l.function_name $ '\' takes 2 parameters' ) }">
 		</MvIF>
+
+		<MvIF EXPR = "{ NOT Is_Variable( l.parameters[2] ) }">
+			<MvFUNCTIONRETURN VALUE = "{ Parameter_Error( l.param, 'The Second parameter must be a variable' ) }">
+		</MvIF>
+
+		<MvASSIGN NAME = "l.new_param" VALUE = "{ 'Component_' $ l.function_name $ '( l.module, l.param, l.settings, ' $ l.parameters $ ' )' }">
 	<MvELSEIF EXPR = "{ l.function_name EQ 'waitlistxemail_load' }">
-		<MvIF EXPR = "{ l.parameter_count EQ 2 }">
-			<MvIF EXPR = "{ NOT Is_Variable( l.parameters[2] ) }">
-				<MvFUNCTIONRETURN VALUE = "{ Parameter_Error( l.param, 'The Second parameter must be a variable' ) }">
-			</MvIF>
-
-			<MvIF EXPR = "{ NOT WaitlistXEmail_Load( l.parameters[1], l.parameters[2] ) }">
-				<MvFUNCTIONRETURN>
-			</MvIF>
+		<MvIF EXPR = "{ l.parameter_count NE 2 }">
+			<MvFUNCTIONRETURN VALUE = "{ Parameter_Error( l.param, '\'' $ l.function_name $ '\' takes 2 parameters' ) }">
 		</MvIF>
+
+		<MvIF EXPR = "{ NOT Is_Variable( l.parameters[2] ) }">
+			<MvFUNCTIONRETURN VALUE = "{ Parameter_Error( l.param, 'The Second parameter must be a variable' ) }">
+		</MvIF>
+
+		<MvASSIGN NAME = "l.new_param" VALUE = "{ 'Component_' $ l.function_name $ '( l.module, l.param, l.settings, ' $ l.parameters $ ' )' }">
+	<MvELSE>
+		<MvFUNCTIONRETURN VALUE = "{ Parameter_Error( l.param, '\'' $ l.function_name $ '\' is not a valid function' ) }">
 	</MvIF>
+
+	<MvCOMMENT>
+	|
+	|	tagerror
+	|	22, 3 = display
+	|	22, 0 = no display
+	|
+	</MvCOMMENT>
+
+	<MvIF EXPR = "{ ISNULL l.new_param }">
+		<MvFUNCTIONRETURN VALUE = "">
+	</MvIF>
+
+	<MvASSEMBLY>
+		.string asm_0 "l.new_param"
+		.string asm_1 "g.Module_Root"
+		.string asm_2 "l.module"
+		.string asm_3 "module"
+		.string asm_4 "g.MvDO_Error"
+
+			pushc		asm_1
+			pushn
+			pushc		asm_2
+			pushn
+			pushc		asm_3
+			memb_ro
+			cat
+			pushc		asm_0
+			pushn
+			tagerror	22, 0
+			do_function
+			pop
+			tagerror	22, 3
+			pushc		asm_4
+			pushn
+			jmp_eq		L_asm_success
+			retn
+		L_asm_success:
+	</MvASSEMBLY>
 </MvFUNCTION>
 
 <MvFUNCTION NAME = "ComponentModule_Render_Head" PARAMETERS = "module var, item, all_settings var, settings var" STANDARDOUTPUTLEVEL = "">
@@ -637,8 +682,8 @@
 </MvFUNCTION>
 
 <MvFUNCTION NAME = "Waitlist_Sent_Insert" PARAMETERS = "waitlist var" STANDARDOUTPUTLEVEL = "">
-	<MvIF EXPR = "{ NOT Waitlist_Delete_Product( l.waitlist ) }">	<MvFUNCTIONRETURN VALUE = 0>
-	<MvELSEIF EXPR = "{ NOT Waitlist_Delete( l.waitlist:id ) }">	<MvFUNCTIONRETURN VALUE = 0>
+	<MvIF EXPR = "{ NOT Waitlist_Sent_Insert_LowLevel( l.waitlist ) }">	<MvFUNCTIONRETURN VALUE = 0>
+	<MvELSEIF EXPR = "{ NOT Waitlist_Delete( l.waitlist:id ) }">		<MvFUNCTIONRETURN VALUE = 0>
 	</MvIF>
 
 	<MvFUNCTIONRETURN VALUE = 1>
@@ -1341,31 +1386,25 @@
 	<MvIF EXPR = "{ NOT [ g.Module_JSON ].JSON_Store_Open() }">				<MvFUNCTIONRETURN>																	</MvIF>
 	<MvIF EXPR = "{ NOT [ g.Module_Admin ].CanI( 'SYSM', 0, 0, 1, 0 ) }">	<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Access_Denied() }">	</MvIF>
 
-	<MvEVAL EXPR = "{ Waitlist_Trigger_All_ASYNC( l.session_id ) }">
+	<MvEVAL EXPR = "{ Waitlist_Trigger_All_ASYNC( ) }">
 
-	<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Response_Start() }">
-	{
-		"session_id": "<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode( l.session_id ) }">"
-	}
-	<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_End() }">
+	<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Success() }">
 </MvFUNCTION>
 
-<MvFUNCTION NAME = "Waitlist_Trigger_All_ASYNC" PARAMETERS = "session_id var" STANDARDOUTPUTLEVEL = "" ERROROUTPUTLEVEL = "">
-	<MvASSIGN NAME = "l.session_id" VALUE = "{ MakeSessionID() }">
-
+<MvFUNCTION NAME = "Waitlist_Trigger_All_ASYNC" PARAMETERS = "" STANDARDOUTPUTLEVEL = "" ERROROUTPUTLEVEL = "">
 	<MvASYNC>
 		<MvIF EXPR = "{ NOT [ g.Module_Library_Utilities ].Initialize_Async_Environment( 'admin', g.Store:code ) }">
 			<MvEXIT>
 		</MvIF>
 
-		<MvLOCKFILE FILE = "{ Waitlist_Lockfile_Path( l.session_id ) }">
+		<MvLOCKFILE FILE = "{ Waitlist_Lockfile_Path() }">
 			<MvASSIGN NAME = "l.null" VALUE = "{ Waitlist_Trigger_All() }">
 		</MvLOCKFILE>
 	</MvASYNC>
 </MvFUNCTION>
 
-<MvFUNCTION NAME = "Waitlist_Lockfile_Path" PARAMETERS = "session_id" STANDARDOUTPUTLEVEL = "">
-	<MvFUNCTIONRETURN VALUE = "{ g.MerchantPath $ 'waitlist_' $  l.session_id }">
+<MvFUNCTION NAME = "Waitlist_Lockfile_Path" PARAMETERS = "" STANDARDOUTPUTLEVEL = "">
+	<MvFUNCTIONRETURN VALUE = "{ g.MerchantPath $ 'tgwaitlist' }">
 </MvFUNCTION>
 
 <MvFUNCTION NAME = "JSON_API_Waitlist_Add" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = "" ERROROUTPUTLEVEL = "">
@@ -1430,7 +1469,7 @@
 		<MvASSIGN NAME = "l.waitlist:product_id"	VALUE = "{ l.product:id }">
 		<MvASSIGN NAME = "l.waitlist:variant_id"	VALUE = "{ l.variant_id }">
 		<MvASSIGN NAME = "l.waitlist:email"			VALUE = "{ l.email }">
-		<MvASSIGN NAME = "l.waitlist:cust_id" 		VALUE = "{ int( g.Basket:cust_id ) }">
+		<MvASSIGN NAME = "l.waitlist:cust_id" 		VALUE = "{ g.Basket:cust_id }">
 
 		<MvIF EXPR = "{ l.waitlist:cust_id GT 0 }">
 			<MvIF EXPR = "{ Waitlist_Check_Customer( l.waitlist:product_id, l.waitlist:variant_id, l.waitlist:cust_id, l.existing_waitlist ) }">
@@ -1462,13 +1501,13 @@
 |
 </MvCOMMENT>
 
-<MvFUNCTION NAME = "Waitlist_API_URL" PARAMETERS = "module var, return var" STANDARDOUTPUTLEVEL = "">
-	<MvASSIGN NAME = "l.return" VALUE = "{ g.json_url $ 'Module_Code=' $ encodeattribute( l.module:code ) $ '&Store_Code=' $ encodeattribute( g.Store:code ) $ '&Function=Module&Module_Function=Waitlist_API' }">
+<MvFUNCTION NAME = "Component_Waitlist_API_URL" PARAMETERS = "module var, param, all_settings var, return var" STANDARDOUTPUTLEVEL = "">
+	<MvASSIGN NAME = "l.return" VALUE = "{ g.json_url $ 'Session_Type=runtime&Module_Code=' $ encodeattribute( l.module:code ) $ '&Store_Code=' $ encodeattribute( g.Store:code ) $ '&Function=Module&Module_Function=Waitlist_API' }">
 
 	<MvFUNCTIONRETURN VALUE = 1>
 </MvFUNCTION>
 
-<MvFUNCTION NAME = "CurrentWaitlistCount" PARAMETERS = "product_id, variant_id, count var" STANDARDOUTPUTLEVEL = ""  ERROROUTPUTLEVEL = "">
+<MvFUNCTION NAME = "Component_CurrentWaitlistCount" PARAMETERS = "module var, param, all_settings var, product_id, variant_id, count var" STANDARDOUTPUTLEVEL = ""  ERROROUTPUTLEVEL = "">
 	<MvIF EXPR = "{ ISNULL l.variant_id }">
 		<MvASSIGN NAME = "l.variant_id" VALUE = 0>
 	</MvIF>
@@ -1497,7 +1536,7 @@
 	<MvFUNCTIONRETURN VALUE = 1>
 </MvFUNCTION>
 
-<MvFUNCTION NAME = "WaitlistXCustomer_Load" PARAMETERS = "cust_id, return var" STANDARDOUTPUTLEVEL = ""   ERROROUTPUTLEVEL = "">
+<MvFUNCTION NAME = "Component_WaitlistXCustomer_Load" PARAMETERS = "module var, param, all_settings var, cust_id, return var" STANDARDOUTPUTLEVEL = ""   ERROROUTPUTLEVEL = "">
 	<MvOPENVIEW NAME	= "Merchant"
 				VIEW	= "TGWaitlist"
 				QUERY	= "{ 'SELECT * FROM ' $ g.Store_Table_Prefix $ 'TGWaitlist
@@ -1525,7 +1564,7 @@
 	<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_DB ].ListLoad_EOF_Return( '#Error#', l.waitlist_count ) }">
 </MvFUNCTION>
 
-<MvFUNCTION NAME = "WaitlistXEmail_Load" PARAMETERS = "email, return var" STANDARDOUTPUTLEVEL = ""  ERROROUTPUTLEVEL = "">
+<MvFUNCTION NAME = "Component_WaitlistXEmail_Load" PARAMETERS = "module var, param, all_settings var, email, return var" STANDARDOUTPUTLEVEL = ""  ERROROUTPUTLEVEL = "">
 	<MvOPENVIEW NAME	= "Merchant"
 				VIEW	= "TGWaitlist"
 				QUERY	= "{ 'SELECT * FROM ' $ g.Store_Table_Prefix $ 'TGWaitlist
