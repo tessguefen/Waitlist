@@ -110,7 +110,7 @@ Add the following code somewhere below the page, or utilize pieces of it to tie 
 
 *Please Note:* If you are utilizing deferred attribute machine, you may have issues reading `attributemachine`.
 
->>>
+<<<
 
 If you don't want to utilize the AJAX'd version, and would rather have a normal form submission, you will just need the following:
 
@@ -126,7 +126,7 @@ If you don't want to utilize the AJAX'd version, and would rather have a normal 
 |Waitlist_Variant_ID|Number|Variant ID for the waitlist sign up. Optional, but if the product requires a variant, it is required.
 |===
 
->>>
+<<<
 
 Example Form
 
