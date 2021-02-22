@@ -42,7 +42,7 @@ The following request parameters can also be used to sort/ filter.
 	"Function": "Module",
 	"Module_Code": "TGWaitlist",
 	"Module_Function": "Waitlist_Load_Query",
-	"sort": "email",
+	"Sort": "email",
 	"Filter":[  
 		{  
 			"name":"search",
