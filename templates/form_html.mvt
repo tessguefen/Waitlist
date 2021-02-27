@@ -1,7 +1,7 @@
 <mvt:if expr="g.Waitlist_Error"><div class="x-messages x-messages--error">Error: &mvte:global:Waitlist_Error;</div></mvt:if>
 <mvt:if expr="g.Waitlist_Message"><div class="x-messages x-messages--success">&mvte:global:Waitlist_Message;</div></mvt:if>
 
-<form name="waitlist_add" method="post" action="&mvte:product:link;"<mvt:if expr="g.Waitlist_Error"> style="display:none;"</mvt:if>>
+<form name="waitlist_add" method="post" action="&mvte:product:link;"<mvt:if expr="ISNULL g.Waitlist_Error"> style="display:none;"</mvt:if>>
 	<div class="x-messages x-messages--info">Sign up with your email to be notified when this product is back in stock!</div>
 	<div id="jsWaitlist_Message"></div>
 	<input type="hidden" name="Action" value="WaitlistAdd" />
