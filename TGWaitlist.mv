@@ -819,7 +819,8 @@
 	</MvIF>
 
 	<MvFOREACH ITERATOR = "l.unique_waitlist" ARRAY = "l.waitlists">
-		<MvASSIGN NAME = "l.success" VALUE = "{ Waitlist_Trigger_Email( l.unique_waitlist) }">
+		<MvASSIGN NAME = "l.unique_waitlist:product"	VALUE = "{ l.waitlist:product }">
+		<MvASSIGN NAME = "l.success"					VALUE = "{ Waitlist_Trigger_Email( l.unique_waitlist) }">
 	</MvFOREACH>
 
 	<MvFUNCTIONRETURN VALUE = 1>
