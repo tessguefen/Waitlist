@@ -6,7 +6,7 @@
 [[_requirements]]
 === Requirements
 
-Miva Merchant: *9.14.00* or higher
+Miva Merchant: *10.00.00* or higher
 
 Store User Interface: *Miva Merchant CSSUI*
 
