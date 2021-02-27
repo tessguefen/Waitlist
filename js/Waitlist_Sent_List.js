@@ -11,7 +11,7 @@ function Waitlist_Sent_Load_Query( filter, sort, offset, count, callback, delega
 
 function Waitlist_Sent_Batchlist_Delete( id, callback, delegator )
 {
-	return AJAX_Call_Module_JSON( callback, 'admin', 'TGWaitlist', 'Waitlist_Delete',
+	return AJAX_Call_Module_JSON( callback, 'admin', 'TGWaitlist', 'Waitlist_Sent_Delete',
 	{
 		ID: id
 	}, delegator );

@@ -373,7 +373,11 @@
 
 <MvFUNCTION NAME = "ScheduledTaskModule_Execute" PARAMETERS = "module var, task var" STANDARDOUTPUTLEVEL = "">
 	<MvIF EXPR = "{ l.task:operation EQ 'waitlist_trigger' }">
-		<MvFUNCTIONRETURN VALUE = "{ Waitlist_Trigger_All() }">
+		<MvLOCKFILE FILE = "{ Waitlist_Lockfile_Path() }">
+			<MvASSIGN NAME = "l.result" VALUE = "{ Waitlist_Trigger_All() }">
+		</MvLOCKFILE>
+
+		<MvFUNCTIONRETURN VALUE = "{ l.result }">
 	</MvIF>
 
 	<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( '#Error#', 'Unsupported operation' ) }">
@@ -749,9 +753,15 @@
 </MvCOMMENT>
 
 <MvFUNCTION NAME = "Waitlist_Trigger_All" PARAMETERS = "" STANDARDOUTPUTLEVEL = ""  ERROROUTPUTLEVEL = "">
+	<MvCOMMENT>
+	|
+	|	Group by `product_id`, `variant_id`, and `cust_id`
+	|
+	</MvCOMMENT>
+
 	<MvOPENVIEW NAME	= "Merchant"
 				VIEW 	= "TGWaitlist"
-				QUERY 	= "{ 'SELECT * FROM ' $ g.Store_Table_Prefix $ 'TGWaitlist ORDER BY product_id ASC, variant_id ASC' }">
+				QUERY 	= "{ 'SELECT * FROM ' $ g.Store_Table_Prefix $ 'TGWaitlist GROUP BY product_id, variant_id, cust_id ORDER BY product_id ASC, variant_id ASC' }">
 	<MvIF EXPR = "{ g.MvOPENVIEW_Error }">
 		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( '#Error#', g.MvOPENVIEW_Error ) }">
 	</MvIF>
@@ -769,17 +779,53 @@
 	<MvCLOSEVIEW NAME = "Merchant" VIEW = "TGWaitlist">
 
 	<MvFOREACH ITERATOR = "l.waitlist" ARRAY = "l.waitlists">
-		<MvASSIGN NAME = "l.success" VALUE = "{ Waitlist_Trigger_Email( l.waitlist) }">
+		<MvASSIGN NAME = "l.success" VALUE = "{ Waitlist_Trigger_Emails( l.waitlist) }">
+	</MvFOREACH>
+
+	<MvFUNCTIONRETURN VALUE = 1>
+</MvFUNCTION>
+
+<MvFUNCTION NAME = "Waitlist_Load_Product_Customer_Groups" PARAMETERS = "waitlist var, waitlists var" STANDARDOUTPUTLEVEL = "">
+	<MvOPENVIEW NAME	= "Merchant"
+				VIEW 	= "TGWaitlist"
+				QUERY 	= "{ 'SELECT * FROM ' $ g.Store_Table_Prefix $ 'TGWaitlist WHERE product_id = ? AND variant_id = ? AND cust_id = ?' }"
+				FIELDS	= "l.waitlist:product_id, l.waitlist:variant_id, l.waitlist:cust_id">
+	<MvIF EXPR = "{ g.MvOPENVIEW_Error }">
+		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( '#Error#', g.MvOPENVIEW_Error ) }">
+	</MvIF>
+
+	<MvASSIGN NAME = "l.waitlists_count"	VALUE = 0>
+	<MvASSIGN NAME = "l.waitlists"			VALUE = "">
+
+	<MvWHILE EXPR = "{ NOT TGWaitlist.d.EOF }">
+		<MvASSIGN NAME = "l.waitlists_count" VALUE = "{ l.waitlists_count + 1 }">
+		<MvEVAL EXPR = "{ Waitlist_Read( l.waitlists[ l.waitlists_count ] ) }">
+
+		<MvSKIP NAME = "Merchant" VIEW = "TGWaitlist" ROWS = 1>
+	</MvWHILE>
+
+	<MvCLOSEVIEW NAME = "Merchant" VIEW = "TGWaitlist">
+
+	<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_DB ].ListLoad_EOF_Return( '#Error#', l.waitlists_count ) }">
+</MvFUNCTION>
+
+<MvFUNCTION NAME = "Waitlist_Trigger_Emails" PARAMETERS = "waitlist var" STANDARDOUTPUTLEVEL = "">
+	<MvIF EXPR = "{ NOT Waitlist_Trigger_Check( l.waitlist ) }">
+		<MvFUNCTIONRETURN VALUE = 0>
+	</MvIF>
+
+	<MvIF EXPR = "{ NOT Waitlist_Load_Product_Customer_Groups( l.waitlist, l.waitlists ) }">
+		<MvFUNCTIONRETURN VALUE = 0>
+	</MvIF>
+
+	<MvFOREACH ITERATOR = "l.unique_waitlist" ARRAY = "l.waitlists">
+		<MvASSIGN NAME = "l.success" VALUE = "{ Waitlist_Trigger_Email( l.unique_waitlist) }">
 	</MvFOREACH>
 
 	<MvFUNCTIONRETURN VALUE = 1>
 </MvFUNCTION>
 
 <MvFUNCTION NAME = "Waitlist_Trigger_Email" PARAMETERS = "waitlist var" STANDARDOUTPUTLEVEL = "">
-	<MvIF EXPR = "{ NOT Waitlist_Trigger_Check( l.waitlist ) }">
-		<MvFUNCTIONRETURN VALUE = 0>
-	</MvIF>
-
 	<MvEVAL EXPR = "{ Waitlist_Email_Format( l.waitlist ) }">
 
 	<MvFUNCTIONRETURN VALUE = "{ Waitlist_Trigger_Email_LowLevel( l.waitlist ) }">
@@ -787,7 +833,6 @@
 
 <MvFUNCTION NAME = "Waitlist_Trigger_Check" PARAMETERS = "waitlist var" STANDARDOUTPUTLEVEL = "">
 	<MvIF EXPR = "{ l.waitlist:product_id EQ 0 }">
-		<MvASSIGN NAME = "l.null" VALUE = "{ Waitlist_Delete( l.waitlist:id ) }">
 		<MvFUNCTIONRETURN VALUE = 0>
 	</MvIF>
 
@@ -801,11 +846,11 @@
 	<MvASSIGN NAME = "g.Basket:cust_id"		VALUE = "{ l.waitlist:cust_id }">
 
 	<MvIF EXPR = "{ NOT [ g.Module_Library_DB ].Runtime_Product_Load_ID( l.waitlist:product_id, l.waitlist:product ) }">
-		<MvASSIGN NAME = "g.Basket:cust_id" VALUE = "{ l.original_cust_id }">
+		<MvASSIGN NAME = "g.Basket:cust_id"	VALUE = "{ l.original_cust_id }">
 		<MvFUNCTIONRETURN VALUE = 0>
 	</MvIF>
 
-	<MvASSIGN NAME = "l.continue" VALUE = 0>
+	<MvASSIGN NAME = "l.continue"			VALUE = 0>
 
 	<MvIF EXPR = "{ l.waitlist:variant_id GT 0 }">
 		<MvDO FILE = "{ g.Module_Feature_INV_RT }" NAME = "l.continue" VALUE = "{ Inventory_Is_Available_Variant( l.waitlist:product, l.waitlist:variant_id, 1 ) }">
@@ -817,7 +862,7 @@
 		<MvFUNCTIONRETURN VALUE = 0>
 	</MvIF>
 
-	<MvASSIGN NAME = "g.Basket:cust_id" VALUE = "{ l.original_cust_id }">
+	<MvASSIGN NAME = "g.Basket:cust_id"		VALUE = "{ l.original_cust_id }">
 
 	<MvIF EXPR = "{ l.continue LE 0 }">
 		<MvFUNCTIONRETURN VALUE = 0>
@@ -883,7 +928,7 @@
 </MvFUNCTION>
 
 <MvFUNCTION NAME = "Waitlist_Email_Format" PARAMETERS = "waitlist var" STANDARDOUTPUTLEVEL = "">
-	<MvDO FILE = "{ g.Module_Library_Utilities }"	NAME = "l.waitlist:formatted_date"	VALUE = "{ Format_Date( l.waitlist:time_added, s.miva_language ) }">
+	<MvDO FILE = "{ g.Module_Library_Utilities }" NAME = "l.waitlist:formatted_date" VALUE = "{ Format_Date( l.waitlist:time_added, s.miva_language ) }">
 
 	<MvIF EXPR = "{ l.waitlist:variant_id GT 0 }">
 		<MvFOREACH ITERATOR = "l.variant" ARRAY = "l.waitlist:variants" COUNT = "{ [ g.Module_Library_DB ].ProductVariantPartList_Load_Variant( l.waitlist:product_id, l.waitlist:variant_id, l.waitlist:variants ) }">
@@ -911,7 +956,7 @@
 </MvFUNCTION>
 
 <MvFUNCTION NAME = "Waitlist_Trigger_Email_Lowlevel" PARAMETERS = "waitlist var" STANDARDOUTPUTLEVEL = "">
-	<MvIF EXPR = "{ NOT [ g.Module_Feature_TUI_DB ].Page_Load_Code( 'WaitlistEmailTemplate', l.page ) }">
+	<MvIF EXPR = "{ NOT [ g.Module_Feature_TUI_DB ].Page_Load_Code_Cached( 'WaitlistEmailTemplate', l.page ) }">
 		<MvFUNCTIONRETURN VALUE = 0>
 	</MvIF>
 
@@ -948,7 +993,7 @@
 		<MvDO FILE = "{ g.Store_Template_Path $ l.waitlist_email_template:filename }" NAME = "l.success" VALUE = "{ Template_Render( l.settings, l.all_settings ) }">
 	</MvCAPTURE>
 
-	<MvASSIGN NAME ="l.email_headers"	VALUE = "{ 'Content-Type: text/html; charset=ISO-8859-1' $ asciichar( 13 ) $ asciichar( 10 ) $ asciichar( 13 ) $ asciichar( 10 ) }">
+	<MvASSIGN NAME = "l.email_headers"	VALUE = "{ 'Content-Type: text/html; charset=ISO-8859-1' $ asciichar( 13 ) $ asciichar( 10 ) $ asciichar( 13 ) $ asciichar( 10 ) }">
 	<MvASSIGN NAME = "l.subject"		VALUE = "{ l.waitlist:product:name $ ' is back in stock!' }">
 	<MvASSIGN NAME = "l.from"			VALUE = "{ g.Store:Email }">
 
@@ -1531,7 +1576,7 @@
 	</MvIF>
 
 	<MvASSIGN NAME = "l.count"		VALUE = "{ TGWaitlist.d.total_count }">
-	<MvCLOSEVIEW NAME = "Merchant" VIEW = "Reports">
+	<MvCLOSEVIEW NAME = "Merchant" VIEW = "TGWaitlist">
 
 	<MvFUNCTIONRETURN VALUE = 1>
 </MvFUNCTION>
