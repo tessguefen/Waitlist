@@ -1,13 +1,14 @@
-<mvt:if expr="g.Waitlist_Error"><div style="background: #e74c3c; color: #fff; font-size: 11px; padding: 5px 10px;">Error: &mvte:global:Waitlist_Error;</div></mvt:if>
-<mvt:if expr="g.Waitlist_Message"><div style="background: #16a085; color: #fff; font-size: 11px; padding: 5px 10px;">&mvte:global:Waitlist_Message;</div></mvt:if>
+<mvt:if expr="g.Waitlist_Error"><div class="x-messages x-messages--error">Error: &mvte:global:Waitlist_Error;</div></mvt:if>
+<mvt:if expr="g.Waitlist_Message"><div class="x-messages x-messages--success">&mvte:global:Waitlist_Message;</div></mvt:if>
 
-<form name="waitlist_add" method="post" action="&mvte:product:link;" style="display:none;">
-	<div id="jsWaitlist_Message" style="font-size: 11px; background: #ecf0f1; text-align: center; padding: 10px 5px; margin-bottom: 0.75rem;">Sign up with your email to be notified when this product is back in stock!</div>
+<form name="waitlist_add" method="post" action="&mvte:product:link;"<mvt:if expr="g.Waitlist_Error"> style="display:none;"</mvt:if>>
+	<div class="x-messages x-messages--info">Sign up with your email to be notified when this product is back in stock!</div>
+	<div id="jsWaitlist_Message"></div>
 	<input type="hidden" name="Action" value="WaitlistAdd" />
-	<input type="hidden" name="Waitlist_Product_Code" value="&mvte:product:code;" />
-	<input type="hidden" name="Waitlist_Variant_ID" id="jsWaitlist_Variant_ID" value="&mvte:attributemachine:variant_id;" />
-	<div style="display: flex;flex-direction: row;">
-		<input type="email" name="Waitlist_Email" value="&mvte:global:Waitlist_Email;" placeholder="Email" style="flex: 1 1 auto; padding: 5px; border: 1px solid #bdc3c7; border-right: 0;" />
-		<input type="submit" value="Sign up" class="button" style="flex: 1 1 auto; padding: 5px; border: 0; background-color: #3498db;" />
+	<input type="hidden" name="Waitlist_Product_Code" value="&mvt:product:code;" />
+	<input type="hidden" name="Waitlist_Variant_ID" id="jsWaitlist_Variant_ID" value="&mvt:attributemachine:variant_id;" />
+	<div class="c-control-group">
+		<input type="email" name="Waitlist_Email" value="&mvte:global:Waitlist_Email;" placeholder="Email" class="c-form-input c-control-group__field" />
+		<input type="submit" value="Sign up" class="c-button c-control-group__button" />
 	</div>
 </form>

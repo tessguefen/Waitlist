@@ -53,8 +53,8 @@ This will trigger the Variant Change functionality.
 [source,javascript]
 ----
 MivaEvents.SubscribeToEvent('variant_changed', function (data) {
-	var WaitlistVariantID = document.getElementById( 'jsWaitlist_Variant_ID' );
-	if ( WaitlistVariantID ) {
+	var WaitlistVariantID = document.getElementById('jsWaitlist_Variant_ID');
+	if (WaitlistVariantID) {
 		WaitlistVariantID.value = data.variant_id > 0 ? data.variant_id : 0;
 	}
 });
@@ -71,13 +71,13 @@ Add the following code to your AttributeMachine Template. This will determine wh
 ----
 AttributeMachine.prototype.AttributeList_Load_Possible_Callback_Original = AttributeMachine.prototype.AttributeList_Load_Possible_Callback;
 
-AttributeMachine.prototype.AttributeList_Load_Possible_Callback = function( response )
+AttributeMachine.prototype.AttributeList_Load_Possible_Callback = function (response)
 {
-	var waitlist_form = document.getElementsByName( 'waitlist_add' )[0];
+	var waitlist_form = document.getElementsByName('waitlist_add')[0];
 
 	if (response && response.data && response.data.variant && waitlist_form)
 	{
-		if ( response.data.variant.inv_active && response.data.variant.inv_level == 'out' )
+		if (response.data.variant.inv_active && response.data.variant.inv_level === 'out')
 		{
 			waitlist_form.style.display = 'block';
 		}
@@ -86,9 +86,9 @@ AttributeMachine.prototype.AttributeList_Load_Possible_Callback = function( resp
 			waitlist_form.style.display = 'none';
 		}
 	}
-	
-	this.AttributeList_Load_Possible_Callback_Original( response );
-}
+
+	this.AttributeList_Load_Possible_Callback_Original(response);
+};
 ----
 
 <<<
@@ -106,18 +106,19 @@ This will enable the Waitlist form to be asynchronously sent, so your user does 
 	<mvt:item name="waitlist" param="Waitlist_API_URL( l.all_settings:waitlist_url )" />
 	var waitlist_api = '&mvtj:waitlist_url;';
 	// ---- Update Display When Attribute Machine Fires ---- //
-	var waitlist_form = document.getElementsByName( 'waitlist_add' )[0];
-	var waitlist_ajax_msg = document.getElementById( 'jsWaitlist_Message');
+	var waitlist_form = document.getElementsByName('waitlist_add')[0];
+	var waitlist_ajax_msg = document.getElementById('jsWaitlist_Message');
 
 	var stock_level = '&mvtj:attributemachine:product:inv_level;';
-	if (stock_level == 'out' && waitlist_form)
+
+	if (stock_level === 'out' && waitlist_form)
 	{
 		waitlist_form.style.display = 'block';
 	}
 
-	if ( waitlist_form && waitlist_api )
+	if (waitlist_form && waitlist_api)
 	{
-		waitlist_form.onsubmit = function onSubmit( form ) {
+		waitlist_form.onsubmit = function onSubmit (form) {
 			form.preventDefault();
 			var waitlist_data = new FormData(waitlist_form);
 			waitlist_data.append('WaitlistFunction', 'Waitlist_Add');
@@ -136,9 +137,9 @@ This will enable the Waitlist form to be asynchronously sent, so your user does 
 					waitlist_ajax_msg.classList = "";
 					if (this.status === 200)
 					{
-						var wishlist_return = JSON.parse( this.responseText );
+						var wishlist_return = JSON.parse(this.responseText);
 
-						if ( wishlist_return.success === 0 )
+						if (wishlist_return.success === 0)
 						{
 							waitlist_ajax_msg.classList.add('x-messages', 'x-messages--error');
 							waitlist_ajax_msg.innerHTML = wishlist_return.error_message;
@@ -156,10 +157,12 @@ This will enable the Waitlist form to be asynchronously sent, so your user does 
 					}
 				}
 			};
-			wishlist_call.send( waitlist_data );
-		}
+
+			wishlist_call.send(waitlist_data);
+		};
 	}
 </script>
+
 ----
 
 <<<
