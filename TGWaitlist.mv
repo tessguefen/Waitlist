@@ -559,7 +559,7 @@
 <MvFUNCTION NAME = "Waitlist_Load_ID" PARAMETERS = "id, waitlist var" STANDARDOUTPUTLEVEL = ""  ERROROUTPUTLEVEL = "">
 	<MvOPENVIEW NAME	= "Merchant"
 				VIEW 	= "TGWaitlist"
-				QUERY 	= "{ 'SELECT * FROM ' $ g.Store_Table_Prefix $ 'TGWaitlist WHERE id = ? ' }"
+				QUERY 	= "{ 'SELECT * FROM ' $ g.Store_Table_Prefix $ 'TGWaitlist WHERE id = ?' }"
 				FIELDS	= "l.id">
 	<MvIF EXPR = "{ g.MvOPENVIEW_Error }">
 		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'MOD-SYS-TGW-0011', g.MvQUERY_Error ) }">
@@ -924,8 +924,8 @@
 
 	<MvASSIGN NAME = "g.Waitlist_Email_Continue" VALUE = "">
 
-	<MvCAPTURE VARIABLE = "l.success">
-		<MvDO FILE = "{ g.Store_Template_Path $ l.waitlist_logic_template:filename }" NAME = "l.success" VALUE = "{ Template_Render( l.settings, l.all_settings ) }">
+	<MvCAPTURE VARIABLE = "l.null">
+		<MvDO FILE = "{ g.Store_Template_Path $ l.waitlist_logic_template:filename }" NAME = "l.null" VALUE = "{ Template_Render( l.settings, l.all_settings ) }">
 	</MvCAPTURE>
 
 	<MvIF EXPR = "{ NOT ISNULL( g.Waitlist_Email_Continue ) }">
@@ -942,7 +942,7 @@
 
 	<MvIF EXPR = "{ l.waitlist:variant_id GT 0 }">
 		<MvFOREACH ITERATOR = "l.variant" ARRAY = "l.waitlist:variants" COUNT = "{ [ g.Module_Library_DB ].ProductVariantPartList_Load_Variant( l.waitlist:product_id, l.waitlist:variant_id, l.waitlist:variants ) }">
-			<MvDO FILE = "{ g.Module_Library_DB }" NAME = "l.success" VALUE = "{ Product_Load_ID_WithRuntimeInventory( l.variant:part_id, l.variant:product ) }">
+			<MvDO FILE = "{ g.Module_Library_DB }" NAME = "l.null" VALUE = "{ Product_Load_ID_WithRuntimeInventory( l.variant:part_id, l.variant:product ) }">
 		</MvFOREACH>
 	
 		<MvIF EXPR = "{ [ g.Module_Library_DB ].ProductVariantList_Load_Variant( l.waitlist:product:id, l.waitlist:variant_id, l.waitlist:options ) }">
@@ -954,13 +954,13 @@
 <MvFUNCTION NAME = "Waitlist_Format_Variant_Options" PARAMETERS = "options var" STANDARDOUTPUTLEVEL = "">
 	<MvFOREACH ITERATOR = "l.option" ARRAY = "l.options">
 		<MvIF EXPR = "{ l.option:attmpat_id GT 0 }">
-			<MvDO FILE = "{ g.Module_Library_DB }"		NAME = "l.success" VALUE = "{ Attribute_Load_ID( l.option:attr_id, l.option:attribute ) }">
-			<MvDO FILE = "{ g.Module_Feature_ATT_DB }"	NAME = "l.success" VALUE = "{ AttributeTemplateAttr_Load_ID( l.option:attmpat_id, l.option:product_attribute ) }">
-			<MvDO FILE = "{ g.Module_Feature_ATT_DB }"	NAME = "l.success" VALUE = "{ AttributeTemplate_Load_ID( l.option:attribute:attemp_id, l.option:attributetemplate ) }">
-			<MvDO FILE = "{ g.Module_Feature_ATT_DB }"	NAME = "l.success" VALUE = "{ AttributeTemplateOption_Load_ID( l.option:option_id, l.option:option ) }">
+			<MvDO FILE = "{ g.Module_Library_DB }"		NAME = "l.null" VALUE = "{ Attribute_Load_ID( l.option:attr_id, l.option:attribute ) }">
+			<MvDO FILE = "{ g.Module_Feature_ATT_DB }"	NAME = "l.null" VALUE = "{ AttributeTemplateAttr_Load_ID( l.option:attmpat_id, l.option:product_attribute ) }">
+			<MvDO FILE = "{ g.Module_Feature_ATT_DB }"	NAME = "l.null" VALUE = "{ AttributeTemplate_Load_ID( l.option:attribute:attemp_id, l.option:attributetemplate ) }">
+			<MvDO FILE = "{ g.Module_Feature_ATT_DB }"	NAME = "l.null" VALUE = "{ AttributeTemplateOption_Load_ID( l.option:option_id, l.option:option ) }">
 		<MvELSE>
-			<MvDO FILE = "{ g.Module_Library_DB }"		NAME = "l.success" VALUE = "{ Attribute_Load_ID( l.option:attr_id, l.option:attribute ) }">
-			<MvDO FILE = "{ g.Module_Library_DB }"		NAME = "l.success" VALUE = "{ Option_Load_ID( l.option:option_id, l.option:option ) }">
+			<MvDO FILE = "{ g.Module_Library_DB }"		NAME = "l.null" VALUE = "{ Attribute_Load_ID( l.option:attr_id, l.option:attribute ) }">
+			<MvDO FILE = "{ g.Module_Library_DB }"		NAME = "l.null" VALUE = "{ Option_Load_ID( l.option:option_id, l.option:option ) }">
 		</MvIF>
 	</MvFOREACH>
 </MvFUNCTION>
@@ -1000,7 +1000,7 @@
 	<MvASSIGN NAME = "l.all_settings:waitlist"	VALUE = "{ l.waitlist }">
 
 	<MvCAPTURE VARIABLE = "l.message">
-		<MvDO FILE = "{ g.Store_Template_Path $ l.waitlist_email_template:filename }" NAME = "l.success" VALUE = "{ Template_Render( l.settings, l.all_settings ) }">
+		<MvDO FILE = "{ g.Store_Template_Path $ l.waitlist_email_template:filename }" NAME = "l.null" VALUE = "{ Template_Render( l.settings, l.all_settings ) }">
 	</MvCAPTURE>
 
 	<MvASSIGN NAME = "l.email_headers"	VALUE = "{ 'Content-Type: text/html; charset=ISO-8859-1' $ asciichar( 13 ) $ asciichar( 10 ) $ asciichar( 13 ) $ asciichar( 10 ) }">
@@ -1143,8 +1143,8 @@
 
 	<MvASSIGN NAME = "g.Waitlist_PreLogic_Continue" VALUE = 1>
 
-	<MvCAPTURE VARIABLE = "l.success">
-		<MvDO FILE = "{ g.Store_Template_Path $ l.waitlist_logic_template:filename }" NAME = "l.success" VALUE = "{ Template_Render( l.settings, l.all_settings ) }">
+	<MvCAPTURE VARIABLE = "l.null">
+		<MvDO FILE = "{ g.Store_Template_Path $ l.waitlist_logic_template:filename }" NAME = "l.null" VALUE = "{ Template_Render( l.settings, l.all_settings ) }">
 	</MvCAPTURE>
 
 	<MvIF EXPR = "{ g.Waitlist_PreLogic_Continue EQ 0 }">
@@ -1603,6 +1603,7 @@
 	</MvIF>
 
 	<MvASSIGN NAME = "l.waitlist_count" VALUE = 0>
+
 	<MvWHILE EXPR = "{ NOT TGWaitlist.d.EOF }">
 		<MvASSIGN NAME = "l.waitlist_count" VALUE = "{ l.waitlist_count + 1 }">
 		<MvEVAL EXPR = "{ Waitlist_Read( l.return[ l.waitlist_count ] ) }">
@@ -1717,9 +1718,9 @@
 </MvFUNCTION>
 
 <MvFUNCTION NAME = "Parameter_Error" PARAMETERS = "param, message" STANDARDOUTPUTLEVEL = "">
-	<MvASSIGN NAME = "l.error_count"														VALUE = "{ miva_array_elements( g.Session:wailist ) }">
-	<MvASSIGN NAME = "g.Session:wailist" INDEX = "{ l.error_count + 1 }" MEMBER = "param"	VALUE = "{ l.param }">
-	<MvASSIGN NAME = "g.Session:wailist" INDEX = "{ l.error_count + 1 }" MEMBER = "message"	VALUE = "{ l.message }">
+	<MvASSIGN NAME = "l.error_count"															VALUE = "{ miva_array_elements( g.Session:tgwaitlist ) }">
+	<MvASSIGN NAME = "g.Session:tgwaitlist" INDEX = "{ l.error_count + 1 }" MEMBER = "param"	VALUE = "{ l.param }">
+	<MvASSIGN NAME = "g.Session:tgwaitlist" INDEX = "{ l.error_count + 1 }" MEMBER = "message"	VALUE = "{ l.message }">
 	
 	<MvFUNCTIONRETURN VALUE = 0>
 </MvFUNCTION>
