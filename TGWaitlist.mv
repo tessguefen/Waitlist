@@ -1301,12 +1301,17 @@
 
 	<MvFOREACH ITERATOR = "l.id" ARRAY = "l.waitlists" COUNT = "{ l.waitlists_count }">
 		<MvASSIGN NAME = "l.processed" 	VALUE = "{ l.processed + 1 }">
+		<MvASSIGN NAME = "l.waitlist"	VALUE = "">
 
 		<MvIF EXPR = "{ NOT Waitlist_Load_ID( l.id, l.waitlist ) }">
 			<MvIF EXPR = "{ NOT [ g.Module_Library_DB ].Error_Is_EOF() }">
 				<MvASSIGN NAME = "l.error_count" VALUE = "{ [ g.Module_JSON ].JSON_Response_ListProcessed_Error( l.id, g.Error_Code, g.Error_Message, l.errors ) }">
 			</MvIF>
 		<MvELSE>
+			<MvIF EXPR = "{ NOT Waitlist_Trigger_Check( l.waitlist ) }">
+				<MvFOREACHCONTINUE>
+			</MvIF>
+
 			<MvASSIGN NAME = "l.null" VALUE = "{ Waitlist_Trigger_Email( l.waitlist ) }">
 		</MvIF>
 
