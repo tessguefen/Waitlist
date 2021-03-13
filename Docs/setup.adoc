@@ -39,6 +39,8 @@ Store User Interface: *Miva Merchant CSSUI*
 . Set the module to *TGWaitlist*
 . Click *Add*
 
+image::waitlist-item.png[Waitlist Item]
+
 You may now utilize the item on the pages you assign it to.
 
 <<<

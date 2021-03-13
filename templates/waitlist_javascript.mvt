@@ -30,7 +30,7 @@
 			{
 				if (waitlist_ajax_msg)
 				{
-					waitlist_ajax_msg.classList = "";
+					waitlist_ajax_msg.classList = '';
 					if (this.status === 200)
 					{
 						var wishlist_return = JSON.parse(this.responseText);
@@ -44,6 +44,7 @@
 						{
 							waitlist_ajax_msg.innerHTML = 'Thank you for signing up!';
 							waitlist_ajax_msg.classList.add('x-messages', 'x-messages--success');
+							waitlist_form.reset();
 						}
 					}
 					else
@@ -51,6 +52,11 @@
 						waitlist_ajax_msg.classList.add('x-messages', 'x-messages--error');
 						waitlist_ajax_msg.innerHTML = 'An error has occurred.';
 					}
+
+					setTimeout(function () {
+						waitlist_ajax_msg.innerHTML = '';
+						waitlist_ajax_msg.classList = '';
+					}, 5000);
 				}
 			};
 

@@ -18,6 +18,8 @@ There is one scheduled task that should be created during the installation proce
 . Select the operation *Waitlist: Trigger Waitlist Emails*
 . Set up your schedule (_Recommended to be every 2 hours_)
 
+image::scheduled-task.png[Scheduled Task]
+
 If you want your scheduled task to run after a product update, you can add the following fields to your scheduled task:
 
 * Trigger: *waitlist_trigger*

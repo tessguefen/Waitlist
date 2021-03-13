@@ -12,6 +12,8 @@ To add waitlist to your product page, you will need to do the following:
 . Assign the item to the pages you would like to utilize the module.
 .. If you want to assign the item to the product page, assign the item to *PROD*.
 
+image::waitlist-assignment.png[Waitlist Assignment to Pages]
+
 Once you have assigned the item to the pages you would like, you can add the following code for the form and the reviews. By Default, this uses classes that are in the base Shadows ReadyTheme.
 
 <<<
@@ -60,6 +62,8 @@ MivaEvents.SubscribeToEvent('variant_changed', function (data) {
 });
 ----
 
+image::attribute-machine.png[Attribute Machine: Head Template]
+
 <<<
 
 [[__showHideOnAttributeMachine]]
@@ -90,6 +94,8 @@ AttributeMachine.prototype.AttributeList_Load_Possible_Callback = function (resp
 	this.AttributeList_Load_Possible_Callback_Original(response);
 };
 ----
+
+image::attribute-machine.png[Attribute Machine: Head Template]
 
 <<<
 
@@ -134,7 +140,7 @@ This will enable the Waitlist form to be asynchronously sent, so your user does 
 			{
 				if (waitlist_ajax_msg)
 				{
-					waitlist_ajax_msg.classList = "";
+					waitlist_ajax_msg.classList = '';
 					if (this.status === 200)
 					{
 						var wishlist_return = JSON.parse(this.responseText);
@@ -148,6 +154,7 @@ This will enable the Waitlist form to be asynchronously sent, so your user does 
 						{
 							waitlist_ajax_msg.innerHTML = 'Thank you for signing up!';
 							waitlist_ajax_msg.classList.add('x-messages', 'x-messages--success');
+							waitlist_form.reset();
 						}
 					}
 					else
@@ -155,6 +162,11 @@ This will enable the Waitlist form to be asynchronously sent, so your user does 
 						waitlist_ajax_msg.classList.add('x-messages', 'x-messages--error');
 						waitlist_ajax_msg.innerHTML = 'An error has occurred.';
 					}
+
+					setTimeout(function () {
+						waitlist_ajax_msg.innerHTML = '';
+						waitlist_ajax_msg.classList = '';
+					}, 5000);
 				}
 			};
 
@@ -162,7 +174,6 @@ This will enable the Waitlist form to be asynchronously sent, so your user does 
 		};
 	}
 </script>
-
 ----
 
 <<<
