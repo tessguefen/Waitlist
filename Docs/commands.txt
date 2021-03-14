@@ -1,0 +1,14 @@
+# Asciidoc To PDF
+asciidoctor-pdf -a pdf-stylesdir=themes -a pdf-style=basic -a pdf-fontsdir=fonts
+
+document.adoc
+themes/
+	basic-theme.yml
+fonts/
+	roboto-normal.ttf
+	roboto-italic.ttf
+	roboto-bold.ttf
+	roboto-bold_italic.ttf
+
+
+asciidoctor-pdf -a pdf-stylesdir=themes -a imagesdir=images -a pdf-style=basic -a pdf-fontsdir=fonts TGWaitlist-documentation.adoc

@@ -1,0 +1,65 @@
+<<<
+
+[[_setup]]
+== Setup
+
+[[_requirements]]
+=== Requirements
+
+Miva Merchant: *10.00.00* or higher
+
+Store User Interface: *Miva Merchant CSSUI*
+
+[[_installation]]
+=== Installation
+
+. Log into your Miva Merchant Admin
+. Navigate to *Modules*
+. Click *Add Module* button
+. Click *Upload* and upload *TGWaitlist.mvc*
+. Press the *Add* button
+. Navigate to *System Extension Settings*
+. Click on *Add/Remove Modules*
+. Look for *Waitlist* and click *Install*
+. The *Waitlist* module is now installed!
+
+<<_technicalSetup,Jump to Technical set-up>>
+
+<<<
+
+[[_itemSetup]]
+=== Setting up the waitlist item
+
+*By default, this item should be created. In the case you do not see the item waitlist in your items list, follow these steps:*
+
+. Navigate to *User Interface*
+. Click on the *Items* tabs
+. Click *Add Item*
+. Set the code to *waitlist*
+. Set the module to *TGWaitlist*
+. Click *Add*
+
+image::waitlist-item.png[Waitlist Item]
+
+You may now utilize the item on the pages you assign it to.
+
+<<<
+
+[[_upgrading]]
+=== Upgrading
+
+If upgrading from a version below *1.004*, please change the following page codes:
+
+* `WatilistEmailTemplate` to `WaitlistEmailTemplate`
+* `WatilistEmailLogic` to `WaitlistEmailLogic` (if applicable)
+
+
+If upgrading from a version below *2.000*, the following JSON API functions are now no longer supported:
+
+* Waitlist_Load_Email
+** You can utilize `Waitlist_Load_Query` and filter by `email`
+* Waitlist_Load_Customer
+** You can utilize `Waitlist_Load_Query` and filter by `cust_id`
+
+A new template can be added to run some logic before the waitlist add. <<_preLogicTemplate,See More Details.>>
+

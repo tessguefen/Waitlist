@@ -1,0 +1,200 @@
+<<<
+
+[[_technicalSetup]]
+== Technical Set-up
+
+To add waitlist to your product page, you will need to do the following:
+
+. Navigate to *User Interface*
+. Click on *Items*
+. Search for *waitlist* and open the edit tab for that item.
+. Click on the *Pages* tab
+. Assign the item to the pages you would like to utilize the module.
+.. If you want to assign the item to the product page, assign the item to *PROD*.
+
+image::waitlist-assignment.png[Waitlist Assignment to Pages]
+
+Once you have assigned the item to the pages you would like, you can add the following code for the form and the reviews. By Default, this uses classes that are in the base Shadows ReadyTheme.
+
+<<<
+
+[[__formSourceCode]]
+=== Waitlist Form Source Code
+
+Add the following code where you want the Waitlist Form to display.
+
+*Do not add this inside of another form*:
+
+[source,xml]
+----
+<mvt:if expr="g.Waitlist_Error"><div class="x-messages x-messages--error">Error: &mvte:global:Waitlist_Error;</div></mvt:if>
+<mvt:if expr="g.Waitlist_Message"><div class="x-messages x-messages--success">&mvte:global:Waitlist_Message;</div></mvt:if>
+
+<form name="waitlist_add" method="post" action="&mvte:product:link;"<mvt:if expr="ISNULL g.Waitlist_Error"> style="display:none;"</mvt:if>>
+	<div class="x-messages x-messages--info">Sign up with your email to be notified when this product is back in stock!</div>
+	<div id="jsWaitlist_Message"></div>
+	<input type="hidden" name="Action" value="WaitlistAdd" />
+	<input type="hidden" name="Waitlist_Product_Code" value="&mvt:product:code;" />
+	<input type="hidden" name="Waitlist_Variant_ID" id="jsWaitlist_Variant_ID" value="&mvt:attributemachine:variant_id;" />
+	<div class="c-control-group">
+		<input type="email" name="Waitlist_Email" value="&mvte:global:Waitlist_Email;" placeholder="Email" class="c-form-input c-control-group__field" />
+		<input type="submit" value="Sign up" class="c-button c-control-group__button" />
+	</div>
+</form>
+----
+
+<<<
+
+[[__variantChangedEvent]]
+=== Variant Changed Event
+
+Add the following to your Attribute Machine Template (or if you're already utilizing `variant_changed`, add the code there).
+
+This will trigger the Variant Change functionality.
+
+[source,javascript]
+----
+MivaEvents.SubscribeToEvent('variant_changed', function (data) {
+	var WaitlistVariantID = document.getElementById('jsWaitlist_Variant_ID');
+	if (WaitlistVariantID) {
+		WaitlistVariantID.value = data.variant_id > 0 ? data.variant_id : 0;
+	}
+});
+----
+
+image::attribute-machine.png[Attribute Machine: Head Template]
+
+<<<
+
+[[__showHideOnAttributeMachine]]
+=== Attribute Machine Show/ Hide (based on inventory levels)
+
+Add the following code to your AttributeMachine Template. This will determine when a variant is out of stock (`inv_level` is `out`) to show the Waitlist form.
+
+[source,javascript]
+----
+AttributeMachine.prototype.AttributeList_Load_Possible_Callback_Original = AttributeMachine.prototype.AttributeList_Load_Possible_Callback;
+
+AttributeMachine.prototype.AttributeList_Load_Possible_Callback = function (response)
+{
+	var waitlist_form = document.getElementsByName('waitlist_add')[0];
+
+	if (response && response.data && response.data.variant && waitlist_form)
+	{
+		if (response.data.variant.inv_active && response.data.variant.inv_level === 'out')
+		{
+			waitlist_form.style.display = 'block';
+		}
+		else
+		{
+			waitlist_form.style.display = 'none';
+		}
+	}
+
+	this.AttributeList_Load_Possible_Callback_Original(response);
+};
+----
+
+image::attribute-machine.png[Attribute Machine: Head Template]
+
+<<<
+
+[[__ajaxSource]]
+=== Asynchronous Form Submission
+
+Add the following below **<mvt:item name="attributemachine" param="body_deferred" />** or **<mvt:item name="attributemachine" param="body" />**.
+
+This will enable the Waitlist form to be asynchronously sent, so your user does not need to leave the page.
+
+[source,html]
+----
+<script>
+	<mvt:item name="waitlist" param="Waitlist_API_URL( l.all_settings:waitlist_url )" />
+	var waitlist_api = '&mvtj:waitlist_url;';
+	// ---- Update Display When Attribute Machine Fires ---- //
+	var waitlist_form = document.getElementsByName('waitlist_add')[0];
+	var waitlist_ajax_msg = document.getElementById('jsWaitlist_Message');
+
+	var stock_level = '&mvtj:attributemachine:product:inv_level;';
+
+	if (stock_level === 'out' && waitlist_form)
+	{
+		waitlist_form.style.display = 'block';
+	}
+
+	if (waitlist_form && waitlist_api)
+	{
+		waitlist_form.addEventListener('submit', function(e) {
+			e.preventDefault();
+
+			var waitlist_data = new FormData(waitlist_form);
+			waitlist_data.append('WaitlistFunction', 'Waitlist_Add');
+			waitlist_data.append('Product_Code', waitlist_data.get('Waitlist_Product_Code'));
+			waitlist_data.append('Variant_ID', waitlist_data.get('Waitlist_Variant_ID'));
+			waitlist_data.append('Email', waitlist_data.get('Waitlist_Email'));
+			waitlist_data.delete('Action');
+
+			var waitlist_call = new XMLHttpRequest();
+			waitlist_call.open('POST', waitlist_api, true);
+
+			waitlist_call.onload = function()
+			{
+				if (waitlist_ajax_msg)
+				{
+					waitlist_ajax_msg.classList.remove('x-messages');
+					waitlist_ajax_msg.classList.remove('x-messages--error');
+					waitlist_ajax_msg.classList.remove('x-messages--success');
+
+					if (this.status === 200)
+					{
+						var waitlist_return = JSON.parse(this.responseText);
+
+						if (waitlist_return.success === 0)
+						{
+							waitlist_ajax_msg.classList.add('x-messages', 'x-messages--error');
+							waitlist_ajax_msg.innerHTML = waitlist_return.error_message;
+						}
+						else
+						{
+							waitlist_ajax_msg.innerHTML = 'Thank you for signing up!';
+							waitlist_ajax_msg.classList.add('x-messages', 'x-messages--success');
+							waitlist_form.reset();
+						}
+					}
+					else
+					{
+						waitlist_ajax_msg.classList.add('x-messages', 'x-messages--error');
+						waitlist_ajax_msg.innerHTML = 'An error has occurred.';
+					}
+
+					setTimeout(function () {
+						waitlist_ajax_msg.innerHTML = '';
+						waitlist_ajax_msg.classList = '';
+					}, 5000);
+				}
+			};
+
+			waitlist_call.send(waitlist_data);
+		});
+	}
+</script>
+----
+
+<<<
+
+If you don't want to utilize the AJAX'd version, and would rather have a normal form submission, you will just need the following.
+
+You can also just utilize the <<__formSourceCode,Waitlist Form Code>>
+
+[[__waitlistFormParameters]]
+=== Form Parameters
+
+[stripes=odd,options="header",cols="25%,25%,50%"]
+|===
+|Key|Type|Description
+|Action |String|`WaitlistAdd`
+|Waitlist_Product_Code|String|Product Code for the Waitlist Sign up
+|Waitlist_Email|String|Email for the Waitlist Sign up
+|Waitlist_Variant_ID|Number|Variant ID for the waitlist sign up. Optional, but if the product requires a variant, it is required.
+|===
+

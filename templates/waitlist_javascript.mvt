@@ -1,62 +1,70 @@
 <script>
-<mvt:item name="waitlist" param="Waitlist_API_URL( l.all_settings:waitlist_url )" />
-var waitlist_api = '&mvtj:waitlist_url;';
-// ---- Update Display When Attribute Machine Fires ---- //
-var waitlist_form = document.getElementsByName( 'waitlist_add' )[0];
-var watilist_ajax_msg = document.getElementById( 'jsWaitlist_Message');
-if ( typeof MivaEvents !== 'undefined' ) {
-	MivaEvents.SubscribeToEvent('variant_changed', function (product_data) {
-		var WaitlistVariantID = document.getElementById( 'jsWaitlist_Variant_ID' );
-		if ( WaitlistVariantID ) {
-			WaitlistVariantID.value = 0;
-			if ( product_data.variant_id > 0 ) WaitlistVariantID.value = product_data.variant_id;
-		}
-		if ( am&mvte:product:id;.buttons && waitlist_form ) {
-			var show_waitlist = 0;
-			am&mvte:product:id;.buttons.forEach( function( button ) {
-				if ( button.disabled ) show_waitlist = 1;
-			});
-			show_waitlist === 0 ? waitlist_form.style.display = 'none' : waitlist_form.style.display = 'block';
-		}
-	});
-}
+	<mvt:item name="waitlist" param="Waitlist_API_URL( l.all_settings:waitlist_url )" />
+	var waitlist_api = '&mvtj:waitlist_url;';
+	// ---- Update Display When Attribute Machine Fires ---- //
+	var waitlist_form = document.getElementsByName('waitlist_add')[0];
+	var waitlist_ajax_msg = document.getElementById('jsWaitlist_Message');
 
-var stock_level = '&mvtj:attributemachine:product:inv_level;';
-( stock_level == 'out' && waitlist_form ) ? waitlist_form.style.display = 'block' : waitlist_form.style.display = 'none';
+	var stock_level = '&mvtj:attributemachine:product:inv_level;';
 
-// ---- Show / Hide Form for Attributes ---- //
-if ( typeof am&mvte:product:id; != 'undefined' ) {
-	var inv_msg_element = document.getElementById( am&mvte:product:id;.settings.inventory_element_id );
-	if ( inv_msg_element && ( inv_msg_element.innerHTML ).includes( am&mvte:product:id;.settings.invalid_msg ) && waitlist_form ) waitlist_form.style.display = 'none';
-}
-
-// Ajax Call
-if ( waitlist_form && waitlist_api ) {
-	waitlist_form.onsubmit = function onSubmit( form ) {
-		form.preventDefault();
-		var Waitlist_Product_Code = document.getElementsByName( 'Waitlist_Product_Code' )[0].value;
-		var Waitlist_Variant_ID = document.getElementsByName( 'Waitlist_Variant_ID' )[0].value;
-		var Waitlist_Email = document.getElementsByName( 'Waitlist_Email' )[0].value;
-
-		var waitlist_data = 'WaitlistFunction=Waitlist_Add&Product_Code=' + encodeURIComponent( Waitlist_Product_Code ) + '&Variant_ID=' + encodeURIComponent( Waitlist_Variant_ID ) + '&Email=' + encodeURIComponent( Waitlist_Email );
-
-		var wishlist_call = new XMLHttpRequest();
-		wishlist_call.open('POST', waitlist_api, true);
-		wishlist_call.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-
-		wishlist_call.onload = function() {
-			if (this.status === 200) {
-				var wishlist_return = JSON.parse( this.responseText );
-				if ( wishlist_return.success === 0 ) {
-					watilist_ajax_msg.textContent = wishlist_return.error_message;
-				} else {
-					watilist_ajax_msg.textContent = 'Thank you for signing up!';
-				}
-			} else {
-				watilist_ajax_msg.textContent = 'An error has occurred.';
-			}
-		};
-		wishlist_call.send( waitlist_data );
+	if (stock_level === 'out' && waitlist_form)
+	{
+		waitlist_form.style.display = 'block';
 	}
-}
+
+	if (waitlist_form && waitlist_api)
+	{
+		waitlist_form.addEventListener('submit', function(e) {
+			e.preventDefault();
+
+			var waitlist_data = new FormData(waitlist_form);
+			waitlist_data.append('WaitlistFunction', 'Waitlist_Add');
+			waitlist_data.append('Product_Code', waitlist_data.get('Waitlist_Product_Code'));
+			waitlist_data.append('Variant_ID', waitlist_data.get('Waitlist_Variant_ID'));
+			waitlist_data.append('Email', waitlist_data.get('Waitlist_Email'));
+			waitlist_data.delete('Action');
+
+			var waitlist_call = new XMLHttpRequest();
+			waitlist_call.open('POST', waitlist_api, true);
+
+			waitlist_call.onload = function()
+			{
+				if (waitlist_ajax_msg)
+				{
+					waitlist_ajax_msg.classList.remove('x-messages');
+					waitlist_ajax_msg.classList.remove('x-messages--error');
+					waitlist_ajax_msg.classList.remove('x-messages--success');
+
+					if (this.status === 200)
+					{
+						var waitlist_return = JSON.parse(this.responseText);
+
+						if (waitlist_return.success === 0)
+						{
+							waitlist_ajax_msg.classList.add('x-messages', 'x-messages--error');
+							waitlist_ajax_msg.innerHTML = waitlist_return.error_message;
+						}
+						else
+						{
+							waitlist_ajax_msg.innerHTML = 'Thank you for signing up!';
+							waitlist_ajax_msg.classList.add('x-messages', 'x-messages--success');
+							waitlist_form.reset();
+						}
+					}
+					else
+					{
+						waitlist_ajax_msg.classList.add('x-messages', 'x-messages--error');
+						waitlist_ajax_msg.innerHTML = 'An error has occurred.';
+					}
+
+					setTimeout(function () {
+						waitlist_ajax_msg.innerHTML = '';
+						waitlist_ajax_msg.classList = '';
+					}, 5000);
+				}
+			};
+
+			waitlist_call.send(waitlist_data);
+		});
+	}
 </script>
