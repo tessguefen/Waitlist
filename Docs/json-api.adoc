@@ -12,8 +12,10 @@ This function is used to query one or more waitlists from the module.
 
 The following request parameters can also be used to sort/ filter.
 
+Please reference https://docs.miva.com/json-api/list-load-query-overview[Miva's List Load Query Overview].
+
 [[___waitlistLoadQueryParameters]]
-==== Request Parameters
+==== Request Parameters (Sort/ Filters)
 
 [stripes=odd,options="header",cols="25%,25%,50%"]
 |===
@@ -43,6 +45,7 @@ The following request parameters can also be used to sort/ filter.
 	"Module_Code": "TGWaitlist",
 	"Module_Function": "Waitlist_Load_Query",
 	"Sort": "email",
+	"Count": 25,
 	"Filter":[  
 		{  
 			"name":"search",
@@ -137,10 +140,10 @@ This function is used to add a new waitlist entry. This bypasses any pre-logic (
 [stripes=odd,options="header",cols="25%,25%,50%"]
 |===
 |Key|Type|Description
-|Customer_ID|Number|Customer ID
-|Email|String|Email
-|Product_Code|String|Product Code
-|Variant_ID|Number|Variant ID
+|Customer_ID|Number|Customer ID (Optional)
+|Email|String|Email (Required)
+|Product_Code|String|Product Code (Required)
+|Variant_ID|Number|Variant ID (Optional,but if the product requires a variant, it is required.)
 |===
 
 [[__waitlistAddJSONExampleRequest]]

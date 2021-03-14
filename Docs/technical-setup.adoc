@@ -124,8 +124,9 @@ This will enable the Waitlist form to be asynchronously sent, so your user does 
 
 	if (waitlist_form && waitlist_api)
 	{
-		waitlist_form.onsubmit = function onSubmit (form) {
-			form.preventDefault();
+		waitlist_form.addEventListener('submit', function(e) {
+			e.preventDefault();
+
 			var waitlist_data = new FormData(waitlist_form);
 			waitlist_data.append('WaitlistFunction', 'Waitlist_Add');
 			waitlist_data.append('Product_Code', waitlist_data.get('Waitlist_Product_Code'));
@@ -140,7 +141,10 @@ This will enable the Waitlist form to be asynchronously sent, so your user does 
 			{
 				if (waitlist_ajax_msg)
 				{
-					waitlist_ajax_msg.classList = '';
+					waitlist_ajax_msg.classList.remove('x-messages');
+					waitlist_ajax_msg.classList.remove('x-messages--error');
+					waitlist_ajax_msg.classList.remove('x-messages--success');
+
 					if (this.status === 200)
 					{
 						var waitlist_return = JSON.parse(this.responseText);
@@ -171,7 +175,7 @@ This will enable the Waitlist form to be asynchronously sent, so your user does 
 			};
 
 			waitlist_call.send(waitlist_data);
-		};
+		});
 	}
 </script>
 ----

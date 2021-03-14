@@ -21,7 +21,9 @@ l.settings:waitlist:product_id
 l.settings:waitlist:variant_id
 ----
 
-Example template code, utilizing a call to reCAPTCHA (assuming the `g-recaptcha-response` came through)
+Example template code, utilizing a call to reCAPTCHA (assuming the `g-recaptcha-response` came through).
+
+Please note this is just an example. You would need to make sure you have implemented the proper reCAPTCHA portions in your form submission.
 
 [source,xml]
 ----
