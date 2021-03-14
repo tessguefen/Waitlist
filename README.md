@@ -5,4 +5,4 @@ Last Updated: 03/13/2021
 
 Please see [Waitlist Documentation](Docs/TGWaitlist-documentation.pdf)
 
-![](Docs/images/form_submssion.gif)
+![](Docs/images/form_submission.gif)
