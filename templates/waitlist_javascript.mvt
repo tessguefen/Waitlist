@@ -23,22 +23,22 @@
 			waitlist_data.append('Email', waitlist_data.get('Waitlist_Email'));
 			waitlist_data.delete('Action');
 
-			var wishlist_call = new XMLHttpRequest();
-			wishlist_call.open('POST', waitlist_api, true);
+			var waitlist_call = new XMLHttpRequest();
+			waitlist_call.open('POST', waitlist_api, true);
 
-			wishlist_call.onload = function()
+			waitlist_call.onload = function()
 			{
 				if (waitlist_ajax_msg)
 				{
 					waitlist_ajax_msg.classList = '';
 					if (this.status === 200)
 					{
-						var wishlist_return = JSON.parse(this.responseText);
+						var waitlist_return = JSON.parse(this.responseText);
 
-						if (wishlist_return.success === 0)
+						if (waitlist_return.success === 0)
 						{
 							waitlist_ajax_msg.classList.add('x-messages', 'x-messages--error');
-							waitlist_ajax_msg.innerHTML = wishlist_return.error_message;
+							waitlist_ajax_msg.innerHTML = waitlist_return.error_message;
 						}
 						else
 						{
@@ -60,7 +60,7 @@
 				}
 			};
 
-			wishlist_call.send(waitlist_data);
+			waitlist_call.send(waitlist_data);
 		};
 	}
 </script>
