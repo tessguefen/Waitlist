@@ -48,6 +48,12 @@ You may now utilize the item on the pages you assign it to.
 [[_upgrading]]
 === Upgrading
 
+If upgrading from a version below *1.004*, please change the following page codes:
+
+* `WatilistEmailTemplate` to `WaitlistEmailTemplate`
+* `WatilistEmailLogic` to `WaitlistEmailLogic` (if applicable)
+
+
 If upgrading from a version below *2.000*, the following JSON API functions are now no longer supported:
 
 * Waitlist_Load_Email

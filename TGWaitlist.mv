@@ -14,7 +14,7 @@
 	<MvASSIGN NAME = "l.module:version"		VALUE = "2.000">
 	<MvASSIGN NAME = "l.module:api_ver"		VALUE = "9.12">
 	<MvASSIGN NAME = "l.module:description"	VALUE = "Make it easy for customers to quickly sign up for email alerts on out of stock products. When products are back in stock, emails will be automatically sent out by a Scheduled Task. This works on Products & Variants.">
-	<MvASSIGN NAME = "l.module:features"	VALUE = "data_store, not_prod,system, vis_system, json, clientside, scheduledtask, component, json_api">
+	<MvASSIGN NAME = "l.module:features"	VALUE = "data_store, not_prod, system, vis_system, json, clientside, scheduledtask, component, json_api">
 </MvFUNCTION>
 
 <MvCOMMENT>
@@ -118,6 +118,7 @@
 	<MvASSIGN NAME = "l.task:module_id"		VALUE = "{ l.module:id }">
 	<MvASSIGN NAME = "l.task:operation"		VALUE = "waitlist_trigger">
 	<MvASSIGN NAME = "l.task:config"		VALUE = "">
+	<MvASSIGN NAME = "l.task:loglevel"		VALUE = "I">
 
 	<MvIF EXPR = "{ NOT [ g.Module_Feature_SCH_DB ].ScheduledTask_Insert( l.task ) }">
 		<MvFUNCTIONRETURN VALUE = 0>
