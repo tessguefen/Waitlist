@@ -11,7 +11,7 @@
 	<MvASSIGN NAME = "l.module:code"		VALUE = "TGWaitlist">
 	<MvASSIGN NAME = "l.module:name"		VALUE = "Waitlist">
 	<MvASSIGN NAME = "l.module:provider"	VALUE = "Tess Guefen">
-	<MvASSIGN NAME = "l.module:version"		VALUE = "2.000">
+	<MvASSIGN NAME = "l.module:version"		VALUE = "2.001">
 	<MvASSIGN NAME = "l.module:api_ver"		VALUE = "9.12">
 	<MvASSIGN NAME = "l.module:description"	VALUE = "Make it easy for customers to quickly sign up for email alerts on out of stock products. When products are back in stock, emails will be automatically sent out by a Scheduled Task. This works on Products & Variants.">
 	<MvASSIGN NAME = "l.module:features"	VALUE = "data_store, not_prod, system, vis_system, json, clientside, scheduledtask, component, json_api">
@@ -1070,12 +1070,10 @@
 		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'MOD-SYS-TGW-0033', 'Invalid Product Code.' ) }">
 	</MvIF>
 
-	<MvIF EXPR = "{ l.variant_id EQ 0 }">
-		<MvIF EXPR = "{ [ g.Module_Library_DB ].ProductVariantList_Load_Product( l.product:id, l.productvariants ) }">
-			<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'MOD-SYS-TGW-0034', 'A valid variant was not found.' ) }">
+	<MvIF EXPR = "{ l.variant_id GT 0 }">
+		<MvIF EXPR = "{ NOT [ g.Module_Library_DB ].ProductVariantPartList_Load_Variant( l.product:id, l.variant_id, l.productvariantparts ) }">
+			<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'MOD-SYS-TGW-0035', 'Invalid variant.' ) }">
 		</MvIF>
-	<MvELSEIF EXPR = "{ NOT [ g.Module_Library_DB ].ProductVariantPartList_Load_Variant( l.product:id, l.variant_id, l.productvariantparts ) }">
-		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'MOD-SYS-TGW-0035', 'Invalid variant.' ) }">
 	</MvIF>
 
 	<MvASSIGN NAME = "l.waitlist:product_id"	VALUE = "{ l.product:id }">
@@ -1519,12 +1517,10 @@
 			<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error( 'MOD-SYS-TGW-0047', 'Invalid Product Code.' ) }">
 		</MvIF>
 	
-		<MvIF EXPR = "{ l.variant_id EQ 0 }">
-			<MvIF EXPR = "{ [ g.Module_Library_DB ].ProductVariantList_Load_Product( l.product:id, l.productvariants ) }">
-				<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error( 'MOD-SYS-TGW-0048', 'A valid variant was not found.' ) }">
+		<MvIF EXPR = "{ l.variant_id GT 0 }">
+			<MvIF EXPR = "{ NOT [ g.Module_Library_DB ].ProductVariantPartList_Load_Variant( l.product:id, l.variant_id, l.productvariantparts ) }">
+				<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error( 'MOD-SYS-TGW-0049', 'Invalid variant.' ) }">
 			</MvIF>
-		<MvELSEIF EXPR = "{ NOT [ g.Module_Library_DB ].ProductVariantPartList_Load_Variant( l.product:id, l.variant_id, l.productvariantparts ) }">
-			<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error( 'MOD-SYS-TGW-0049', 'Invalid variant.' ) }">
 		</MvIF>
 	
 		<MvASSIGN NAME = "l.waitlist:product_id"	VALUE = "{ l.product:id }">
