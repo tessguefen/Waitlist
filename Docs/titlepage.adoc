@@ -1,7 +1,7 @@
 :title-page:
 = Waitlist Documentation
-Module Version: 2.001
-Last Updated: 04/16/2021
+Module Version: 2.002
+Last Updated: 10/10/2021
 :toc:
 :toclevels: 3
 

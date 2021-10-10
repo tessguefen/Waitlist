@@ -1,5 +1,6 @@
 <mvt:if expr="g.Waitlist_Error"><div class="x-messages x-messages--error">Error: &mvte:global:Waitlist_Error;</div></mvt:if>
 <mvt:if expr="g.Waitlist_Message"><div class="x-messages x-messages--success">&mvte:global:Waitlist_Message;</div></mvt:if>
+<mvt:if expr="ISNULL g.Waitlist_Quantity"><mvt:assign name="g.Waitlist_Quantity" value="1" /></mvt:if>
 
 <form name="waitlist_add" method="post" action="&mvte:product:link;"<mvt:if expr="ISNULL g.Waitlist_Error"> style="display:none;"</mvt:if>>
 	<div class="x-messages x-messages--info">Sign up with your email to be notified when this product is back in stock!</div>
@@ -7,8 +8,17 @@
 	<input type="hidden" name="Action" value="WaitlistAdd" />
 	<input type="hidden" name="Waitlist_Product_Code" value="&mvt:product:code;" />
 	<input type="hidden" name="Waitlist_Variant_ID" id="jsWaitlist_Variant_ID" value="&mvt:attributemachine:variant_id;" />
-	<div class="c-control-group">
-		<input type="email" name="Waitlist_Email" value="&mvte:global:Waitlist_Email;" placeholder="Email" class="c-form-input c-control-group__field" />
-		<input type="submit" value="Sign up" class="c-button c-control-group__button" />
+	<div class="u-flex o-layout--no-wrap o-layout--align-bottom">
+		<div class="waitlist__field o-layout--grow" style="padding-right: 0.75rem;">
+			<label for="Waitlist_Email" class="c-form-label is-required">Email</label><br>
+			<input type="email" id="Waitlist_Email" name="Waitlist_Email" value="&mvte:global:Waitlist_Email;" placeholder="Email" class="c-form-input" required style="margin-bottom: 0;" />
+		</div>
+		<div class="waitlist__field" style="padding-right: 0.75rem;">
+			<label for="Waitlist_Quantity" class="c-form-label">Quantity</label><br>
+			<input type="number" name="Waitlist_Quantity" value="&mvte:global:Waitlist_Quantity;" placeholder="Quantity" class="c-form-input" style="margin-bottom: 0; width: auto;" />
+		</div>
+		<div class="waitlist__field">
+			<input type="submit" value="Sign up" class="c-button c-control-group__button" />
+		</div>
 	</div>
 </form>

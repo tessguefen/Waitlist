@@ -80,6 +80,7 @@ l.settings:waitlist:product:price
 l.settings:waitlist:product:taxable
 l.settings:waitlist:product:weight
 l.settings:waitlist:product_id
+l.settings:waitlist:quantity
 l.settings:waitlist:time_added
 l.settings:waitlist:variant_id
 l.settings:waitlist:variants[x]:part_id

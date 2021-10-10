@@ -60,7 +60,8 @@ Waitlist_Sent_Batchlist.prototype.onCreateRootColumnList = function()
 			.SetAdvancedSearchEnabled(false)
 			.SetDisplayInMenu(false)
 			.SetDisplayInList(false)
-			.SetSortByField( '' )
+			.SetSortByField( '' ),
+		new MMBatchList_Column_Numeric(		'Quantity',				'quantity',		'quantity', 0)
 	];
 
 	return columnlist;

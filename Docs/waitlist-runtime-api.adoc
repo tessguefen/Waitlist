@@ -20,6 +20,7 @@ Utilizing the <<__waitlistAPIURL,Waitlist API URL>>, you can make the following 
 |Product_Code|String|Product Code for the Waitlist Sign up (Required)
 |Email|String|Email for the Waitlist Sign up (Required)
 |Variant_ID|Number|Variant ID for the waitlist sign up. Optional,but if the product requires a variant, it is required.
+|Quantity|Number|Quantity for the waitlist sign up. Optional, defaults to 1.
 |===
 
 This will run through the <<_preLogicTemplate,Pre-Logic Template>> (if applicable). If you need other fields to be passed through (like a reCAPTCHA field), make sure to pass it through here.
@@ -29,7 +30,7 @@ This will run through the <<_preLogicTemplate,Pre-Logic Template>> (if applicabl
 
 [source,json]
 ----
-[Waitlist API URL]&WaitlistFunction=Waitlist_Add&Product_Code=My_Product_Code&Email=myemail@website.com&Variant_ID=22
+[Waitlist API URL]&WaitlistFunction=Waitlist_Add&Product_Code=My_Product_Code&Email=myemail@website.com&Variant_ID=22&Quantity=1
 ----
 
 [[___waitlistRuntimeAPIExampleResponse]]
