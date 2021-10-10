@@ -63,3 +63,5 @@ If upgrading from a version below *2.000*, the following JSON API functions are 
 
 A new template can be added to run some logic before the waitlist add. <<_preLogicTemplate,See More Details.>>
 
+If upgrading to *2.002*, Quantity can now be passed. It is not required, and will default to *1* when applicable.
+

@@ -3,7 +3,7 @@
 <MvCOMMENT>
 |
 | Prefix         : MOD-SYS-TGW-
-| Next Error Code: 60
+| Next Error Code: 64
 |
 </MvCOMMENT>
 
@@ -11,7 +11,7 @@
 	<MvASSIGN NAME = "l.module:code"		VALUE = "TGWaitlist">
 	<MvASSIGN NAME = "l.module:name"		VALUE = "Waitlist">
 	<MvASSIGN NAME = "l.module:provider"	VALUE = "Tess Guefen">
-	<MvASSIGN NAME = "l.module:version"		VALUE = "2.001">
+	<MvASSIGN NAME = "l.module:version"		VALUE = "2.002">
 	<MvASSIGN NAME = "l.module:api_ver"		VALUE = "9.12">
 	<MvASSIGN NAME = "l.module:description"	VALUE = "Make it easy for customers to quickly sign up for email alerts on out of stock products. When products are back in stock, emails will be automatically sent out by a Scheduled Task. This works on Products & Variants.">
 	<MvASSIGN NAME = "l.module:features"	VALUE = "data_store, not_prod, system, vis_system, json, clientside, scheduledtask, component, json_api">
@@ -32,7 +32,8 @@
 									product_id		' $ [ g.Module_Library_Native_DBAPI ].DB_Type_NUMBER( 0, 0 )	$ ',
 									variant_id		' $ [ g.Module_Library_Native_DBAPI ].DB_Type_NUMBER( 0, 0 )	$ ',
 				 					email			' $ [ g.Module_Library_Native_DBAPI ].DB_Type_CHAR( 255 )		$ ',
-				 					cust_id			' $ [ g.Module_Library_Native_DBAPI ].DB_Type_NUMBER( 0, 0 )	$ '
+				 					cust_id			' $ [ g.Module_Library_Native_DBAPI ].DB_Type_NUMBER( 0, 0 )	$ ',
+									quantity		' $ [ g.Module_Library_Native_DBAPI ].DB_Type_INTEGER() 		$ '
 								)' }">
 	<MvIF EXPR = "{ g.MvQUERY_Error }">
 		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'MOD-SYS-TGW-0001', g.MvQUERY_Error ) }">
@@ -53,7 +54,8 @@
 									product_id		' $ [ g.Module_Library_Native_DBAPI ].DB_Type_NUMBER( 0, 0 )	$ ',
 									variant_id		' $ [ g.Module_Library_Native_DBAPI ].DB_Type_NUMBER( 0, 0 )	$ ',
 				 					email			' $ [ g.Module_Library_Native_DBAPI ].DB_Type_CHAR( 255 )		$ ',
-				 					cust_id			' $ [ g.Module_Library_Native_DBAPI ].DB_Type_NUMBER( 0, 0 )	$ '
+				 					cust_id			' $ [ g.Module_Library_Native_DBAPI ].DB_Type_NUMBER( 0, 0 )	$ ',
+									quantity		' $ [ g.Module_Library_Native_DBAPI ].DB_Type_INTEGER() 		$ '
 								)' }">
 	<MvIF EXPR = "{ g.MvQUERY_Error }">
 		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'MOD-SYS-TGW-0003', g.MvQUERY_Error ) }">
@@ -160,6 +162,44 @@
 			 QUERY	= "{ 'CREATE UNIQUE INDEX ' $ g.Store_Table_Prefix $ 'TGWaitlist_Sent_1 ON ' $ g.Store_Table_Prefix $ 'TGWaitlist_Sent ( id )' }">
 		<MvIF EXPR = "{ g.MvQUERY_Error }">
 			<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'MOD-SYS-TGW-0008', g.MvQUERY_Error ) }">
+		</MvIF>
+	</MvIF>
+
+	<MvIF EXPR = "{ l.version LT 2.002 }">
+		<MvQUERY NAME	= "Merchant"
+				 QUERY	= "{ 'ALTER TABLE ' $ g.Store_Table_Prefix $ 'TGWaitlist 
+							  ADD
+							  (
+								quantity	' $ [ g.Module_Library_Native_DBAPI ].DB_Type_INTEGER()	$ '
+							  )' }">
+		<MvIF EXPR = "{ g.MvQUERY_Error }">
+			<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'MOD-SYS-TGW-0060', g.MvQUERY_Error ) }">
+		</MvIF>
+
+		<MvASSIGN NAME = "l.default_quantity" VALUE = 1>
+
+		<MvQUERY NAME	= "Merchant"
+				QUERY	= "{ 'UPDATE ' $ g.Store_Table_Prefix $ 'TGWaitlist SET quantity = ?' }"
+				FIELDS	= "l.default_quantity">
+		<MvIF EXPR = "{ g.MvQUERY_Error }">
+			<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'MOD-SYS-TGW-0061', g.MvQUERY_Error ) }">
+		</MvIF>
+
+		<MvQUERY NAME	= "Merchant"
+				 QUERY	= "{ 'ALTER TABLE ' $ g.Store_Table_Prefix $ 'TGWaitlist_Sent 
+							  ADD
+							  (
+								quantity	' $ [ g.Module_Library_Native_DBAPI ].DB_Type_INTEGER()	$ '
+							  )' }">
+		<MvIF EXPR = "{ g.MvQUERY_Error }">
+			<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'MOD-SYS-TGW-0062', g.MvQUERY_Error ) }">
+		</MvIF>
+
+		<MvQUERY NAME	= "Merchant"
+				QUERY	= "{ 'UPDATE ' $ g.Store_Table_Prefix $ 'TGWaitlist_Sent SET quantity = ?' }"
+				FIELDS	= "l.default_quantity">
+		<MvIF EXPR = "{ g.MvQUERY_Error }">
+			<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'MOD-SYS-TGW-0063', g.MvQUERY_Error ) }">
 		</MvIF>
 	</MvIF>
 
@@ -555,6 +595,7 @@
 	<MvASSIGN NAME = "l.waitlist:variant_id"	VALUE = "{ TGWaitlist.d.variant_id }">
 	<MvASSIGN NAME = "l.waitlist:email"			VALUE = "{ TGWaitlist.d.email }">
 	<MvASSIGN NAME = "l.waitlist:cust_id" 		VALUE = "{ TGWaitlist.d.cust_id }">
+	<MvASSIGN NAME = "l.waitlist:quantity" 		VALUE = "{ TGWaitlist.d.quantity }">
 </MvFUNCTION>
 
 <MvFUNCTION NAME = "Waitlist_Load_ID" PARAMETERS = "id, waitlist var" STANDARDOUTPUTLEVEL = ""  ERROROUTPUTLEVEL = "">
@@ -580,16 +621,17 @@
 <MvFUNCTION NAME = "Waitlist_Insert" PARAMETERS = "waitlist var" STANDARDOUTPUTLEVEL = ""  ERROROUTPUTLEVEL = "">
 	<MvASSIGN NAME = "l.waitlist:id" VALUE = "{ [ g.Module_Library_DB ].StoreKey_Generate( 'TGWaitlist' ) }">
 	
-	<MvIF EXPR = "{ ISNULL l.waitlist:time_added }">	<MvASSIGN NAME = "l.waitlist:time_added"	VALUE = "{ s.dyn_time_t }">	</MvIF>
-	<MvIF EXPR = "{ ISNULL l.waitlist:variant_id }">	<MvASSIGN NAME = "l.waitlist:variant_id"	VALUE = 0>					</MvIF>
-	<MvIF EXPR = "{ ISNULL l.waitlist:cust_id }">		<MvASSIGN NAME = "l.waitlist:cust_id"		VALUE = 0>					</MvIF>
+	<MvIF EXPR = "{ ISNULL l.waitlist:time_added }">								<MvASSIGN NAME = "l.waitlist:time_added"	VALUE = "{ s.dyn_time_t }">	</MvIF>
+	<MvIF EXPR = "{ ISNULL l.waitlist:variant_id }">								<MvASSIGN NAME = "l.waitlist:variant_id"	VALUE = 0>					</MvIF>
+	<MvIF EXPR = "{ ISNULL l.waitlist:cust_id }">									<MvASSIGN NAME = "l.waitlist:cust_id"		VALUE = 0>					</MvIF>
+	<MvIF EXPR = "{ ISNULL l.waitlist:quantity OR l.waitlist:quantity LE 0 }">		<MvASSIGN NAME = "l.waitlist:quantity"		VALUE = 1>					</MvIF>
 
 	<MvQUERY NAME	= "Merchant"
 			 QUERY	= "{ 'INSERT INTO ' $ g.Store_Table_Prefix $ 'TGWaitlist
-			 			  ( id, time_added, product_id, variant_id, email, cust_id )
+			 			  ( id, time_added, product_id, variant_id, email, cust_id, quantity )
 						  VALUES
-						  ( ?, ?, ?, ?, ?, ? )' }"
-			 FIELDS	= "l.waitlist:id, l.waitlist:time_added, l.waitlist:product_id, l.waitlist:variant_id, l.waitlist:email, l.waitlist:cust_id">
+						  ( ?, ?, ?, ?, ?, ?, ? )' }"
+			 FIELDS	= "l.waitlist:id, l.waitlist:time_added, l.waitlist:product_id, l.waitlist:variant_id, l.waitlist:email, l.waitlist:cust_id, l.waitlist:quantity">
 	<MvIF EXPR = "{ g.MvQUERY_Error }">
 		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'MOD-SYS-TGW-0013', g.MvQUERY_Error ) }">
 	</MvIF>
@@ -673,6 +715,7 @@
 	<MvASSIGN NAME = "l.waitlist_sent:variant_id"	VALUE = "{ TGWaitlist_Sent.d.variant_id }">
 	<MvASSIGN NAME = "l.waitlist_sent:email"		VALUE = "{ TGWaitlist_Sent.d.email }">
 	<MvASSIGN NAME = "l.waitlist_sent:cust_id" 		VALUE = "{ TGWaitlist_Sent.d.cust_id }">
+	<MvASSIGN NAME = "l.waitlist_sent:quantity" 	VALUE = "{ TGWaitlist_Sent.d.quantity }">
 </MvFUNCTION>
 
 <MvFUNCTION NAME = "Waitlist_Sent_Load_ID" PARAMETERS = "id, waitlist_sent var" STANDARDOUTPUTLEVEL = ""  ERROROUTPUTLEVEL = "">
@@ -708,11 +751,11 @@
 
 	<MvQUERY NAME	= "Merchant"
 			 QUERY	= "{ 'INSERT INTO ' $ g.Store_Table_Prefix $ 'TGWaitlist_Sent
-			 			  ( id, time_added, time_sent, product_id, variant_id, email, cust_id )
+			 			  ( id, time_added, time_sent, product_id, variant_id, email, cust_id, quantity )
 						  VALUES
-						  ( ?, ?, ?, ?, ?, ?, ? )' }"
+						  ( ?, ?, ?, ?, ?, ?, ?, ? )' }"
 			 FIELDS	= "l.waitlist_sent:id, l.waitlist_sent:time_added, l.waitlist_sent:time_sent, l.waitlist_sent:product_id,
-			 		   l.waitlist_sent:variant_id, l.waitlist_sent:email, l.waitlist_sent:cust_id">
+			 		   l.waitlist_sent:variant_id, l.waitlist_sent:email, l.waitlist_sent:cust_id, l.waitlist_sent:quantity">
 	<MvIF EXPR = "{ g.MvQUERY_Error }">
 		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'MOD-SYS-TGW-0022', g.MvQUERY_Error ) }">
 	</MvIF>
@@ -771,7 +814,7 @@
 
 	<MvOPENVIEW NAME	= "Merchant"
 				VIEW 	= "TGWaitlist"
-				QUERY 	= "{ 'SELECT * FROM ' $ g.Store_Table_Prefix $ 'TGWaitlist GROUP BY product_id, variant_id, cust_id ORDER BY product_id ASC, variant_id ASC' }">
+				QUERY 	= "{ 'SELECT * FROM ' $ g.Store_Table_Prefix $ 'TGWaitlist GROUP BY product_id, variant_id, cust_id, quantity ORDER BY product_id ASC, variant_id ASC' }">
 	<MvIF EXPR = "{ g.MvOPENVIEW_Error }">
 		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'MOD-SYS-TGW-0025', g.MvOPENVIEW_Error ) }">
 	</MvIF>
@@ -798,8 +841,8 @@
 <MvFUNCTION NAME = "Waitlist_Load_Product_Customer_Groups" PARAMETERS = "waitlist var, waitlists var" STANDARDOUTPUTLEVEL = "">
 	<MvOPENVIEW NAME	= "Merchant"
 				VIEW 	= "TGWaitlist"
-				QUERY 	= "{ 'SELECT * FROM ' $ g.Store_Table_Prefix $ 'TGWaitlist WHERE product_id = ? AND variant_id = ? AND cust_id = ?' }"
-				FIELDS	= "l.waitlist:product_id, l.waitlist:variant_id, l.waitlist:cust_id">
+				QUERY 	= "{ 'SELECT * FROM ' $ g.Store_Table_Prefix $ 'TGWaitlist WHERE product_id = ? AND variant_id = ? AND cust_id = ? AND quantity = ?' }"
+				FIELDS	= "l.waitlist:product_id, l.waitlist:variant_id, l.waitlist:cust_id, l.waitlist:quantity">
 	<MvIF EXPR = "{ g.MvOPENVIEW_Error }">
 		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'MOD-SYS-TGW-0026', g.MvOPENVIEW_Error ) }">
 	</MvIF>
@@ -864,9 +907,9 @@
 	<MvASSIGN NAME = "l.continue"			VALUE = 0>
 
 	<MvIF EXPR = "{ l.waitlist:variant_id GT 0 }">
-		<MvDO FILE = "{ g.Module_Feature_INV_RT }" NAME = "l.continue" VALUE = "{ Inventory_Is_Available_Variant( l.waitlist:product, l.waitlist:variant_id, 1 ) }">
+		<MvDO FILE = "{ g.Module_Feature_INV_RT }" NAME = "l.continue" VALUE = "{ Inventory_Is_Available_Variant( l.waitlist:product, l.waitlist:variant_id, l.waitlist:quantity ) }">
 	<MvELSE>
-		<MvDO FILE = "{ g.Module_Feature_INV_RT }" NAME = "l.continue" VALUE = "{ Inventory_Is_Available_LowLevel( l.waitlist:product, 1 ) }">
+		<MvDO FILE = "{ g.Module_Feature_INV_RT }" NAME = "l.continue" VALUE = "{ Inventory_Is_Available_LowLevel( l.waitlist:product, l.waitlist:quantity ) }">
 	</MvIF>
 
 	<MvIF EXPR = "{ NOT Waitlist_Logic_Override( l.waitlist, l.continue ) }">
@@ -1024,7 +1067,7 @@
 
 	<MvDO FILE = "{ g.Module_Library_Utilities }" NAME = "l.null"  VALUE = "{ SendEmail( l.waitlist:email, l.from, '', l.subject, l.email_headers, l.message ) }">
 
-	<MvASSIGN NAME = "l.success" VALUE = "{ [ g.Module_Admin ].Admin_Log_Action( 'MOD-SYS-TGW-0030', 'Waitlist Email triggered to' $ l.waitlist:email ) }">
+	<MvASSIGN NAME = "l.success" VALUE = "{ [ g.Module_Admin ].Admin_Log_Action( 'MOD-SYS-TGW-0030', 'Waitlist Email triggered to ' $ l.waitlist:email ) }">
 
 	<MvIF EXPR = "{ NOT Waitlist_Sent_Insert( l.waitlist ) }">
 		<MvFUNCTIONRETURN VALUE = 0>
@@ -1043,7 +1086,7 @@
 	<MvASSIGN NAME = "g.Waitlist_Error"		VALUE = "">
 	<MvASSIGN NAME = "g.Waitlist_Message"	VALUE = "">
 
-	<MvIF EXPR = "{ NOT Waitlist_Form_Add_Runtime_LowLevel( g.Waitlist_Product_Code, g.Waitlist_Variant_ID, g.Waitlist_Email, g.Basket:cust_id, 1 ) }">
+	<MvIF EXPR = "{ NOT Waitlist_Form_Add_Runtime_LowLevel( g.Waitlist_Product_Code, g.Waitlist_Variant_ID, g.Waitlist_Email, g.Basket:cust_id, 1, g.Waitlist_Quantity ) }">
 		<MvASSIGN NAME = "g.Waitlist_Error" VALUE = "{ g.Error_Message }">
 		<MvFUNCTIONRETURN VALUE = 1>
 	</MvIF>
@@ -1053,12 +1096,13 @@
 	<MvFUNCTIONRETURN VALUE = 1>
 </MvFUNCTION>
 
-<MvFUNCTION NAME = "Waitlist_Form_Add_Runtime_LowLevel" PARAMETERS = "product_code, variant_id, email, cust_id, prelogic" STANDARDOUTPUTLEVEL = "">
+<MvFUNCTION NAME = "Waitlist_Form_Add_Runtime_LowLevel" PARAMETERS = "product_code, variant_id, email, cust_id, prelogic, quantity" STANDARDOUTPUTLEVEL = "">
 	<MvASSIGN NAME = "l.product_code"	VALUE = "{ trim( l.product_code ) }">
 	<MvASSIGN NAME = "l.variant_id"		VALUE = "{ int( l.variant_id ) }">
 	<MvASSIGN NAME = "l.email"			VALUE = "{ trim( l.email ) }">
 	<MvASSIGN NAME = "l.cust_id"		VALUE = "{ int( l.cust_id ) }">
 	<MvASSIGN NAME = "l.prelogic"		VALUE = "{ int( l.prelogic ) }">
+	<MvASSIGN NAME = "l.quantity"		VALUE = "{ int( l.quantity ) }">
 
 	<MvIF EXPR = "{ NOT [ g.Module_Admin ].Validate_Email( l.email ) }">
 		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'MOD-SYS-TGW-0031', 'Please enter a valid email.' ) }">
@@ -1080,6 +1124,7 @@
 	<MvASSIGN NAME = "l.waitlist:variant_id"	VALUE = "{ l.variant_id }">
 	<MvASSIGN NAME = "l.waitlist:email"			VALUE = "{ l.email }">
 	<MvASSIGN NAME = "l.waitlist:cust_id" 		VALUE = "{ l.cust_id }">
+	<MvASSIGN NAME = "l.waitlist:quantity" 		VALUE = "{ l.quantity }">
 
 	<MvIF EXPR = "{ l.waitlist:cust_id GT 0 }">
 		<MvIF EXPR = "{ Waitlist_Check_Customer( l.waitlist:product_id, l.waitlist:variant_id, l.waitlist:cust_id, l.existing_waitlist ) }">
@@ -1205,10 +1250,10 @@
 	<MvEVAL EXPR = "{ [ g.Module_Library_DB ].SQL_Query_LEFT_OUTER_JOIN( l.search_query, 'tgw', g.Store_Table_Prefix $ 'Products', 'pv', 'pvp.part_id = pv.id', '' ) }">
 	
 	<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Filter( l.search_query, l.filter,
-													 'id:tgw.id,time_added:tgw.time_added,product_id:tgw.product_id,variant_id:tgw.variant_id,email:tgw.email,cust_id:tgw.cust_id,product_code:p.code,variant_code:pv.code,product_name:p.name,variant_name:pv.name' ) }">
+													 'id:tgw.id,time_added:tgw.time_added,product_id:tgw.product_id,variant_id:tgw.variant_id,email:tgw.email,cust_id:tgw.cust_id,quantity:tgw.quantity,product_code:p.code,variant_code:pv.code,product_name:p.name,variant_name:pv.name' ) }">
 
 	<MvEVAL EXPR = "{ [ g.Module_Library_DB ].SQL_Query_OrderBy_Fields( l.search_query, l.sort,
-																		'id:tgw.id,time_added:tgw.time_added,product_id:tgw.product_id,variant_id:tgw.variant_id,email:tgw.email,cust_id:tgw.cust_id,product_code:p.code,variant_code:pv.code,product_name:p.name,variant_name:pv.name',
+																		'id:tgw.id,time_added:tgw.time_added,product_id:tgw.product_id,variant_id:tgw.variant_id,email:tgw.email,cust_id:tgw.cust_id,quantity:tgw.quantity,product_code:p.code,variant_code:pv.code,product_name:p.name,variant_name:pv.name',
 																		'tgw.time_added' ) }">
 
 	<MvASSIGN NAME = "l.search_sql" VALUE = "{ [ g.Module_Library_DB].SQL_Query_Build( l.search_query, l.search_fields ) }">
@@ -1245,6 +1290,7 @@
 				"product_name":		"<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode( TGWaitlist.d.product_name ) }">",
 				"variant_code":		"<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode( TGWaitlist.d.variant_code ) }">",
 				"variant_name":		"<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode( TGWaitlist.d.variant_name ) }">",
+				"quantity":			<MvEVAL EXPR = "{ int( TGWaitlist.d.quantity ) }">,
 				<MvIF EXPR = "{ NOT ISNULL l.product:inv_available }">
 					"inv_count":	"<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode( l.product:inv_available ) }">"
 				<MvELSE>
@@ -1364,10 +1410,10 @@
 	<MvEVAL EXPR = "{ [ g.Module_Library_DB ].SQL_Query_LEFT_OUTER_JOIN( l.search_query, 'tgws', g.Store_Table_Prefix $ 'Products', 'pv', 'pvp.part_id = pv.id', '' ) }">
 
 	<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Filter( l.search_query, l.filter,
-													 'id:tgws.id,time_added:tgws.time_added,time_sent:tgws.time_sent,product_id:tgws.product_id,variant_id:tgws.variant_id,email:tgws.email,cust_id:tgws.cust_id,product_code:p.code,variant_code:pv.code,product_name:p.name,variant_name:pv.name' ) }">
+													 'id:tgws.id,time_added:tgws.time_added,time_sent:tgws.time_sent,product_id:tgws.product_id,variant_id:tgws.variant_id,email:tgws.email,cust_id:tgws.cust_id,quantity:tgws.quantity,product_code:p.code,variant_code:pv.code,product_name:p.name,variant_name:pv.name' ) }">
 
 	<MvEVAL EXPR = "{ [ g.Module_Library_DB ].SQL_Query_OrderBy_Fields( l.search_query, l.sort,
-																		'id:tgws.id,time_added:tgws.time_added,time_sent:tgws.time_sent,product_id:tgws.product_id,variant_id:tgws.variant_id,email:tgws.email,cust_id:tgws.cust_id,product_code:p.code,variant_code:pv.code,product_name:p.name,variant_name:pv.name',
+																		'id:tgws.id,time_added:tgws.time_added,time_sent:tgws.time_sent,product_id:tgws.product_id,variant_id:tgws.variant_id,email:tgws.email,cust_id:tgws.cust_id,quantity:tgws.quantity,product_code:p.code,variant_code:pv.code,product_name:p.name,variant_name:pv.name',
 																		'tgws.time_sent' ) }">
 
 	<MvASSIGN NAME = "l.search_sql" VALUE = "{ [ g.Module_Library_DB].SQL_Query_Build( l.search_query, l.search_fields ) }">
@@ -1395,6 +1441,7 @@
 					"variant_id":	<MvEVAL EXPR = "{ int( TGWaitlist_Sent.d.variant_id ) }">,
 					"email":		"<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode( TGWaitlist_Sent.d.email ) }">",
 					"cust_id":		<MvEVAL EXPR = "{ int( TGWaitlist_Sent.d.cust_id ) }">,
+					"quantity":		<MvEVAL EXPR = "{ int( TGWaitlist_Sent.d.quantity ) }">,
 					"product_code":	"<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode( TGWaitlist_Sent.d.product_code ) }">",
 					"product_name":	"<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode( TGWaitlist_Sent.d.product_name ) }">",
 					"variant_code":	"<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Encode( TGWaitlist_Sent.d.variant_code ) }">",
@@ -1474,11 +1521,12 @@
 	<MvIF EXPR = "{	NOT [ g.Module_JSON ].JSON_Input_Text(		'R', 'Product_Code',	l.product_code )		OR
 					NOT [ g.Module_JSON ].JSON_Input_Text(		'R', 'Email',			l.email )				OR
 					NOT [ g.Module_JSON ].JSON_Input_Number(	'o', 'Variant_ID',		l.variant_id, -1, -1 )	OR
-					NOT [ g.Module_JSON ].JSON_Input_Number( 	'o', 'Customer_ID',		l.customer_id, -1, -1 ) }">
+					NOT [ g.Module_JSON ].JSON_Input_Number( 	'o', 'Customer_ID',		l.customer_id, -1, -1 )	OR
+					NOT [ g.Module_JSON ].JSON_Input_Number( 	'o', 'Quantity',		l.quantity, -1, -1 ) }">
 		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_InputErrors() }">
 	</MvIF>
 
-	<MvIF EXPR = "{ NOT Waitlist_Form_Add_Runtime_LowLevel( l.product_code, l.variant_id, l.email, l.customer_id, 0 ) }">
+	<MvIF EXPR = "{ NOT Waitlist_Form_Add_Runtime_LowLevel( l.product_code, l.variant_id, l.email, l.customer_id, 0, l.quantity ) }">
 		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error( 'MOD-SYS-TGW-0043', g.Error_Message ) }">
 	</MvIF>
 
@@ -1506,6 +1554,7 @@
 		<MvASSIGN NAME = "l.email"			VALUE = "{ [ g.Module_JSON ].JSON_Decode( g.Email ) }">
 		<MvASSIGN NAME = "l.product_code"	VALUE = "{ [ g.Module_JSON ].JSON_Decode( g.Product_Code ) }">
 		<MvASSIGN NAME = "l.variant_id"		VALUE = "{ int( [ g.Module_JSON ].JSON_Decode( g.Variant_ID ) ) }">
+		<MvASSIGN NAME = "l.quantity"		VALUE = "{ int( [ g.Module_JSON ].JSON_Decode( g.Quantity ) ) }">
 
 		<MvIF EXPR = "{ NOT [ g.Module_Admin ].Validate_Email( g.Email ) }">
 			<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error( 'MOD-SYS-TGW-0045', 'Please enter a valid email.' ) }">
@@ -1527,6 +1576,7 @@
 		<MvASSIGN NAME = "l.waitlist:variant_id"	VALUE = "{ l.variant_id }">
 		<MvASSIGN NAME = "l.waitlist:email"			VALUE = "{ l.email }">
 		<MvASSIGN NAME = "l.waitlist:cust_id" 		VALUE = "{ g.Basket:cust_id }">
+		<MvASSIGN NAME = "l.waitlist:quantity" 		VALUE = "{ l.quantity }">
 
 		<MvIF EXPR = "{ l.waitlist:cust_id GT 0 }">
 			<MvIF EXPR = "{ Waitlist_Check_Customer( l.waitlist:product_id, l.waitlist:variant_id, l.waitlist:cust_id, l.existing_waitlist ) }">
@@ -1573,8 +1623,8 @@
 				VIEW	= "TGWaitlist"
 				QUERY	= "{ 'SELECT COUNT( id ) AS total_count FROM ' $ g.Store_Table_Prefix $ 'TGWaitlist
 							  WHERE
-							  product_id	= ?,
-							  variant_id	= ?' }"
+							  	product_id	= ?,
+							  	variant_id	= ?' }"
 				FIELDS	= "l.product_id, l.variant_id">
 	<MvIF EXPR = "{ g.MvOPENVIEW_Error }">
 		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'MOD-SYS-TGW-0055', g.MvOPENVIEW_Error ) }">
@@ -1598,7 +1648,7 @@
 				VIEW	= "TGWaitlist"
 				QUERY	= "{ 'SELECT * FROM ' $ g.Store_Table_Prefix $ 'TGWaitlist
 							  WHERE
-							  cust_id	= ?' }"
+							  	cust_id	= ?' }"
 				FIELDS	= "l.cust_id">
 	<MvIF EXPR = "{ g.MvOPENVIEW_Error }">
 		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'MOD-SYS-TGW-0056', g.MvOPENVIEW_Error ) }">
@@ -1627,7 +1677,7 @@
 				VIEW	= "TGWaitlist"
 				QUERY	= "{ 'SELECT * FROM ' $ g.Store_Table_Prefix $ 'TGWaitlist
 							  WHERE
-							  email	= ?' }"
+							  	email	= ?' }"
 				FIELDS	= "l.email">
 	<MvIF EXPR = "{ g.MvOPENVIEW_Error }">
 		<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'MOD-SYS-TGW-0058', g.MvOPENVIEW_Error ) }">

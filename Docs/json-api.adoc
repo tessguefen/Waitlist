@@ -144,6 +144,7 @@ This function is used to add a new waitlist entry. This bypasses any pre-logic (
 |Email|String|Email (Required)
 |Product_Code|String|Product Code (Required)
 |Variant_ID|Number|Variant ID (Optional,but if the product requires a variant, it is required.)
+|Quantity|Number|Quantity for the waitlist sign up. Optional, defaults to 1.
 |===
 
 [[__waitlistAddJSONExampleRequest]]
@@ -159,7 +160,8 @@ This function is used to add a new waitlist entry. This bypasses any pre-logic (
 	"Product_Code": "My_Product_Code",
 	"Email": "hello@email.com",
 	"Customer_ID": 1,
-	"Variant_ID": 1
+	"Variant_ID": 1,
+	"Quantity": 2
 }
 ----
 

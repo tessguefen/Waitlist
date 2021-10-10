@@ -22,6 +22,11 @@
 			waitlist_data.append('Product_Code', waitlist_data.get('Waitlist_Product_Code'));
 			waitlist_data.append('Variant_ID', waitlist_data.get('Waitlist_Variant_ID'));
 			waitlist_data.append('Email', waitlist_data.get('Waitlist_Email'));
+			var quantity = waitlist_data.get('Waitlist_Quantity');
+			if (quantity) {
+				waitlist_data.append('Quantity', quantity);
+			}
+
 			waitlist_data.delete('Action');
 
 			var waitlist_call = new XMLHttpRequest();

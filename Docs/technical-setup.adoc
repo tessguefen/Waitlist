@@ -25,10 +25,13 @@ Add the following code where you want the Waitlist Form to display.
 
 *Do not add this inside of another form*:
 
+https://raw.githubusercontent.com/tessguefen/Waitlist/main/templates/form_html.mvt[Raw Source]
+
 [source,xml]
 ----
 <mvt:if expr="g.Waitlist_Error"><div class="x-messages x-messages--error">Error: &mvte:global:Waitlist_Error;</div></mvt:if>
 <mvt:if expr="g.Waitlist_Message"><div class="x-messages x-messages--success">&mvte:global:Waitlist_Message;</div></mvt:if>
+<mvt:if expr="ISNULL g.Waitlist_Quantity"><mvt:assign name="g.Waitlist_Quantity" value="1" /></mvt:if>
 
 <form name="waitlist_add" method="post" action="&mvte:product:link;"<mvt:if expr="ISNULL g.Waitlist_Error"> style="display:none;"</mvt:if>>
 	<div class="x-messages x-messages--info">Sign up with your email to be notified when this product is back in stock!</div>
@@ -36,9 +39,18 @@ Add the following code where you want the Waitlist Form to display.
 	<input type="hidden" name="Action" value="WaitlistAdd" />
 	<input type="hidden" name="Waitlist_Product_Code" value="&mvt:product:code;" />
 	<input type="hidden" name="Waitlist_Variant_ID" id="jsWaitlist_Variant_ID" value="&mvt:attributemachine:variant_id;" />
-	<div class="c-control-group">
-		<input type="email" name="Waitlist_Email" value="&mvte:global:Waitlist_Email;" placeholder="Email" class="c-form-input c-control-group__field" />
-		<input type="submit" value="Sign up" class="c-button c-control-group__button" />
+	<div class="u-flex o-layout--no-wrap o-layout--align-bottom">
+		<div class="waitlist__field o-layout--grow" style="padding-right: 0.75rem;">
+			<label for="Waitlist_Email" class="c-form-label is-required">Email</label><br>
+			<input type="email" id="Waitlist_Email" name="Waitlist_Email" value="&mvte:global:Waitlist_Email;" placeholder="Email" class="c-form-input" required style="margin-bottom: 0;" />
+		</div>
+		<div class="waitlist__field" style="padding-right: 0.75rem;">
+			<label for="Waitlist_Quantity" class="c-form-label">Quantity</label><br>
+			<input type="number" name="Waitlist_Quantity" value="&mvte:global:Waitlist_Quantity;" placeholder="Quantity" class="c-form-input" style="margin-bottom: 0; width: auto;" />
+		</div>
+		<div class="waitlist__field">
+			<input type="submit" value="Sign up" class="c-button c-control-group__button" />
+		</div>
 	</div>
 </form>
 ----
@@ -51,6 +63,8 @@ Add the following code where you want the Waitlist Form to display.
 Add the following to your Attribute Machine Template (or if you're already utilizing `variant_changed`, add the code there).
 
 This will trigger the Variant Change functionality.
+
+https://raw.githubusercontent.com/tessguefen/Waitlist/main/templates/Variant_Changed.js[Raw Source]
 
 [source,javascript]
 ----
@@ -70,6 +84,8 @@ image::attribute-machine.png[Attribute Machine: Head Template]
 === Attribute Machine Show/ Hide (based on inventory levels)
 
 Add the following code to your AttributeMachine Template. This will determine when a variant is out of stock (`inv_level` is `out`) to show the Waitlist form.
+
+https://raw.githubusercontent.com/tessguefen/Waitlist/main/templates/AttributeMachine.js[Raw Source]
 
 [source,javascript]
 ----
@@ -106,6 +122,8 @@ Add the following below **<mvt:item name="attributemachine" param="body_deferred
 
 This will enable the Waitlist form to be asynchronously sent, so your user does not need to leave the page.
 
+https://raw.githubusercontent.com/tessguefen/Waitlist/main/templates/waitlist_javascript.mvt[Raw Source]
+
 [source,html]
 ----
 <script>
@@ -132,6 +150,11 @@ This will enable the Waitlist form to be asynchronously sent, so your user does 
 			waitlist_data.append('Product_Code', waitlist_data.get('Waitlist_Product_Code'));
 			waitlist_data.append('Variant_ID', waitlist_data.get('Waitlist_Variant_ID'));
 			waitlist_data.append('Email', waitlist_data.get('Waitlist_Email'));
+			var quantity = waitlist_data.get('Waitlist_Quantity');
+			if (quantity) {
+				waitlist_data.append('Quantity', quantity);
+			}
+
 			waitlist_data.delete('Action');
 
 			var waitlist_call = new XMLHttpRequest();
@@ -196,5 +219,6 @@ You can also just utilize the <<__formSourceCode,Waitlist Form Code>>
 |Waitlist_Product_Code|String|Product Code for the Waitlist Sign up
 |Waitlist_Email|String|Email for the Waitlist Sign up
 |Waitlist_Variant_ID|Number|Variant ID for the waitlist sign up. Optional, but if the product requires a variant, it is required.
+|Waitlist_Quantity|Number|Quantity for the waitlist sign up. Optional, defaults to 1.
 |===
 

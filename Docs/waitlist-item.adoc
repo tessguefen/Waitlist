@@ -106,6 +106,7 @@ __[x] denotes array__
 [x]:product:taxable
 [x]:product:weight
 [x]:product_id
+[x]:quantity
 [x]:time_added
 [x]:variant_id
 [x]:variants[x]:part_id

@@ -78,9 +78,10 @@ Waitlist_Batchlist.prototype.onCreateRootColumnList = function()
 			.SetDisplayInMenu(false)
 			.SetDisplayInList(false)
 			.SetSortByField( '' ),
-		new MMBatchList_Column_Name( 'Current Stock',				'inv_count',	'inv_count')
+		new MMBatchList_Column_Name( 		'Current Stock',		'inv_count',	'inv_count')
 			.SetAdvancedSearchEnabled(false)
-			.SetSortByField( '' )
+			.SetSortByField( '' ),
+		new MMBatchList_Column_Numeric(		'Quantity',				'quantity',		'quantity', 0)
 	];
 
 	return columnlist;
