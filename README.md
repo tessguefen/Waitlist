@@ -1,7 +1,7 @@
 # Waitlist
-Current Module Version: 2.002
+Current Module Version: 2.003
 
-Last Updated: 10/10/2021
+Last Updated: 02/24/2022
 
 Please see [Waitlist Documentation](Docs/TGWaitlist-documentation.pdf)
 
