@@ -3,7 +3,7 @@
 <MvCOMMENT>
 |
 | Prefix         : MOD-SYS-TGW-
-| Next Error Code: 64
+| Next Error Code: 65
 |
 </MvCOMMENT>
 
@@ -11,7 +11,7 @@
 	<MvASSIGN NAME = "l.module:code"		VALUE = "TGWaitlist">
 	<MvASSIGN NAME = "l.module:name"		VALUE = "Waitlist">
 	<MvASSIGN NAME = "l.module:provider"	VALUE = "Tess Guefen">
-	<MvASSIGN NAME = "l.module:version"		VALUE = "2.003">
+	<MvASSIGN NAME = "l.module:version"		VALUE = "2.004">
 	<MvASSIGN NAME = "l.module:api_ver"		VALUE = "9.12">
 	<MvASSIGN NAME = "l.module:description"	VALUE = "Make it easy for customers to quickly sign up for email alerts on out of stock products. When products are back in stock, emails will be automatically sent out by a Scheduled Task. This works on Products & Variants.">
 	<MvASSIGN NAME = "l.module:features"	VALUE = "data_store, not_prod, system, vis_system, json, clientside, scheduledtask, component, json_api">
@@ -1043,9 +1043,15 @@
 	<MvASSIGN NAME = "l.all_settings"			VALUE = "{ l.page:settings }">
 	<MvASSIGN NAME = "l.all_settings:waitlist"	VALUE = "{ l.waitlist }">
 
-	<MvCAPTURE VARIABLE = "l.message">
-		<MvDO FILE = "{ g.Store_Template_Path $ l.waitlist_email_template:filename }" NAME = "l.null" VALUE = "{ Template_Render( l.settings, l.all_settings ) }">
-	</MvCAPTURE>
+	<MvCAPTURE VARIABLE = "l.message"><MvDO FILE = "{ g.Store_Template_Path $ l.waitlist_email_template:filename }" NAME = "l.null" VALUE = "{ Template_Render( l.settings, l.all_settings ) }"></MvCAPTURE>
+
+	<MvIF EXPR = "{ ISNULL l.message }">
+		<MvASSIGN NAME = "l.success" VALUE = "{ [ g.Module_Admin ].Admin_Log_Action( 'MOD-SYS-TGW-0064', 'Waitlist Email Template Empty. Did not trigger to ' $ l.waitlist:email ) }">
+
+		<MvIF EXPR = "{ NOT Waitlist_Sent_Insert( l.waitlist ) }">
+			<MvFUNCTIONRETURN VALUE = 0>
+		</MvIF>
+	</MvIF>
 
 	<MvASSIGN NAME = "l.email_headers"	VALUE = "{ 'Content-Type: text/html; charset=ISO-8859-1' $ asciichar( 13 ) $ asciichar( 10 ) $ asciichar( 13 ) $ asciichar( 10 ) }">
 	<MvASSIGN NAME = "l.subject"		VALUE = "{ l.waitlist:product:name $ ' is back in stock!' }">
