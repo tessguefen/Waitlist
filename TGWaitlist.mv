@@ -3,7 +3,7 @@
 <MvCOMMENT>
 |
 | Prefix         : MOD-SYS-TGW-
-| Next Error Code: 64
+| Next Error Code: 65
 |
 </MvCOMMENT>
 
@@ -11,7 +11,7 @@
 	<MvASSIGN NAME = "l.module:code"		VALUE = "TGWaitlist">
 	<MvASSIGN NAME = "l.module:name"		VALUE = "Waitlist">
 	<MvASSIGN NAME = "l.module:provider"	VALUE = "Tess Guefen">
-	<MvASSIGN NAME = "l.module:version"		VALUE = "2.003">
+	<MvASSIGN NAME = "l.module:version"		VALUE = "2.004">
 	<MvASSIGN NAME = "l.module:api_ver"		VALUE = "9.12">
 	<MvASSIGN NAME = "l.module:description"	VALUE = "Make it easy for customers to quickly sign up for email alerts on out of stock products. When products are back in stock, emails will be automatically sent out by a Scheduled Task. This works on Products & Variants.">
 	<MvASSIGN NAME = "l.module:features"	VALUE = "data_store, not_prod, system, vis_system, json, clientside, scheduledtask, component, json_api">
@@ -167,7 +167,7 @@
 
 	<MvIF EXPR = "{ l.version LT 2.002 }">
 		<MvQUERY NAME	= "Merchant"
-				 QUERY	= "{ 'ALTER TABLE ' $ g.Store_Table_Prefix $ 'TGWaitlist 
+				 QUERY	= "{ 'ALTER TABLE ' $ g.Store_Table_Prefix $ 'TGWaitlist
 							  ADD
 							  (
 								quantity	' $ [ g.Module_Library_Native_DBAPI ].DB_Type_INTEGER()	$ '
@@ -186,7 +186,7 @@
 		</MvIF>
 
 		<MvQUERY NAME	= "Merchant"
-				 QUERY	= "{ 'ALTER TABLE ' $ g.Store_Table_Prefix $ 'TGWaitlist_Sent 
+				 QUERY	= "{ 'ALTER TABLE ' $ g.Store_Table_Prefix $ 'TGWaitlist_Sent
 							  ADD
 							  (
 								quantity	' $ [ g.Module_Library_Native_DBAPI ].DB_Type_INTEGER()	$ '
@@ -371,7 +371,7 @@
 	<MvELSE>
 		<MvFUNCTIONRETURN VALUE = 0>
 	</MvIF>
-	
+
 	<MvFUNCTIONRETURN VALUE = 1>
 </MvFUNCTION>
 
@@ -484,7 +484,7 @@
 		<MvIF EXPR = "{ l.parameter_count NE 1 }">
 			<MvFUNCTIONRETURN VALUE = "{ Parameter_Error( l.param, '\'' $ l.function_name $ '\' takes 1 parameter' ) }">
 		</MvIF>
-	
+
 		<MvIF EXPR = "{ NOT Is_Variable( l.parameters[1] ) }">
 			<MvFUNCTIONRETURN VALUE = "{ Parameter_Error( l.param, 'The first parameter must be a variable' ) }">
 		</MvIF>
@@ -494,7 +494,7 @@
 		<MvIF EXPR = "{ l.parameter_count NE 3 }">
 			<MvFUNCTIONRETURN VALUE = "{ Parameter_Error( l.param, '\'' $ l.function_name $ '\' takes 3 parameters' ) }">
 		</MvIF>
-	
+
 		<MvIF EXPR = "{ NOT Is_Variable( l.parameters[3] ) }">
 			<MvFUNCTIONRETURN VALUE = "{ Parameter_Error( l.param, 'The third parameter must be a variable' ) }">
 		</MvIF>
@@ -620,7 +620,7 @@
 
 <MvFUNCTION NAME = "Waitlist_Insert" PARAMETERS = "waitlist var" STANDARDOUTPUTLEVEL = ""  ERROROUTPUTLEVEL = "">
 	<MvASSIGN NAME = "l.waitlist:id" VALUE = "{ [ g.Module_Library_DB ].StoreKey_Generate( 'TGWaitlist' ) }">
-	
+
 	<MvIF EXPR = "{ ISNULL l.waitlist:time_added }">								<MvASSIGN NAME = "l.waitlist:time_added"	VALUE = "{ s.dyn_time_t }">	</MvIF>
 	<MvIF EXPR = "{ ISNULL l.waitlist:variant_id }">								<MvASSIGN NAME = "l.waitlist:variant_id"	VALUE = 0>					</MvIF>
 	<MvIF EXPR = "{ ISNULL l.waitlist:cust_id }">									<MvASSIGN NAME = "l.waitlist:cust_id"		VALUE = 0>					</MvIF>
@@ -988,7 +988,7 @@
 		<MvFOREACH ITERATOR = "l.variant" ARRAY = "l.waitlist:variants" COUNT = "{ [ g.Module_Library_DB ].ProductVariantPartList_Load_Variant( l.waitlist:product_id, l.waitlist:variant_id, l.waitlist:variants ) }">
 			<MvDO FILE = "{ g.Module_Library_DB }" NAME = "l.null" VALUE = "{ Product_Load_ID_WithRuntimeInventory( l.variant:part_id, l.variant:product ) }">
 		</MvFOREACH>
-	
+
 		<MvIF EXPR = "{ [ g.Module_Library_DB ].ProductVariantList_Load_Variant( l.waitlist:product:id, l.waitlist:variant_id, l.waitlist:options ) }">
 			<MvEVAL EXPR = "{ Waitlist_Format_Variant_Options( l.waitlist:options ) }">
 		</MvIF>
@@ -1043,9 +1043,17 @@
 	<MvASSIGN NAME = "l.all_settings"			VALUE = "{ l.page:settings }">
 	<MvASSIGN NAME = "l.all_settings:waitlist"	VALUE = "{ l.waitlist }">
 
-	<MvCAPTURE VARIABLE = "l.message">
-		<MvDO FILE = "{ g.Store_Template_Path $ l.waitlist_email_template:filename }" NAME = "l.null" VALUE = "{ Template_Render( l.settings, l.all_settings ) }">
-	</MvCAPTURE>
+	<MvCAPTURE VARIABLE = "l.message"><MvASSIGN NAME = "l.null" VALUE = "{ [ g.Store_Template_Path $ l.waitlist_email_template:filename ].Template_Render( l.settings, l.all_settings ) }"></MvCAPTURE>
+
+	<MvIF EXPR = "{ ISNULL l.message }">
+		<MvASSIGN NAME = "l.success" VALUE = "{ [ g.Module_Admin ].Admin_Log_Action( 'MOD-SYS-TGW-0064', 'Waitlist Email Template Empty. Did not trigger to ' $ l.waitlist:email ) }">
+
+		<MvIF EXPR = "{ NOT Waitlist_Sent_Insert( l.waitlist ) }">
+			<MvFUNCTIONRETURN VALUE = 0>
+		</MvIF>
+
+		<MvFUNCTIONRETURN VALUE = 1>
+	</MvIF>
 
 	<MvASSIGN NAME = "l.email_headers"	VALUE = "{ 'Content-Type: text/html; charset=ISO-8859-1' $ asciichar( 13 ) $ asciichar( 10 ) $ asciichar( 13 ) $ asciichar( 10 ) }">
 	<MvASSIGN NAME = "l.subject"		VALUE = "{ l.waitlist:product:name $ ' is back in stock!' }">
@@ -1248,7 +1256,7 @@
 	<MvEVAL EXPR = "{ [ g.Module_Library_DB ].SQL_Query_LEFT_OUTER_JOIN( l.search_query, 'tgw', g.Store_Table_Prefix $ 'Products', 'p', 'tgw.product_id = p.id', '' ) }">
 	<MvEVAL EXPR = "{ [ g.Module_Library_DB ].SQL_Query_LEFT_OUTER_JOIN( l.search_query, 'tgw', g.Store_Table_Prefix $ 'ProductVariantParts', 'pvp', 'tgw.variant_id = pvp.variant_id AND tgw.product_id = pvp.product_id', '' ) }">
 	<MvEVAL EXPR = "{ [ g.Module_Library_DB ].SQL_Query_LEFT_OUTER_JOIN( l.search_query, 'tgw', g.Store_Table_Prefix $ 'Products', 'pv', 'pvp.part_id = pv.id', '' ) }">
-	
+
 	<MvEVAL EXPR = "{ [ g.Module_JSON ].JSON_Filter( l.search_query, l.filter,
 													 'id:tgw.id,time_added:tgw.time_added,product_id:tgw.product_id,variant_id:tgw.variant_id,email:tgw.email,cust_id:tgw.cust_id,quantity:tgw.quantity,product_code:p.code,variant_code:pv.code,product_name:p.name,variant_name:pv.name' ) }">
 
@@ -1565,13 +1573,13 @@
 		<MvELSEIF EXPR = "{ NOT [ g.Module_Library_DB ].Runtime_Product_Load_Code_Cached( l.product_code, l.product ) }">
 			<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error( 'MOD-SYS-TGW-0047', 'Invalid Product Code.' ) }">
 		</MvIF>
-	
+
 		<MvIF EXPR = "{ l.variant_id GT 0 }">
 			<MvIF EXPR = "{ NOT [ g.Module_Library_DB ].ProductVariantPartList_Load_Variant( l.product:id, l.variant_id, l.productvariantparts ) }">
 				<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error( 'MOD-SYS-TGW-0049', 'Invalid variant.' ) }">
 			</MvIF>
 		</MvIF>
-	
+
 		<MvASSIGN NAME = "l.waitlist:product_id"	VALUE = "{ l.product:id }">
 		<MvASSIGN NAME = "l.waitlist:variant_id"	VALUE = "{ l.variant_id }">
 		<MvASSIGN NAME = "l.waitlist:email"			VALUE = "{ l.email }">
@@ -1591,7 +1599,7 @@
 		<MvIF EXPR = "{ NOT Waitlist_PreLogic_Override( l.waitlist ) }">
 			<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error( 'MOD-SYS-TGW-0052', g.Error_Message ) }">
 		</MvIF>
-	
+
 		<MvIF EXPR = "{ NOT Waitlist_Insert( l.waitlist ) }">
 			<MvFUNCTIONRETURN VALUE = "{ [ g.Module_JSON ].JSON_Response_Error( 'MOD-SYS-TGW-0053', g.Error_Message ) }">
 		</MvIF>
@@ -1700,21 +1708,21 @@
 	<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_DB ].ListLoad_EOF_Return( 'MOD-SYS-TGW-0059', l.waitlist_count ) }">
 </MvFUNCTION>
 
-<MvFUNCTION NAME = "Parse_Function_Parameters" PARAMETERS = "string, function_name var, parameters var, parameter_count var" STANDARDOUTPUTLEVEL = "">	
+<MvFUNCTION NAME = "Parse_Function_Parameters" PARAMETERS = "string, function_name var, parameters var, parameter_count var" STANDARDOUTPUTLEVEL = "">
 	<MvASSIGN NAME = "l.parameter_count" 	VALUE = 0>
 	<MvASSIGN NAME = "l.loop_counter" 		VALUE = 0>
 	<MvASSIGN NAME = "l.string" 			VALUE = "{ trim( l.string ) }">
 	<MvASSIGN NAME = "l.starting_pos" 		VALUE = "{ indexof( '(', l.string, 1 ) + 1 }">
 	<MvASSIGN NAME = "l.function_name" 		VALUE = "{ tolower( substring_var( l.string, 1, l.starting_pos - 2 ) ) }">
-	
+
 	<MvIF EXPR = "{ l.starting_pos EQ 1 }">
 		<MvFUNCTIONRETURN VALUE = "{ Parameter_Error( l.string, 'Expected \'(\' to start the function call' ) }">
 	</MvIF>
-	
+
 	<MvIF EXPR = "{ ISNULL l.function_name }">
 		<MvFUNCTIONRETURN VALUE = "{ Parameter_Error( l.string, 'Missing function name' ) }">
 	</MvIF>
-	
+
 	<MvIF EXPR = "{ substring_var( l.string, len_var( l.string ), 1 ) NE ')' }">
 		<MvFUNCTIONRETURN VALUE = "{ Parameter_Error( l.string, 'Expected \')\' to end the function call' ) }">
 	</MvIF>
@@ -1727,11 +1735,11 @@
 		<MvIF EXPR = "{ l.quote_pos AND NOT l.end_quote_pos }">
 			<MvFUNCTIONRETURN VALUE = "{ Parameter_Error( l.string, 'Missing single quote' ) }">
 		</MvIF>
-		
+
 		<MvWHILE EXPR = "{ ( l.comma_pos LT l.end_quote_pos ) AND ( l.comma_pos GT l.quote_pos ) }"> <MvCOMMENT> comma in a quoted string </MvCOMMENT>
 			<MvASSIGN NAME = "l.comma_pos" VALUE = "{ indexof( ',', l.string, l.comma_pos + 1 ) }">
 		</MvWHILE>
-		
+
 		<MvIF EXPR = "{ l.comma_pos EQ 0 }"> <MvCOMMENT> on the last parameter or we only have 1 parameter </MvCOMMENT>
 			<MvASSIGN NAME = "l.start" 			VALUE = "{ l.starting_pos }">
 			<MvASSIGN NAME = "l.end" 			VALUE = "{ len_var( l.string ) - l.starting_pos }">
@@ -1744,17 +1752,17 @@
 		</MvIF>
 
 		<MvASSIGN NAME = "l.param" VALUE = "{ trim( substring_var( l.string, l.start, l.end ) ) }">
-		
+
 		<MvIF EXPR = "{ ISNULL l.param }">
 			<MvIF EXPR = "{ l.comma_pos EQ 0 AND l.parameter_count EQ 0 }">
 				<MvFUNCTIONRETURN VALUE = 1>
 			</MvIF>
-			
+
 			<MvFUNCTIONRETURN VALUE = "{ Parameter_Error( l.string, 'Parameter number ' $ ( ++l.parameter_count ) $ ' cannot be empty' ) }">
 		</MvIF>
-		
+
 		<MvASSIGN NAME = "l.parameters" INDEX = "{ ++l.parameter_count }" VALUE = "{ l.param }">
-		
+
 		<MvIF EXPR = "{ l.quote_pos EQ 0 AND l.comma_pos EQ 0 }">
 			<MvWHILESTOP>
 		</MvIF>
@@ -1762,10 +1770,10 @@
 		<MvIF EXPR = "{ l.loop_counter GT 1000 }">
 			<MvFUNCTIONRETURN VALUE = "{ Parameter_Error( l.string, 'Error parsing parameters' ) }">
 		</MvIF>
-		
+
 		<MvASSIGN NAME = "l.loop_counter" VALUE = "{ l.loop_counter + 1 }">
 	</MvWHILE>
-	
+
 	<MvFUNCTIONRETURN VALUE = 1>
 </MvFUNCTION>
 
@@ -1773,7 +1781,7 @@
 	<MvASSIGN NAME = "l.error_count"															VALUE = "{ miva_array_elements( g.Session:tgwaitlist ) }">
 	<MvASSIGN NAME = "g.Session:tgwaitlist" INDEX = "{ l.error_count + 1 }" MEMBER = "param"	VALUE = "{ l.param }">
 	<MvASSIGN NAME = "g.Session:tgwaitlist" INDEX = "{ l.error_count + 1 }" MEMBER = "message"	VALUE = "{ l.message }">
-	
+
 	<MvFUNCTIONRETURN VALUE = 0>
 </MvFUNCTION>
 
@@ -1790,15 +1798,15 @@
 							( l.char NE '_' ) }">
 				<MvFUNCTIONRETURN VALUE = 0>
 			</MvIF>
-			
+
 			<MvFORCONTINUE>
 		</MvIF>
-		
+
 		<MvIF EXPR = "{ l.char EQ '[' }">
 			<MvASSIGN NAME = "l.bracket_count" 				VALUE = "{ l.bracket_count + 1 }">
 			<MvASSIGN NAME = "l.opening_square_bracket_pos" VALUE = "{ indexof( '[', l.variable, l.pos + 1 ) }">
 			<MvASSIGN NAME = "l.closing_square_bracket_pos" VALUE = "{ indexof( ']', l.variable, l.pos ) }">
-			
+
 			<MvIF EXPR = "{ ( l.opening_square_bracket_pos GT 0 ) AND
 							( l.opening_square_bracket_pos LT l.closing_square_bracket_pos ) }">
 				<MvASSIGN NAME = "l.pos" VALUE = "{ l.opening_square_bracket_pos - 1 }">
@@ -1809,7 +1817,7 @@
 			<MvASSIGN NAME = "l.bracket_count" 				VALUE = "{ l.bracket_count - 1 }">
 			<MvASSIGN NAME = "l.opening_square_bracket_pos" VALUE = "{ indexof( '[', l.variable, l.pos ) }">
 			<MvASSIGN NAME = "l.closing_square_bracket_pos" VALUE = "{ indexof( ']', l.variable, l.pos + 1 ) }">
-			
+
 			<MvIF EXPR = "{ ( l.opening_square_bracket_pos GT 0 ) AND
 							( l.opening_square_bracket_pos LT l.closing_square_bracket_pos ) }">
 				<MvASSIGN NAME = "l.pos" VALUE = "{ l.opening_square_bracket_pos - 1 }">
@@ -1824,11 +1832,11 @@
 			</MvIF>
 		</MvIF>
 	</MvFOR>
-	
+
 	<MvIF EXPR = "{ l.bracket_count NE 0 }">
 		<MvFUNCTIONRETURN VALUE = 0>
 	</MvIF>
-	
+
 	<MvFUNCTIONRETURN VALUE = 1>
 </MvFUNCTION>
 
@@ -1842,7 +1850,7 @@
 	<MvIF EXPR = "{ g.Element_Waitlist_List_CSS }">
 		<MvFUNCTIONRETURN>
 	</MvIF>
-	
+
 	<MvASSIGN NAME = "g.Element_Waitlist_List_CSS" VALUE = 1>
 
 	<MvEVAL EXPR = "{ [ g.Module_Admin ].Element_MMBatchList_CSS() }">
@@ -1852,7 +1860,7 @@
 	<MvIF EXPR = "{ g.Element_Waitlist_Sent_List_CSS }">
 		<MvFUNCTIONRETURN>
 	</MvIF>
-	
+
 	<MvASSIGN NAME = "g.Element_Waitlist_Sent_List_CSS" VALUE = 1>
 
 	<MvEVAL EXPR = "{ [ g.Module_Admin ].Element_MMBatchList_CSS() }">
@@ -1862,7 +1870,7 @@
 	<MvIF EXPR = "{ g.Element_Waitlist_List_JavaScript }">
 		<MvFUNCTIONRETURN>
 	</MvIF>
-	
+
 	<MvASSIGN NAME = "g.Element_Waitlist_List_JavaScript" VALUE = 1>
 
 	<MvEVAL EXPR = "{ [ g.Module_Admin ].Element_MMBatchList_JavaScript() }">
@@ -1873,7 +1881,7 @@
 	<MvIF EXPR = "{ g.Element_Waitlist_Sent_List_JavaScript }">
 		<MvFUNCTIONRETURN>
 	</MvIF>
-	
+
 	<MvASSIGN NAME = "g.Element_Waitlist_Sent_List_JavaScript" VALUE = 1>
 
 	<MvEVAL EXPR = "{ [ g.Module_Admin ].Element_MMBatchList_JavaScript() }">
