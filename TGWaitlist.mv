@@ -11,7 +11,7 @@
 	<MvASSIGN NAME = "l.module:code"		VALUE = "TGWaitlist">
 	<MvASSIGN NAME = "l.module:name"		VALUE = "Waitlist">
 	<MvASSIGN NAME = "l.module:provider"	VALUE = "Tess Guefen">
-	<MvASSIGN NAME = "l.module:version"		VALUE = "2.004">
+	<MvASSIGN NAME = "l.module:version"		VALUE = "2.005">
 	<MvASSIGN NAME = "l.module:api_ver"		VALUE = "9.12">
 	<MvASSIGN NAME = "l.module:description"	VALUE = "Make it easy for customers to quickly sign up for email alerts on out of stock products. When products are back in stock, emails will be automatically sent out by a Scheduled Task. This works on Products & Variants.">
 	<MvASSIGN NAME = "l.module:features"	VALUE = "data_store, not_prod, system, vis_system, json, clientside, scheduledtask, component, json_api">
@@ -1010,40 +1010,38 @@
 </MvFUNCTION>
 
 <MvFUNCTION NAME = "Waitlist_Trigger_Email_Lowlevel" PARAMETERS = "waitlist var" STANDARDOUTPUTLEVEL = "">
-	<MvIF EXPR = "{ NOT [ g.Module_Feature_TUI_DB ].Page_Load_Code_Cached( 'WaitlistEmailTemplate', l.page ) }">
+	<MvIF EXPR = "{ NOT [ g.Module_Feature_TUI_DB ].Page_Load_Code( 'WaitlistEmailTemplate', l.page ) }">
 		<MvFUNCTIONRETURN VALUE = 0>
 	</MvIF>
 
-	<MvIF EXPR = "{ NOT [ g.Module_Feature_TUI_DB ].ManagedTemplate_Load_ID( l.page:templ_id, l.waitlist_email_template ) }">
-		<MvFUNCTIONRETURN VALUE = 0>
+	<MvASSIGN NAME = "l.page:settings:waitlist"	VALUE = "{ l.waitlist }">
+
+	<MvIF EXPR = "{ NOT ISNULL g.Domain:base_surl }">	<MvASSIGN NAME = "g.basehref"	VALUE = "{ g.Domain:base_surl }">
+	<MvELSE>											<MvASSIGN NAME = "g.basehref"	VALUE = "{ g.Domain:base_url }">
 	</MvIF>
 
-	<MvCOMMENT>
-	|
-	| Load and initialize items
-	|
-	</MvCOMMENT>
+	<MvIF EXPR = "{ ISNULL g.Domain:mm_surl }">
+		<MvASSIGN NAME = "g.sessionurl"										VALUE = "{ g.Domain:mm_url }">
+		<MvASSIGN NAME = "g.secure_sessionurl"								VALUE = "{ g.sessionurl }">
+	<MvELSE>
+		<MvASSIGN NAME = "g.sessionurl"										VALUE = "{ g.Domain:mm_url }">
+		<MvASSIGN NAME = "g.secure_sessionurl"								VALUE = "{ g.Domain:mm_surl }">
+	</MvIF>
 
-	<MvASSIGN NAME = "l.item_pos"			VALUE = 1>
-	<MvASSIGN NAME = "l.item_count"			VALUE = "{ [ g.Module_Feature_TUI_DB ].ItemModuleList_Load_Page_Render( l.page:id,			l.page:settings:_mgr ) }">
-	<MvASSIGN NAME = "l.extension_count"	VALUE = "{ [ g.Module_Feature_TUI_DB ].ItemExtensionModuleList_Load_Page_Render( l.page:id,	l.page:settings:_mgr ) }">
+	<MvASSIGN NAME = "g.sessionurl_nosep"									VALUE = "{ substring_var( g.sessionurl, 1, len_var( g.sessionurl ) - 1 ) }">
+	<MvASSIGN NAME = "g.secure_sessionurl_nosep"							VALUE = "{ substring_var( g.secure_sessionurl, 1, len_var( g.secure_sessionurl ) - 1 ) }">
 
-	<MvWHILE EXPR = "{ l.item_pos LE l.item_count }">
-		<MvIF EXPR = "{ NOT [ g.Module_Feature_TUI_MGR ].TemplateManager_Initialize_Item_LowLevel( l.page:settings, l.page:settings:_mgr:items[ l.item_pos ] ) }">
-			<MvFUNCTIONRETURN VALUE = 0>
-		</MvIF>
+	<MvASSIGN NAME = "g.Store_Module_Currency"								VALUE = "{ g.Store:currncy_mod }">
+	<MvASSIGN NAME = "g.Store_Module_Tax"									VALUE = "{ g.Store:tax_mod }">
+	<MvASSIGN NAME = "g.Store_Module_UI"									VALUE = "{ g.Store:ui_mod }">
 
-		<MvIF EXPR = "{ g.TemplateManager_Exception }">
-			<MvFUNCTIONRETURN VALUE = "{ [ g.Module_Library_Utilities ].Error( 'MOD-SYS-TGW-0029', 'Item \'' $ l.page:settings:_mgr:items[ l.item_pos ]:item_code $ '\' threw exception \'' $ g.TemplateManager_Exception_Code $ '\' during initialization' ) }">
-		</MvIF>
+	<MvASSIGN NAME = "g.Module_Store_Module_Currency" 						VALUE = "{ g.Module_Root $ g.Store:currncy_mod:module }">
+	<MvASSIGN NAME = "g.Module_Store_Module_Tax" 							VALUE = "{ g.Module_Root $ g.Store:tax_mod:module }">
+	<MvASSIGN NAME = "g.Module_Store_Module_UI"								VALUE = "{ g.Module_Root $ g.Store:ui_mod:module }">
 
-		<MvASSIGN NAME = "l.item_pos"	VALUE = "{ l.item_pos + 1 }">
-	</MvWHILE>
+	<MvASSIGN NAME = "g.Domain:mm_params"									VALUE = "never">
 
-	<MvASSIGN NAME = "l.all_settings"			VALUE = "{ l.page:settings }">
-	<MvASSIGN NAME = "l.all_settings:waitlist"	VALUE = "{ l.waitlist }">
-
-	<MvCAPTURE VARIABLE = "l.message"><MvASSIGN NAME = "l.null" VALUE = "{ [ g.Store_Template_Path $ l.waitlist_email_template:filename ].Template_Render( l.settings, l.all_settings ) }"></MvCAPTURE>
+	<MvCAPTURE VARIABLE = "l.message"><MvASSIGN NAME = "l.result" VALUE = "{ [ g.Module_Feature_TUI_MGR ].TemplateManager_Render_Page_LowLevel( l.page:code, l.page ) }"></MvCAPTURE>
 
 	<MvIF EXPR = "{ ISNULL l.message }">
 		<MvASSIGN NAME = "l.success" VALUE = "{ [ g.Module_Admin ].Admin_Log_Action( 'MOD-SYS-TGW-0064', 'Waitlist Email Template Empty. Did not trigger to ' $ l.waitlist:email ) }">
