@@ -1,3 +1,19 @@
+<MvCOMMENT>
+|
+| Miva Merchant
+|
+| This file and the source codes contained herein are the property of
+| Miva, Inc.  Use of this file is restricted to the specific terms and
+| conditions in the License Agreement associated with this file.  Distribution
+| of this file or portions of this file for uses not covered by the License
+| Agreement is not allowed without a written agreement signed by an officer of
+| Miva, Inc.
+|
+| Copyright 1998-2025 Miva, Inc.  All rights reserved.
+| http://www.miva.com
+|
+</MvCOMMENT>
+
 <MIVA STANDARDOUTPUTLEVEL = "">
 
 <MvCOMMENT>
@@ -10,7 +26,7 @@
 <MvFUNCTION NAME = "Module_Description" PARAMETERS = "module var" STANDARDOUTPUTLEVEL = "">
 	<MvASSIGN NAME = "l.module:code"		VALUE = "TGWaitlist">
 	<MvASSIGN NAME = "l.module:name"		VALUE = "Waitlist">
-	<MvASSIGN NAME = "l.module:provider"	VALUE = "Tess Guefen">
+	<MvASSIGN NAME = "l.module:provider"	VALUE = "Miva Professional Services">
 	<MvASSIGN NAME = "l.module:version"		VALUE = "2.005">
 	<MvASSIGN NAME = "l.module:api_ver"		VALUE = "9.12">
 	<MvASSIGN NAME = "l.module:description"	VALUE = "Make it easy for customers to quickly sign up for email alerts on out of stock products. When products are back in stock, emails will be automatically sent out by a Scheduled Task. This works on Products & Variants.">
